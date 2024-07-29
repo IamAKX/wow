@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 
-void main() {
+import 'utils/router.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -13,10 +18,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Wow',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+        ),
+        useMaterial3: false,
       ),
       home: const SplashScreen(),
+      navigatorKey: navigatorKey,
+      onGenerateRoute: NavRoute.generatedRoute,
     );
   }
 }
