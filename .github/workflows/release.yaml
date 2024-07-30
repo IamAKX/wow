@@ -21,7 +21,8 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.4.4"
+          channel: stable
+          flutter-version-file: pubspec.yaml
       - run: flutter pub get
       - run: flutter test
       - run: flutter build apk --debug --split-per-abi
