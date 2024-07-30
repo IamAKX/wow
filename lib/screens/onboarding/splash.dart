@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,57 +14,17 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _translationAnimation;
-  late AnimationController _sizeController;
-  late Animation<double> _sizeAnimation;
-  bool _isExpanded = false;
-
+class _SplashScreenState extends State<SplashScreen> {
   bool isAgreementChecked = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-    _translationAnimation =
-        Tween<double>(begin: -1.0, end: 0.0).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-
-    _sizeController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-    _sizeAnimation =
-        Tween<double>(begin: 150, end: 300).animate(CurvedAnimation(
-      parent: _sizeController,
-      curve: Curves.easeInOut,
-    ));
-    _startAnimation();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    _sizeController.dispose();
     super.dispose();
-  }
-
-  void _startAnimation() {
-    setState(() {
-      _controller.forward().then((_) {
-        // setState(() {
-        _isExpanded = true;
-        // });
-        _sizeController.forward();
-      });
-    });
   }
 
   void _onTermsOfServiceTap() {
@@ -93,25 +51,10 @@ class _SplashScreenState extends State<SplashScreen>
       child: Column(
         children: [
           Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              child: AnimatedBuilder(
-                animation:
-                    Listenable.merge([_translationAnimation, _sizeAnimation]),
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                        _translationAnimation.value *
-                            MediaQuery.of(context).size.width,
-                        0),
-                    child: Image.asset(
-                      'assets/image/wow_logo.png',
-                      fit: BoxFit.fitWidth,
-                      width: _isExpanded ? _sizeAnimation.value : 150,
-                    ),
-                  );
-                },
-              ),
+            child: Image.asset(
+              'assets/image/wow_logo.png',
+              fit: BoxFit.fitWidth,
+              width: 300,
             ),
           ),
           SocialLoginButton(
@@ -206,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
     return Center(
       child: Container(
         padding: const EdgeInsets.all(1.0),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: hintColor,
           shape: BoxShape.circle,
         ),
@@ -226,7 +169,7 @@ class _SplashScreenState extends State<SplashScreen>
     return Center(
       child: Container(
         padding: const EdgeInsets.all(1.0),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: hintColor,
           shape: BoxShape.circle,
         ),
