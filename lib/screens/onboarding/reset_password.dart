@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/reset_password.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
 import '../../widgets/gaps.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.phoneNumberModel});
-  static const String route = '/login';
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key, required this.phoneNumberModel});
+  static const String route = '/resetPassword';
   final PhoneNumberModel phoneNumberModel;
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _phoneCtrl = TextEditingController();
   bool obsurePassword = true;
@@ -81,31 +80,14 @@ class _LoginScreenState extends State<LoginScreen> {
               border: const UnderlineInputBorder(),
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(VerifyOtpScreen.route,
-                        arguments: widget.phoneNumberModel)
-                    .then((res) {
-                  if (res == true) {
-                    Navigator.of(context).pushNamed(ResetPasswordScreen.route,
-                        arguments: widget.phoneNumberModel);
-                  }
-                });
-              },
-              child: const Text(
-                'Forgot Password',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ),
-          ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                SplashScreen.route,
+                (route) => false,
+                arguments: widget.phoneNumberModel,
+              );
+            },
             child: gradientButton(),
           )
         ],

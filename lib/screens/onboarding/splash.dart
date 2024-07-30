@@ -2,8 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
+import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -28,13 +31,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _onTermsOfServiceTap() {
-    print('Terms of Service clicked');
-    // Add your navigation logic or other functionality here
+    openInBrowser(API.termsOfService);
   }
 
   void _onPrivacyPolicyTap() {
-    print('Privacy Policy clicked');
-    // Add your navigation logic or other functionality here
+    openInBrowser(API.privacyPolicy);
   }
 
   @override
@@ -77,7 +78,9 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(PhoneScreen.route);
+                },
                 child: getMobileButton(),
               ),
               horizontalGap(20),

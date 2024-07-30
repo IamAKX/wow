@@ -1,6 +1,7 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/router.dart';
 
 void main() async {
@@ -19,10 +20,29 @@ class MyApp extends StatelessWidget {
       title: 'Wow',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: Colors.black,
+          primary: Colors.black,
+        ),
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          actionsIconTheme: IconThemeData(
+            color: Colors.black,
+          ),
         ),
         useMaterial3: false,
       ),
+      supportedLocales: const [
+        Locale('en'),
+      ],
+      localizationsDelegates: const [
+        CountryLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       home: const SplashScreen(),
       navigatorKey: navigatorKey,
       onGenerateRoute: NavRoute.generatedRoute,
