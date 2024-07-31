@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/reset_password.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
@@ -105,7 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                HomeContainer.route,
+                (route) => false,
+              );
+            },
             child: gradientButton(),
           )
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/explore_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/home_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 
@@ -16,7 +17,7 @@ class _HomeContainerState extends State<HomeContainer> {
 
   static const List<Widget> screenList = <Widget>[
     HomeScreen(),
-    Center(child: Text('Explore')),
+    ExploreScreen(),
     Center(child: Text('Chat')),
     Center(child: Text('Profile')),
   ];
