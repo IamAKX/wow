@@ -15,6 +15,7 @@ dependencies:
   dio: ^5.5.0+1
   flutter:
     sdk: flutter
+  flutter_carousel_widget: ^2.3.0
   flutter_localization: ^0.2.1
   flutter_localizations:
     sdk: flutter
@@ -39,6 +40,7 @@ flutter:
   assets:
     - assets/image/
     - assets/svg/
+    - assets/dummy/
 
 flutter_native_splash:
   image: assets/image/wow_logo_192.png
