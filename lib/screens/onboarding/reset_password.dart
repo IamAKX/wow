@@ -30,7 +30,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Login',
+          'Reset Password',
           style: TextStyle(color: Colors.black),
         ),
       ),
