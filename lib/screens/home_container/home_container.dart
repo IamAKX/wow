@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/explore_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/home_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 
 class HomeContainer extends StatefulWidget {
@@ -18,8 +20,8 @@ class _HomeContainerState extends State<HomeContainer> {
   static const List<Widget> screenList = <Widget>[
     HomeScreen(),
     ExploreScreen(),
-    Center(child: Text('Chat')),
-    Center(child: Text('Profile')),
+    ChatScreen(),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

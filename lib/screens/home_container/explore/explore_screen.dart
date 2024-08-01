@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/game.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/meet.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/more.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../utils/dimensions.dart';
@@ -42,19 +45,10 @@ class _ExploreScreenState extends State<ExploreScreen>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [
-              Container(
-                color: Colors.amber,
-              ),
+            children: const [
+              GameScreen(),
               MeetScreen(),
-              const Center(
-                  child: Text(
-                'Result Not Found',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              )),
+              MoreScreen(),
             ],
           ),
         ),
@@ -131,10 +125,7 @@ class _ExploreScreenState extends State<ExploreScreen>
           horizontalGap(120),
           IconButton(
             onPressed: () {},
-            icon: const Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
+            icon: SvgPicture.asset('assets/svg/trophy.svg'),
           ),
         ],
       ),

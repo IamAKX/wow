@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class MeetScreen extends StatefulWidget {
@@ -47,14 +48,8 @@ class _MeetScreenState extends State<MeetScreen> {
       children: [
         Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: Image.asset(
-                'assets/dummy/girl.jpeg',
-                width: 80,
-                height: 80,
-              ),
-            ),
+            const CircularImage(
+                imagePath: 'assets/dummy/girl.jpeg', diameter: 80),
             Positioned(
               right: -13,
               bottom: -13,
