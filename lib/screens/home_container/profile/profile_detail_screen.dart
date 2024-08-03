@@ -43,6 +43,15 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: getBody(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: themePinkDark,
+        child: Icon(
+          Icons.add,
+          size: 35,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
@@ -100,98 +109,104 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                   ),
                 ],
               ),
-              Container(
-                height: 1000,
-                child: _tabController.index == 0
-                    ? ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    horizontalGap(pagePadding / 2),
-                                    CircularImage(
-                                        imagePath: 'assets/dummy/girl.jpeg',
-                                        diameter: 35),
-                                    horizontalGap(pagePadding / 2),
-                                    Text(
-                                      'Deepika',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                    Spacer(),
-                                    PopupMenuButton<String>(
-                                      onSelected: (value) => {},
-                                      position: PopupMenuPosition.under,
-                                      itemBuilder: (BuildContext context) {
-                                        return [
-                                          PopupMenuItem<String>(
-                                            value: 'report',
-                                            child: Text('Report'),
-                                          ),
-                                          PopupMenuItem<String>(
-                                            value: 'remove',
-                                            child: Text('Remove'),
-                                          ),
-                                        ];
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                Image.asset('assets/dummy/banner1.jpeg'),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 10,
-                                    bottom: 5,
-                                    top: 5,
-                                  ),
-                                  child: Text('52 likes'),
-                                ),
-                                Row(
-                                  children: [
-                                    horizontalGap(10),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: SvgPicture.asset(
-                                        'assets/svg/chat.svg',
-                                        width: 20,
-                                      ),
-                                    ),
-                                    horizontalGap(10),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: Icon(
-                                        Icons.favorite,
-                                        color: Color(0xFFC22B1A),
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 10, left: 10, top: 5),
-                                  child: Text(
-                                    '24 days ago',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ],
+              if (_tabController.index == 0) ...{
+                for (int i = 0; i < 10; i++) ...{
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            horizontalGap(pagePadding / 2),
+                            CircularImage(
+                                imagePath: 'assets/dummy/girl.jpeg',
+                                diameter: 35),
+                            horizontalGap(pagePadding / 2),
+                            Text(
+                              'Deepika',
+                              style: TextStyle(fontSize: 18),
                             ),
-                          );
-                        },
-                      )
-                    : ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Text('Details');
-                        },
-                      ),
-              ),
+                            Spacer(),
+                            PopupMenuButton<String>(
+                              onSelected: (value) => {},
+                              position: PopupMenuPosition.under,
+                              itemBuilder: (BuildContext context) {
+                                return [
+                                  PopupMenuItem<String>(
+                                    value: 'report',
+                                    child: Text('Report'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'remove',
+                                    child: Text('Remove'),
+                                  ),
+                                ];
+                              },
+                            ),
+                          ],
+                        ),
+                        Image.asset('assets/dummy/banner1.jpeg'),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 10,
+                            bottom: 5,
+                            top: 5,
+                          ),
+                          child: Text('52 likes'),
+                        ),
+                        Row(
+                          children: [
+                            horizontalGap(10),
+                            InkWell(
+                              onTap: () {},
+                              child: SvgPicture.asset(
+                                'assets/svg/chat.svg',
+                                width: 20,
+                              ),
+                            ),
+                            horizontalGap(10),
+                            InkWell(
+                              onTap: () {},
+                              child: Icon(
+                                Icons.favorite,
+                                color: Color(0xFFC22B1A),
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              bottom: 10, left: 10, top: 5),
+                          child: Text(
+                            '24 days ago',
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                }
+              } else ...{
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Color(0xFF3CAFEE),
+                    child: SvgPicture.asset(
+                      'assets/svg/trophy_1_.svg',
+                      color: Colors.white,
+                      width: 20,
+                    ),
+                  ),
+                  title: Text('Gift Wall'),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey,
+                  ),
+                  onTap: () {},
+                )
+              }
             ],
           ),
         )
