@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
@@ -234,7 +235,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(EditProfile.route);
+                },
                 icon: SvgPicture.asset(
                   'assets/svg/edit__2___1_.svg',
                   width: 30,

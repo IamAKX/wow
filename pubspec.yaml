@@ -13,6 +13,7 @@ dependencies:
   country_code_picker: ^3.0.0
   cupertino_icons: ^1.0.8
   dio: ^5.5.0+1
+  emoji_picker_flutter: ^2.2.0
   flutter:
     sdk: flutter
   flutter_carousel_widget: ^2.3.0
