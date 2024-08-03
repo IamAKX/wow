@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
@@ -35,8 +36,11 @@ class NavRoute {
             builder: (_) => ResetPasswordScreen(
                   phoneNumberModel: settings.arguments as PhoneNumberModel,
                 ));
+
       case HomeContainer.route:
         return MaterialPageRoute(builder: (_) => const HomeContainer());
+      case ProfileDeatilScreen.route:
+        return MaterialPageRoute(builder: (_) => const ProfileDeatilScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

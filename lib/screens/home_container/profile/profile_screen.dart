@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -11,7 +12,12 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+     {
+ 
+
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,8 +221,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {},
               ),
               ListTile(
-                leading: SvgPicture.asset(
-                  'assets/svg/mylook.svg',
+                leading: Image.asset(
+                  'assets/image/onlineServices.png',
+                  color: Colors.orange,
                   width: 20,
                 ),
                 title: const Text(
@@ -231,8 +238,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {},
               ),
               ListTile(
-                leading: SvgPicture.asset(
-                  'assets/svg/sett.svg',
+                leading: Image.asset(
+                  'assets/image/settings.png',
                   width: 20,
                 ),
                 title: const Text(
@@ -269,7 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           verticalGap(5),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
             ),
@@ -301,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.white,
                   shadows: [
                     Shadow(
-                      offset: const Offset(2.0, 2.0),
+                      offset: const Offset(1.0, 1.0),
                       blurRadius: 1.0,
                       color: Colors.black.withOpacity(0.5),
                     ),
@@ -317,7 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.white,
                   shadows: [
                     Shadow(
-                      offset: const Offset(2.0, 2.0),
+                      offset: const Offset(1.0, 1.0),
                       blurRadius: 1.0,
                       color: Colors.black.withOpacity(0.5),
                     ),
@@ -328,7 +335,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(ProfileDeatilScreen.route);
+            },
             icon: const Icon(
               Icons.chevron_right,
               color: Colors.white,
