@@ -1,6 +1,5 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/router.dart';

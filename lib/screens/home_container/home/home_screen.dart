@@ -42,10 +42,10 @@ class _HomeScreenState extends State<HomeScreen>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [
-              const RelatedScreen(),
-              const PopularScreen(),
-              const Center(
+            children: const [
+              RelatedScreen(),
+              PopularScreen(),
+              Center(
                   child: Text(
                 'Result Not Found',
                 style: TextStyle(

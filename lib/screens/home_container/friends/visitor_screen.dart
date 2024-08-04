@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
-import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../widgets/user_tile.dart';
 

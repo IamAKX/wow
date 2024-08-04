@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:otp_pin_field/otp_pin_field.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
-import 'package:worldsocialintegrationapp/widgets/otpview.dart';
 
 import '../../utils/colors.dart';
 import 'models/phone_number.dart';

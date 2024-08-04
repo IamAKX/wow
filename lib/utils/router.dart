@@ -4,6 +4,12 @@ import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/blocked_user.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/connected_account.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_verification.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/user_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
@@ -56,6 +62,20 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const VisitorScreen());
       case UserDeatilScreen.route:
         return MaterialPageRoute(builder: (_) => const UserDeatilScreen());
+      case SettingsScreen.route:
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
+      case ConnectedAccountScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => const ConnectedAccountScreen());
+      case PhoneVerificationScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => const PhoneVerificationScreen());
+      case PrivacyScreen.route:
+        return MaterialPageRoute(builder: (_) => const PrivacyScreen());
+      case BlockedUserScreen.route:
+        return MaterialPageRoute(builder: (_) => const BlockedUserScreen());
+      case AboutUsScreen.route:
+        return MaterialPageRoute(builder: (_) => const AboutUsScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
