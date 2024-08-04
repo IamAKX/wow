@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      home: const HomeContainer(),
+      home: const SplashScreen(),
       navigatorKey: navigatorKey,
       onGenerateRoute: NavRoute.generatedRoute,
     );

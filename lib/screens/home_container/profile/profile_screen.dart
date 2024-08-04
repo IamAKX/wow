@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
@@ -12,12 +14,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-     {
- 
-
-  
-
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,10 +54,41 @@ class _ProfileScreenState extends State<ProfileScreen>
             children: [
               Row(
                 children: [
-                  getProfileMetric('Visitors', '0'),
-                  getProfileMetric('Friends', '0'),
-                  getProfileMetric('Following', '0'),
-                  getProfileMetric('Fan', '0'),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(VisitorScreen.route);
+                      },
+                      child: getProfileMetric('Visitors', '1'),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(FriendFansFollowing.route, arguments: 0);
+                      },
+                      child: getProfileMetric('Friends', '2'),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(FriendFansFollowing.route, arguments: 1);
+                      },
+                      child: getProfileMetric('Following', '1'),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(FriendFansFollowing.route, arguments: 2);
+                      },
+                      child: getProfileMetric('Fan', '3'),
+                    ),
+                  ),
                 ],
               ),
               verticalGap(pagePadding * 2),
@@ -260,29 +288,27 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Expanded getProfileMetric(String label, String value) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+  Widget getProfileMetric(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-          verticalGap(5),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+        ),
+        verticalGap(5),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

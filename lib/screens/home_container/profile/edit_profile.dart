@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -208,7 +206,6 @@ class _EditProfileState extends State<EditProfile> {
                 height: 300,
                 checkPlatformCompatibility: true,
                 emojiViewConfig: EmojiViewConfig(
-                  // Issue: https://github.com/flutter/flutter/issues/28894
                   emojiSizeMax: 28 *
                       (defaultTargetPlatform == TargetPlatform.iOS
                           ? 1.20
@@ -229,7 +226,7 @@ class _EditProfileState extends State<EditProfile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Gender'),
+          title: const Text('Select Gender'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -245,8 +242,8 @@ class _EditProfileState extends State<EditProfile> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  Text('Male'),
-                  Spacer(),
+                  const Text('Male'),
+                  const Spacer(),
                   Radio<String>(
                     value: 'Female',
                     groupValue: _genderCtrl.text,
@@ -257,7 +254,7 @@ class _EditProfileState extends State<EditProfile> {
                       Navigator.of(context).pop();
                     },
                   ),
-                  Text('Female'),
+                  const Text('Female'),
                   horizontalGap(10)
                 ],
               ),
