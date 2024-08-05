@@ -6,7 +6,7 @@ import 'package:worldsocialintegrationapp/firebase_options.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'providers/auth_provider.dart';
+import 'providers/generic_auth_provider.dart';
 import 'utils/router.dart';
 
 bool isLoggedIn = false;

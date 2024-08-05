@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:worldsocialintegrationapp/providers/auth_provider.dart';
+import 'package:worldsocialintegrationapp/providers/generic_auth_provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/blocked_user.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/connected_account.dart';

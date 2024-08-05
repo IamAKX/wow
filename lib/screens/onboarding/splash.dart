@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
-import 'package:worldsocialintegrationapp/providers/auth_provider.dart';
+import 'package:worldsocialintegrationapp/providers/generic_auth_provider.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
@@ -72,6 +72,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 return;
               }
               await GenericAuthProvider.instance.loginWithGoogle();
+              if (GenericAuthProvider.instance.user != null) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  HomeContainer.route,
+                  (route) => false,
+                );
+              }
             },
           ),
           verticalGap(20),
@@ -80,11 +86,18 @@ class _SplashScreenState extends State<SplashScreen> {
             width: 240,
             imageWidth: 20,
             buttonType: SocialLoginButtonType.facebook,
-            onPressed: () {
+            onPressed: () async {
               if (!isAgreementChecked) {
                 showToastMessageWithLogo(
                     'Please accept the terms and conditions', context);
                 return;
+              }
+              await GenericAuthProvider.instance.loginWithFacebook();
+              if (GenericAuthProvider.instance.user != null) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  HomeContainer.route,
+                  (route) => false,
+                );
               }
             },
           ),
