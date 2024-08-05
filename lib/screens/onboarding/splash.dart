@@ -63,7 +63,13 @@ class _SplashScreenState extends State<SplashScreen> {
             height: 40,
             width: 240,
             imageWidth: 20,
-            onPressed: () {},
+            onPressed: () {
+              if (!isAgreementChecked) {
+                showToastMessage(
+                    'Please accept the terms and conditions', context);
+                return;
+              }
+            },
           ),
           verticalGap(20),
           SocialLoginButton(
@@ -71,7 +77,13 @@ class _SplashScreenState extends State<SplashScreen> {
             width: 240,
             imageWidth: 20,
             buttonType: SocialLoginButtonType.facebook,
-            onPressed: () {},
+            onPressed: () {
+              if (!isAgreementChecked) {
+                showToastMessage(
+                    'Please accept the terms and conditions', context);
+                return;
+              }
+            },
           ),
           verticalGap(20),
           Row(
@@ -79,13 +91,24 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               InkWell(
                 onTap: () {
+                  if (!isAgreementChecked) {
+                    showToastMessage(
+                        'Please accept the terms and conditions', context);
+                    return;
+                  }
                   Navigator.of(context).pushNamed(PhoneScreen.route);
                 },
                 child: getMobileButton(),
               ),
               horizontalGap(20),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  if (!isAgreementChecked) {
+                    showToastMessage(
+                        'Please accept the terms and conditions', context);
+                    return;
+                  }
+                },
                 child: getSnapchatButton(),
               ),
             ],

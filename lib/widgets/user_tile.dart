@@ -72,7 +72,7 @@ class UserTile extends StatelessWidget {
               ],
             ),
           ),
-          horizontalGap(10),
+          horizontalGap(5),
           Container(
             width: 60,
             padding: const EdgeInsets.all(3),

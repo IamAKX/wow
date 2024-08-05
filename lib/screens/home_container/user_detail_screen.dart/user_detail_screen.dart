@@ -452,7 +452,7 @@ class _UserDeatilScreenState extends State<UserDeatilScreen>
             ],
           ),
           Positioned(
-            top: 300,
+            top: 315,
             left: 0,
             child: Container(
               width: MediaQuery.of(context).size.width,
