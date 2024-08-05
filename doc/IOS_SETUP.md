@@ -18,4 +18,5 @@
     </dict>
 </array>
 ```
-2. In [Podfile](../ios/Podfile), uncomment the link `platform :ios, '12.0'`
+
+2. In [Podfile](../ios/Podfile), uncomment the link `platform :ios, '13.0'`
