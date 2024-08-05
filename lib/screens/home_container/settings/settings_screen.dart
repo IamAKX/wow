@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/providers/auth_provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/blocked_user.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/connected_account.dart';
@@ -185,8 +188,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           content: const Text('Are you sure you want to logout?'),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
+              onPressed: () async {
+                await GenericAuthProvider.instance.logoutUser().then(
+                  (value) {
+                    log('loging out');
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      SplashScreen.route,
+                      (route) => false,
+                    );
+                  },
+                );
               },
               child: const Text(
                 'Yes',
@@ -194,12 +206,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  SplashScreen.route,
-                  (route) => false,
-                );
               },
               child: const Text(
                 'No',

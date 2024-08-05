@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
+import 'package:worldsocialintegrationapp/providers/auth_provider.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
@@ -63,12 +65,13 @@ class _SplashScreenState extends State<SplashScreen> {
             height: 40,
             width: 240,
             imageWidth: 20,
-            onPressed: () {
+            onPressed: () async {
               if (!isAgreementChecked) {
-                showToastMessage(
+                showToastMessageWithLogo(
                     'Please accept the terms and conditions', context);
                 return;
               }
+              await GenericAuthProvider.instance.loginWithGoogle();
             },
           ),
           verticalGap(20),
@@ -79,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
             buttonType: SocialLoginButtonType.facebook,
             onPressed: () {
               if (!isAgreementChecked) {
-                showToastMessage(
+                showToastMessageWithLogo(
                     'Please accept the terms and conditions', context);
                 return;
               }
@@ -92,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
               InkWell(
                 onTap: () {
                   if (!isAgreementChecked) {
-                    showToastMessage(
+                    showToastMessageWithLogo(
                         'Please accept the terms and conditions', context);
                     return;
                   }
@@ -104,7 +107,7 @@ class _SplashScreenState extends State<SplashScreen> {
               InkWell(
                 onTap: () {
                   if (!isAgreementChecked) {
-                    showToastMessage(
+                    showToastMessageWithLogo(
                         'Please accept the terms and conditions', context);
                     return;
                   }

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "102730474815",
+    "project_id": "wowcross-d1bf1",
+    "storage_bucket": "wowcross-d1bf1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102730474815:android:19859ecace9a3f49d6df8a",
+        "android_client_info": {
+          "package_name": "com.live.worldsocialintegrationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "102730474815-j59kk8mfce2rla89tu4mg0sp0jl8pnbg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.live.worldsocialintegrationapp",
+            "certificate_hash": "f27fc0cfbd929b453a9d91c54d29faebbf256174"
+          }
+        },
+        {
+          "client_id": "102730474815-ghu0nmefsq83b74ca818m9394nvc8top.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuVhAR3kp0IeFi_47uBCnU_1Duj9JOp9Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "102730474815-ghu0nmefsq83b74ca818m9394nvc8top.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "102730474815-ve7fo2q41gvb81nq6m0vukop4i2vm1hq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.live.worldsocialintegrationapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
