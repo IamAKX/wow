@@ -1,11 +1,39 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.live.worldsocialintegrationapp">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:label="WOW's"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+        
+        <meta-data
+           android:name="com.snapchat.kit.sdk.clientId"
+           android:value="@string/snapchat_client_id" />
+
+       <meta-data
+           android:name="com.snapchat.kit.sdk.redirectUrl"
+           android:value="@string/snapchat_redirect_url" />
+
+        <meta-data
+          android:name="com.snapchat.kit.sdk.scopes"
+          android:resource="@array/snap_connect_scopes" />
+
+        <activity
+            android:name="com.snap.corekit.SnapKitActivity"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="snapkitexample" android:host="oauth" android:path="/snapchat" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -48,5 +76,8 @@
      <queries>
         <provider android:authorities="com.facebook.katana.provider.PlatformProvider" /> <!-- allows app to access Facebook app features -->
         <provider android:authorities="com.facebook.orca.provider.PlatformProvider" /> <!-- allows sharing to Messenger app -->
+    </queries>
+    <queries>
+        <package android:name="com.snapchat.android" />
     </queries>
 </manifest>

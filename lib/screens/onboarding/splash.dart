@@ -1,5 +1,8 @@
+// ignore_for_file: unnecessary_const
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 import 'package:worldsocialintegrationapp/providers/generic_auth_provider.dart';
@@ -21,6 +24,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool isAgreementChecked = false;
+  static const platform = const MethodChannel('com.example.snapchat/login');
 
   @override
   void initState() {
@@ -124,6 +128,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         'Please accept the terms and conditions', context);
                     return;
                   }
+                  loginSnapchat(context);
                 },
                 child: getSnapchatButton(),
               ),
@@ -225,5 +230,14 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> loginSnapchat(BuildContext context) async {
+    try {
+      final String result = await platform.invokeMethod('login');
+      print(result);
+    } on PlatformException catch (e) {
+      print("Failed to log in: '${e.message}'.");
+    }
   }
 }

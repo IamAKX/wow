@@ -1,10 +1,10 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class PhoneScreen extends StatefulWidget {
@@ -100,23 +100,18 @@ class _PhoneScreenState extends State<PhoneScreen> {
               child: ElevatedButton(
                 onPressed: isNextEnabled
                     ? () {
-                        if (_phoneCtrl.text == '9999999992') {
-                          Navigator.of(context).pushNamed(
-                            LoginScreen.route,
-                            arguments: PhoneNumberModel(
-                              countryCode: selectedCountryCode,
-                              phoneNumber: _phoneCtrl.text,
-                            ),
-                          );
-                        } else {
-                          Navigator.of(context).pushNamed(
-                            VerifyPhoneScreen.route,
-                            arguments: PhoneNumberModel(
-                              countryCode: selectedCountryCode,
-                              phoneNumber: _phoneCtrl.text,
-                            ),
-                          );
+                        if (_phoneCtrl.text.isEmpty) {
+                          showToastMessageWithLogo(
+                              'Enter your phone number', context);
+                          return;
                         }
+                        Navigator.of(context).pushNamed(
+                          VerifyPhoneScreen.route,
+                          arguments: PhoneNumberModel(
+                            countryCode: selectedCountryCode,
+                            phoneNumber: _phoneCtrl.text,
+                          ),
+                        );
                       }
                     : null,
                 style: ButtonStyle(

@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../utils/colors.dart';
+import '../../utils/helpers.dart';
 import 'login.dart';
 import 'models/phone_number.dart';
 
@@ -77,15 +79,31 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed(VerifyOtpScreen.route,
-                      arguments: widget.phoneNumberModel)
-                  .then((res) {
-                if (res == true) {
-                  Navigator.of(context).pushNamed(LoginScreen.route,
-                      arguments: widget.phoneNumberModel);
-                }
-              });
+              FirebaseAuth.instance.verifyPhoneNumber(
+                phoneNumber:
+                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
+                verificationCompleted: (phoneAuthCredential) {},
+                verificationFailed: (firebaseAuthException) {
+                  showToastMessageWithLogo(
+                      'Error : ${firebaseAuthException.message}', context);
+                },
+                codeSent: (verificationId, forceResendingToken) {
+                  widget.phoneNumberModel.verificationId = verificationId;
+                  Navigator.of(context)
+                      .pushNamed(VerifyOtpScreen.route,
+                          arguments: widget.phoneNumberModel)
+                      .then((res) {
+                    if (res == true) {
+                      Navigator.of(context).pushNamed(LoginScreen.route,
+                          arguments: widget.phoneNumberModel);
+                    }
+                  });
+                },
+                codeAutoRetrievalTimeout: (verificationId) {
+                  showToastMessageWithLogo(
+                      'Error : Code retrieval timeout', context);
+                },
+              );
             },
             child: gradientButton(),
           )

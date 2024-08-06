@@ -1,3 +1,4 @@
+
 # Uncomment this line to define a global platform for your project
 platform :ios, '13.0'
 
@@ -29,6 +30,7 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+  pod 'SnapSDK'
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
@@ -42,3 +44,5 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
   end
 end
+
+

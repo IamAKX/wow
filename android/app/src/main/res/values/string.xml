@@ -2,4 +2,6 @@
 <resources>
     <string name="facebook_app_id">1066196318458159</string>
     <string name="facebook_client_token">3529a46a6cfafb7a7841e58e1504ef2f</string>
+    <string name="snapchat_client_id">c3aecbaf-4ed8-468e-a7b9-2db6545b4db7</string>
+    <string name="snapchat_redirect_url">snapkitexample://oauth/snapchat</string>
 </resources>

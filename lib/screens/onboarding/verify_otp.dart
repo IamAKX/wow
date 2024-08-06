@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:otp_pin_field/otp_pin_field.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../utils/colors.dart';
@@ -19,9 +22,10 @@ class VerifyOtpScreen extends StatefulWidget {
 
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   int _seconds = 59;
+  String otpInput = '';
   late Timer _timer;
   bool _isButtonEnabled = false;
-  final _otpPinFieldController = GlobalKey<OtpPinFieldState>();
+  final _otpPinFieldKey = GlobalKey<OtpPinFieldState>();
 
   @override
   void initState() {
@@ -70,129 +74,131 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   }
 
   getBody(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(pagePadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          verticalGap(20),
-          const Align(
-            alignment: Alignment.center,
-            child: Text('A verification code has been sent to you.'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        verticalGap(20),
+        const Align(
+          alignment: Alignment.center,
+          child: Text('A verification code has been sent to you.'),
+        ),
+        verticalGap(20),
+        Align(
+          alignment: Alignment.center,
+          child: Text(
+            widget.phoneNumberModel.toString(),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          verticalGap(20),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              widget.phoneNumberModel.toString(),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+        ),
+        verticalGap(20),
+        OtpPinField(
+          key: _otpPinFieldKey,
+          autoFillEnable: false,
+          textInputAction: TextInputAction.done,
+
+          onSubmit: (text) {
+            otpInput = text;
+          },
+          onChange: (text) {
+            otpInput = text;
+
+            /// return the entered pin
+          },
+          onCodeChanged: (code) {
+            otpInput = code;
+          },
+
+          /// to decorate your Otp_Pin_Field
+          otpPinFieldStyle: OtpPinFieldStyle(
+            activeFieldBorderColor: Colors.white,
+            defaultFieldBorderColor: Colors.white,
+            filledFieldBackgroundColor: Colors.white,
+            defaultFieldBackgroundColor: Colors.white,
+            filledFieldBorderColor: Colors.white,
+            activeFieldBackgroundColor: Colors.white,
+            defaultFieldBoxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3), // changes position of shadow
               ),
-            ),
+            ],
+            activeFieldBoxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
+            filledFieldBoxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
           ),
-          verticalGap(20),
-          // OtpViews(
-          //   obSecure: false,
-          //   boxType: BoxType.circle,
-          //   keyboardType: TextInputType.number,
-          //   length: 6,
-          //   filled: true,
-          //   filledColor: Colors.white,
-          //   onComplete: (otp) {},
-          // ),
-          OtpPinField(
-            key: _otpPinFieldController,
-            autoFillEnable: false,
-            textInputAction: TextInputAction.done,
+          maxLength: 6,
 
-            onSubmit: (text) {
-              print('Entered pin is $text');
+          showCursor: true,
 
-              /// return the entered pin
-            },
-            onChange: (text) {
-              print('Enter on change pin is $text');
+          cursorColor: Colors.black,
 
-              /// return the entered pin
-            },
-            onCodeChanged: (code) {
-              print('onCodeChanged  is $code');
-            },
+          mainAxisAlignment: MainAxisAlignment.center,
 
-            /// to decorate your Otp_Pin_Field
-            otpPinFieldStyle: OtpPinFieldStyle(
-              activeFieldBorderColor: Colors.white,
-              defaultFieldBorderColor: Colors.white,
-              filledFieldBackgroundColor: Colors.white,
-              defaultFieldBackgroundColor: Colors.white,
-              filledFieldBorderColor: Colors.white,
-              activeFieldBackgroundColor: Colors.white,
-              defaultFieldBoxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ],
-              activeFieldBoxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ],
-              filledFieldBoxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            maxLength: 6,
-
-            showCursor: true,
-
-            cursorColor: Colors.black,
-
-            mainAxisAlignment: MainAxisAlignment.center,
-
-            otpPinFieldDecoration:
-                OtpPinFieldDecoration.roundedPinBoxDecoration,
-          ),
-          verticalGap(20),
-          InkWell(
-            onTap: () {
-              Navigator.pop(context, true);
-            },
-            child: gradientButton(),
-          ),
-          verticalGap(10),
-          StatefulBuilder(
-            builder: (context, setState) {
-              return _isButtonEnabled
-                  ? InkWell(
-                      onTap: _isButtonEnabled ? _resetTimer : null,
-                      child: const Text('Resend Code'),
-                    )
-                  : Text(
-                      '00:$_seconds',
-                    );
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+          otpPinFieldDecoration: OtpPinFieldDecoration.roundedPinBoxDecoration,
+        ),
+        verticalGap(20),
+        InkWell(
+          onTap: () async {
+            if (otpInput.length < 6) {
+              showToastMessageWithLogo('Enter 6 digit OTP', context);
+              return;
+            }
+            PhoneAuthCredential credential = PhoneAuthProvider.credential(
+                verificationId: widget.phoneNumberModel.verificationId ?? '',
+                smsCode: otpInput);
+            UserCredential userCredential = await FirebaseAuth.instance
+                .signInWithCredential(credential)
+                .catchError((onError) {
+              showToastMessage('Invalid OTP');
+            });
+            if (userCredential.user != null) {
+              Navigator.of(context).pop(true);
+            } else {
+              showToastMessage('Invalid OTP');
+            }
+          },
+          child: gradientButton(),
+        ),
+        verticalGap(10),
+        StatefulBuilder(
+          builder: (context, setState) {
+            return _isButtonEnabled
+                ? InkWell(
+                    onTap: _isButtonEnabled ? _resetTimer : null,
+                    child: const Text('Resend Code'),
+                  )
+                : Text(
+                    '00:$_seconds',
+                  );
+          },
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 
   Container gradientButton() {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: pagePadding),
+      margin: const EdgeInsets.symmetric(
+          vertical: pagePadding, horizontal: pagePadding),
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
