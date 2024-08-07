@@ -78,8 +78,21 @@ android {
 flutter {
     source = "../.."
 }
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://storage.googleapis.com/snap-kit-build/maven"
+        }
+    }
+}
+
 dependencies {
     implementation([
-            'com.snap.loginkit:loginkit:2.1.0',
+            'com.snapchat.kit.sdk:login:1.10.0',
+            'com.snapchat.kit.sdk:bitmoji:1.10.0',
+
     ])
 }

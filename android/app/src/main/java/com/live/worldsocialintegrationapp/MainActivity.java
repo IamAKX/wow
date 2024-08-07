@@ -4,26 +4,24 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.snapchat.kit.sdk.SnapLogin;
+import com.snapchat.kit.sdk.core.controller.LoginStateController;
+
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
-import com.snap.loginkit.LoginResultCallback;
-import com.snap.loginkit.SnapLogin;
-import com.snap.loginkit.SnapLoginProvider;
-import com.snap.loginkit.exceptions.LoginException;
 
 
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "com.example.snapchat/login";
-    private SnapLogin snapLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        snapLogin = SnapLoginProvider.get(getApplicationContext()); // Ensure context is provided correctly
+
     }
 
     @Override
@@ -34,22 +32,26 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             if (call.method.equals("login")) {
-                                snapLogin.startTokenGrant(new LoginResultCallback() {
+//                                snapLogin = SnapLoginProvider.get(this);
+
+
+                                SnapLogin.getLoginStateController(getActivity()).addOnLoginStateChangedListener(new LoginStateController.OnLoginStateChangedListener() {
                                     @Override
-                                    public void onStart() {
-                                        result.success("Login initiated");
+                                    public void onLoginSucceeded() {
+                                        result.success("Login Success");
                                     }
 
                                     @Override
-                                    public void onSuccess(@NonNull String s) {
-                                        result.success("Login success : "+s);
+                                    public void onLoginFailed() {
+                                        result.error("LoginError", "Error Logging In", null);
                                     }
 
                                     @Override
-                                    public void onFailure(@NonNull LoginException e) {
-                                        result.error(String.valueOf(e.getStatusCode()), e.getMessage(), e);
+                                    public void onLogout() {
+                                        result.success("Logout Success");
                                     }
                                 });
+                                SnapLogin.getAuthTokenManager(getActivity()).startTokenGrant();
 
                             } else {
                                 result.notImplemented();
