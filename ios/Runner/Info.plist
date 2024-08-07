@@ -75,8 +75,8 @@
 			<string>fbapi</string>
 			<string>fb-messenger-share-api</string>
 			<string>snapchat</string>
- 			<string>bitmoji-sdk</string>
- 			<string>itms-apps</string>
+			<string>bitmoji-sdk</string>
+			<string>itms-apps</string>
 		</array>
 		<key>SCSDKClientId</key>
 		<string>cdf9620f-3b98-4c87-8153-7c9965ea75d3</string>

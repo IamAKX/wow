@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
@@ -45,7 +46,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
     return Scaffold(
       body: getBody(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(AddMoments.route);
+        },
         backgroundColor: themePinkDark,
         child: Icon(
           Icons.add,

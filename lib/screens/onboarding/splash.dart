@@ -233,11 +233,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> loginSnapchat(BuildContext context) async {
-    try {
-      final String result = await platform.invokeMethod('login');
-      print(result);
-    } on PlatformException catch (e) {
-      print("Failed to log in: '${e.message}'.");
-    }
+    showToastMessageWithLogo('Coming soon', context);
+    return;
+    // try {
+    //   final String result = await platform.invokeMethod('login');
+    //   print(result);
+    // } on PlatformException catch (e) {
+    //   print("Failed to log in: '${e.message}'.");
+    // }
   }
 }

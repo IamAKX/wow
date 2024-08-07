@@ -30,6 +30,7 @@ dependencies:
   google_sign_in: ^6.2.1
   http: ^1.2.2
   intl: ^0.19.0
+  jwt_decode: ^0.3.1
   otp_pin_field: ^1.2.9+1
   permission_handler: ^11.3.1
   provider: ^6.1.2
@@ -53,7 +54,7 @@ flutter:
     - assets/dummy/
 
 flutter_native_splash:
-  image: assets/image/wow_logo_192.png
+  image: assets/image/wow_logo_512.png
   color: "#ffffff"
   web_image_mode: center
   android_gravity: center

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
@@ -76,6 +77,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const BlockedUserScreen());
       case AboutUsScreen.route:
         return MaterialPageRoute(builder: (_) => const AboutUsScreen());
+      case AddMoments.route:
+        return MaterialPageRoute(builder: (_) => const AddMoments());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
