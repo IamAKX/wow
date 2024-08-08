@@ -18,10 +18,9 @@ class ApiCallProvider extends ChangeNotifier {
 
   ApiCallProvider() {
     final tokenManager = TokenManager();
-    _dio.interceptors
-        .add(DioTokenInterceptor(tokenManager, _dio, API.generateToken));
-
     _dio = Dio();
+    _dio.interceptors.add(DioTokenInterceptor(tokenManager, API.generateToken));
+
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () =>
         HttpClient()
           ..badCertificateCallback =
@@ -35,16 +34,12 @@ class ApiCallProvider extends ChangeNotifier {
     try {
       Response response = await _dio.get(
         endpoint,
-        options: Options(
-          contentType: 'application/json',
-          responseType: ResponseType.json,
-        ),
       );
-      debugPrint('Response : ${response.data}');
+      debugPrint('Response : ${jsonDecode(response.data)}');
       if (response.statusCode == 200) {
         status = ApiStatus.success;
         notifyListeners();
-        return response.data;
+        return jsonDecode(response.data);
       }
     } on DioException catch (e) {
       status = ApiStatus.failed;
@@ -66,21 +61,17 @@ class ApiCallProvider extends ChangeNotifier {
     status = ApiStatus.loading;
     notifyListeners();
     debugPrint('API [POST]: $endpoint');
-    debugPrint('Request : ${json.encode(requestBody)}');
+    debugPrint('Request : ${jsonEncode(requestBody)}');
     try {
       Response response = await _dio.post(
         endpoint,
         data: FormData.fromMap(requestBody),
-        options: Options(
-          contentType: 'application/json',
-          responseType: ResponseType.json,
-        ),
       );
-      debugPrint('Response : ${response.data}');
+      debugPrint('Response : ${jsonDecode(response.data)}');
       if (response.statusCode == 200) {
         status = ApiStatus.success;
         notifyListeners();
-        return response.data;
+        return jsonDecode(response.data);
       }
     } on DioException catch (e) {
       status = ApiStatus.failed;

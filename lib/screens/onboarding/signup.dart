@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
+import 'package:worldsocialintegrationapp/providers/api_call_provider.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/reset_password.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
-import '../../main.dart';
-import '../../providers/api_call_provider.dart';
+import '../../models/country_continent.dart';
 import '../../providers/generic_auth_provider.dart';
+import '../../services/fcm_service.dart';
+import '../../services/location_service.dart';
 import '../../utils/api.dart';
 import '../../utils/helpers.dart';
-import '../../utils/prefs_key.dart';
 import '../../widgets/gaps.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.phoneNumberModel});
-  static const String route = '/login';
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key, required this.phoneNumberModel});
+  static const String route = '/signUpScreen';
   final PhoneNumberModel phoneNumberModel;
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _phoneCtrl = TextEditingController();
   bool obsurePassword = true;
   late ApiCallProvider apiCallProvider;
+  CountryContinent? countryContinent;
 
   @override
   void initState() {
     super.initState();
     _phoneCtrl.text = widget.phoneNumberModel.toString();
+    fetchLocationInfo();
   }
 
   @override
@@ -42,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Login',
+          'Signup',
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -92,54 +94,34 @@ class _LoginScreenState extends State<LoginScreen> {
               border: const UnderlineInputBorder(),
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(VerifyOtpScreen.route,
-                        arguments: widget.phoneNumberModel)
-                    .then((res) {
-                  if (res == true) {
-                    Navigator.of(context).pushNamed(ResetPasswordScreen.route,
-                        arguments: widget.phoneNumberModel);
-                  }
-                });
-              },
-              child: const Text(
-                'Forgot Password',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ),
-          ),
           InkWell(
-            onTap: () {
+            onTap: () async {
               if (_passwordCtrl.text.isEmpty) {
                 showToastMessageWithLogo('Password is mandatory', context);
                 return;
               }
 
+              String? fcmToken = await FCMService.instance.getFCMToken();
+              String? deviceId = await getDeviceId();
               Map<String, dynamic> reqBody = {
                 'phone':
                     '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
                         .replaceAll('+', ''),
                 'password': _passwordCtrl.text,
+                'continent': countryContinent?.continent,
+                'country': countryContinent?.country,
+                'reg_id': fcmToken
               };
-              apiCallProvider.postRequest(API.mobileLogin, reqBody).then(
+              apiCallProvider.postRequest(API.registration, reqBody).then(
                 (value) {
                   if (apiCallProvider.status == ApiStatus.success) {
                     if (value['success'] == '1') {
                       showToastMessageWithLogo('${value['message']}', context);
-                      prefs.setString(PrefsKey.userId, value['details']['id']);
-                      prefs.setString(PrefsKey.loginProvider, 'Phone');
-                      prefs.setBool(PrefsKey.showProfileUpdatePopup,
-                          value['details']['name'].toString().isEmpty);
+
                       Navigator.of(context).pushNamedAndRemoveUntil(
-                        HomeContainer.route,
+                        LoginScreen.route,
                         (route) => false,
+                        arguments: widget.phoneNumberModel,
                       );
                     } else {
                       GenericAuthProvider.instance.logoutUser();
@@ -179,5 +161,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void fetchLocationInfo() async {
+    countryContinent =
+        await LocationService(context: context).getCurrentLocation();
   }
 }

@@ -1,9 +1,15 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/signup.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
+import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../providers/api_call_provider.dart';
 import '../../utils/colors.dart';
 import '../../utils/helpers.dart';
 import 'login.dart';
@@ -21,6 +27,7 @@ class VerifyPhoneScreen extends StatefulWidget {
 class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
   final TextEditingController _countryCtrl = TextEditingController();
   final TextEditingController _phoneCtrl = TextEditingController();
+  late ApiCallProvider apiCallProvider;
 
   @override
   void initState() {
@@ -31,6 +38,7 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -78,30 +86,24 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
             ),
           ),
           InkWell(
-            onTap: () {
-              FirebaseAuth.instance.verifyPhoneNumber(
-                phoneNumber:
-                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
-                verificationCompleted: (phoneAuthCredential) {},
-                verificationFailed: (firebaseAuthException) {
-                  showToastMessageWithLogo(
-                      'Error : ${firebaseAuthException.message}', context);
-                },
-                codeSent: (verificationId, forceResendingToken) {
-                  widget.phoneNumberModel.verificationId = verificationId;
-                  Navigator.of(context)
-                      .pushNamed(VerifyOtpScreen.route,
-                          arguments: widget.phoneNumberModel)
-                      .then((res) {
-                    if (res == true) {
+            onTap: () async {
+              Map<String, dynamic> reqBody = {
+                'phone':
+                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
+                        .replaceAll('+', '')
+              };
+              apiCallProvider.postRequest(API.checkNumber, reqBody).then(
+                (value) {
+                  if (apiCallProvider.status == ApiStatus.success) {
+                    if (value['isRegistered'] == 'false') {
+                      sendOtp(context);
+                    } else {
                       Navigator.of(context).pushNamed(LoginScreen.route,
                           arguments: widget.phoneNumberModel);
                     }
-                  });
-                },
-                codeAutoRetrievalTimeout: (verificationId) {
-                  showToastMessageWithLogo(
-                      'Error : Code retrieval timeout', context);
+                  } else {
+                    showToastMessageWithLogo('Request failed', context);
+                  }
                 },
               );
             },
@@ -109,6 +111,34 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
           )
         ],
       ),
+    );
+  }
+
+  Future<void> sendOtp(BuildContext context) {
+    return FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber:
+          '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
+      verificationCompleted: (phoneAuthCredential) {},
+      verificationFailed: (firebaseAuthException) {
+        log(firebaseAuthException.toString());
+        showToastMessageWithLogo(
+            'Error : ${firebaseAuthException.message}', context);
+      },
+      codeSent: (verificationId, forceResendingToken) {
+        widget.phoneNumberModel.verificationId = verificationId;
+        Navigator.of(context)
+            .pushNamed(VerifyOtpScreen.route,
+                arguments: widget.phoneNumberModel)
+            .then((res) {
+          if (res == true) {
+            Navigator.of(context).pushNamed(SignUpScreen.route,
+                arguments: widget.phoneNumberModel);
+          }
+        });
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        showToastMessageWithLogo('Error : Code retrieval timeout', context);
+      },
     );
   }
 

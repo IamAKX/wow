@@ -5,16 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:worldsocialintegrationapp/firebase_options.dart';
+import 'package:worldsocialintegrationapp/providers/api_call_provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'providers/generic_auth_provider.dart';
+import 'services/fcm_service.dart';
 import 'utils/router.dart';
 
 late SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FCMService.instance.initializeFCM();
+
   prefs = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
@@ -30,6 +35,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (BuildContext context) => GenericAuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ApiCallProvider(),
         ),
       ],
       child: MaterialApp(
@@ -65,11 +73,15 @@ class MyApp extends StatelessWidget {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        home: const AuthCheck(),
+        home: isUserLoggedIn() ? const HomeContainer() : const SplashScreen(),
         navigatorKey: navigatorKey,
         onGenerateRoute: NavRoute.generatedRoute,
       ),
     );
+  }
+
+  bool isUserLoggedIn() {
+    return prefs.containsKey(PrefsKey.loginProvider);
   }
 }
 

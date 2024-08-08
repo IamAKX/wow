@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "102730474815-4rnf3brnh4cs4n11afi0t406vsncktut.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.live.worldsocialintegrationapp",
+            "certificate_hash": "8346e1422066e4b55f467117f8bb603aa1a18e31"
+          }
+        },
+        {
           "client_id": "102730474815-j59kk8mfce2rla89tu4mg0sp0jl8pnbg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

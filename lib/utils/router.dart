@@ -16,6 +16,7 @@ import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/reset_password.dart';
+import 'package:worldsocialintegrationapp/screens/onboarding/signup.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
@@ -45,6 +46,12 @@ class NavRoute {
       case ResetPasswordScreen.route:
         return MaterialPageRoute(
             builder: (_) => ResetPasswordScreen(
+                  phoneNumberModel: settings.arguments as PhoneNumberModel,
+                ));
+
+      case SignUpScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => SignUpScreen(
                   phoneNumberModel: settings.arguments as PhoneNumberModel,
                 ));
 

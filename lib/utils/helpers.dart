@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 Future<void> openInBrowser(String url) async {
@@ -61,4 +62,18 @@ void showToastMessageWithLogo(String message, BuildContext context) {
     ),
     gravity: ToastGravity.BOTTOM,
   );
+}
+
+Future<String?> getDeviceId() async {
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  String? deviceId;
+
+  if (Platform.isAndroid) {
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    deviceId = androidInfo.id; // Equivalent to ANDROID_ID
+  } else if (Platform.isIOS) {
+    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    deviceId = iosInfo.identifierForVendor; // Unique ID on iOS devices
+  }
+  return deviceId;
 }

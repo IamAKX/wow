@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 
 import '../firebase_options.dart';
@@ -43,6 +44,7 @@ class GenericAuthProvider extends ChangeNotifier {
       await _auth.signOut();
       await logoutWithGoogle();
       await logoutWithFacebook();
+      await prefs.clear();
       user = null;
       status = AuthStatus.notAuthenticated;
       showToastMessage('Logged Out');
@@ -52,7 +54,7 @@ class GenericAuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loginWithGoogle() async {
+  Future<GoogleSignInAccount?> loginWithGoogle() async {
     status = AuthStatus.authenticating;
     notifyListeners();
     final GoogleSignInAccount? googleUser = await GoogleSignIn(
@@ -68,6 +70,14 @@ class GenericAuthProvider extends ChangeNotifier {
       notifyListeners();
       return null;
     });
+
+    log('Google account info');
+    log('serverAuthCode : ${googleUser?.serverAuthCode}');
+    log('displayName : ${googleUser?.displayName}');
+    log('email : ${googleUser?.email}');
+    log('id : ${googleUser?.id}');
+    log('photoUrl : ${googleUser?.photoUrl}');
+
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication.catchError((onError) {
       log('$onError');
@@ -87,6 +97,11 @@ class GenericAuthProvider extends ChangeNotifier {
       notifyListeners();
     });
     user = userCredential.user;
+    log('Firebase account info');
+    log('displayName : ${user?.displayName}');
+    log('email : ${user?.email}');
+    log('tenantId : ${user?.tenantId}');
+    log('uid : ${user?.uid}');
 
     if (user != null) {
       log('Google user logged in: ${user?.uid}');
@@ -98,6 +113,7 @@ class GenericAuthProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+    return googleUser;
   }
 
   Future<void> logoutWithGoogle() async {
@@ -123,20 +139,10 @@ class GenericAuthProvider extends ChangeNotifier {
         length, (index) => charset[random.nextInt(charset.length)]).join();
   }
 
-  Future<void> loginWithFacebook() async {
+  Future<Map<String, dynamic>> loginWithFacebook() async {
     status = AuthStatus.authenticating;
     notifyListeners();
-
-    // final LoginResult loginResult =
-    //     await FacebookAuth.instance.login().catchError((onError) {
-    //   log('$onError');
-    //   showToastMessage('Error: $onError');
-    //   status = AuthStatus.notAuthenticated;
-    //   notifyListeners();
-    // });
-    // final OAuthCredential facebookAuthCredential =
-    //     FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
-
+    Map<String, dynamic> userData = {};
     final rawNonce = generateNonce();
     final nonce = sha256ofString(rawNonce);
     final result = await FacebookAuth.instance.login(
@@ -148,8 +154,9 @@ class GenericAuthProvider extends ChangeNotifier {
       showToastMessage('Failed to log in with Facebook.');
       status = AuthStatus.notAuthenticated;
       notifyListeners();
-      return;
+      return userData;
     }
+    userData = await FacebookAuth.instance.getUserData();
     final accessToken = result.accessToken;
     OAuthCredential credential;
     if (accessToken is LimitedToken) {
@@ -174,6 +181,11 @@ class GenericAuthProvider extends ChangeNotifier {
       notifyListeners();
     });
     user = userCredential.user;
+    log('Firebase account info');
+    log('displayName : ${user?.displayName}');
+    log('email : ${user?.email}');
+    log('tenantId : ${user?.tenantId}');
+    log('uid : ${user?.uid}');
     if (user != null) {
       log('Facebook user logged in: ${user?.uid}');
       status = AuthStatus.authenticated;
@@ -183,6 +195,7 @@ class GenericAuthProvider extends ChangeNotifier {
       status = AuthStatus.notAuthenticated;
     }
     notifyListeners();
+    return userData;
   }
 
   Future<void> logoutWithFacebook() async {
