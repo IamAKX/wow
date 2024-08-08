@@ -4,6 +4,10 @@ import 'package:worldsocialintegrationapp/screens/home_container/home/popular.da
 import 'package:worldsocialintegrationapp/screens/home_container/home/related.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
+import '../../../main.dart';
+import '../../../utils/prefs_key.dart';
+import '../profile/edit_profile.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,6 +24,12 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController.index = 1;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (prefs.getBool(PrefsKey.showProfileUpdatePopup) ?? false) {
+        showUpdateProfilePopup();
+      }
+    });
   }
 
   @override
@@ -143,6 +153,31 @@ class _HomeScreenState extends State<HomeScreen>
           )
         ],
       ),
+    );
+  }
+
+  void showUpdateProfilePopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Profile'),
+          content: const Text('Please Edit Your Profile First!'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed(EditProfile.route);
+              },
+              child: const Text(
+                'Next',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
