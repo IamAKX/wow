@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/providers/api_call_provider.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
-import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
@@ -102,7 +101,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }
 
               String? fcmToken = await FCMService.instance.getFCMToken();
-              String? deviceId = await getDeviceId();
               Map<String, dynamic> reqBody = {
                 'phone':
                     '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'

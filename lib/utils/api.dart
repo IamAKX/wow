@@ -11,4 +11,7 @@ class API {
   static const String mobileLogin = '$baseUrl/mobileLogin';
   static const String getUserDataById = '$baseUrl/getUserDataById';
   static const String updateUserProfile = '$baseUrl/updateUserProfile';
+  static const String userPostAndVideo = '$baseUrl/userPostAndVideo';
+  static const String feedDetails = '$baseUrl/feedDetails';
+  static const String resetPassword = '$baseUrl/resetPassword';
 }

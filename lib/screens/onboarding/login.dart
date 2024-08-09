@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
@@ -96,15 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(VerifyOtpScreen.route,
-                        arguments: widget.phoneNumberModel)
-                    .then((res) {
-                  if (res == true) {
-                    Navigator.of(context).pushNamed(ResetPasswordScreen.route,
-                        arguments: widget.phoneNumberModel);
-                  }
-                });
+                sendOtp(context);
               },
               child: const Text(
                 'Forgot Password',
@@ -180,6 +175,34 @@ class _LoginScreenState extends State<LoginScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
+    );
+  }
+
+  Future<void> sendOtp(BuildContext context) {
+    return FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber:
+          '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
+      verificationCompleted: (phoneAuthCredential) {},
+      verificationFailed: (firebaseAuthException) {
+        log(firebaseAuthException.toString());
+        showToastMessageWithLogo(
+            'Error : ${firebaseAuthException.message}', context);
+      },
+      codeSent: (verificationId, forceResendingToken) {
+        widget.phoneNumberModel.verificationId = verificationId;
+        Navigator.of(context)
+            .pushNamed(VerifyOtpScreen.route,
+                arguments: widget.phoneNumberModel)
+            .then((res) {
+          if (res == true) {
+            Navigator.of(context).pushNamed(ResetPasswordScreen.route,
+                arguments: widget.phoneNumberModel);
+          }
+        });
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        showToastMessageWithLogo('Error : Code retrieval timeout', context);
+      },
     );
   }
 }

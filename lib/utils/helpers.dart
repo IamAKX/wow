@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 Future<void> openInBrowser(String url) async {
   if (await launchUrl(Uri.parse(url))) {
@@ -76,4 +78,10 @@ Future<String?> getDeviceId() async {
     deviceId = iosInfo.identifierForVendor; // Unique ID on iOS devices
   }
   return deviceId;
+}
+
+String getTimesAgo(String date) {
+  DateTime parseDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
+
+  return timeago.format(parseDate, locale: 'en');
 }

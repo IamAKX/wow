@@ -49,15 +49,15 @@ class ApiCallProvider extends ChangeNotifier {
       status = ApiStatus.failed;
       var resBody = e.response?.data ?? {};
       notifyListeners();
-      return ('Error : ${resBody['message']}');
+      return resBody;
     } catch (e) {
       status = ApiStatus.failed;
       notifyListeners();
-      return (e.toString());
+      return {'message': e.toString()};
     }
     status = ApiStatus.failed;
     notifyListeners();
-    return 'Unable to process request';
+    return {'message': 'Unable to process request'};
   }
 
   Future<dynamic> postRequest(
@@ -83,15 +83,15 @@ class ApiCallProvider extends ChangeNotifier {
       var resBody = e.response?.data ?? {};
       notifyListeners();
       debugPrint(e.toString());
-      return ('Error : ${resBody['message']}');
+      return resBody;
     } catch (e) {
       status = ApiStatus.failed;
       notifyListeners();
       debugPrint(e.toString());
-      return (e.toString());
+      return {'message': e.toString()};
     }
     status = ApiStatus.failed;
     notifyListeners();
-    return 'Unable to process request';
+    return {'message': 'Unable to process request'};
   }
 }

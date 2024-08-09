@@ -3,14 +3,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
+import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
+import 'package:worldsocialintegrationapp/widgets/feed_video_player.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../models/feed.dart';
 import '../../../models/user_profile_detail.dart';
+import '../../../providers/api_call_provider.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/generic_api_calls.dart';
 
@@ -26,6 +32,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   UserProfileDetail? user;
+  List<FeedModel> momentsList = [];
+  late ApiCallProvider apiCallProvider;
 
   @override
   void initState() {
@@ -39,6 +47,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
+      loadMoments();
     });
   }
 
@@ -50,6 +59,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return Scaffold(
       body: getBody(context),
       floatingActionButton: FloatingActionButton(
@@ -121,85 +132,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 ],
               ),
               if (_tabController.index == 0) ...{
-                for (int i = 0; i < 10; i++) ...{
-                  Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            horizontalGap(pagePadding / 2),
-                            CircularImage(
-                                imagePath: 'assets/dummy/girl.jpeg',
-                                diameter: 35),
-                            horizontalGap(pagePadding / 2),
-                            Text(
-                              'Deepika',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Spacer(),
-                            PopupMenuButton<String>(
-                              onSelected: (value) => {},
-                              position: PopupMenuPosition.under,
-                              itemBuilder: (BuildContext context) {
-                                return [
-                                  PopupMenuItem<String>(
-                                    value: 'report',
-                                    child: Text('Report'),
-                                  ),
-                                  PopupMenuItem<String>(
-                                    value: 'remove',
-                                    child: Text('Remove'),
-                                  ),
-                                ];
-                              },
-                            ),
-                          ],
-                        ),
-                        Image.asset('assets/dummy/banner1.jpeg'),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 10,
-                            bottom: 5,
-                            top: 5,
-                          ),
-                          child: Text('52 likes'),
-                        ),
-                        Row(
-                          children: [
-                            horizontalGap(10),
-                            InkWell(
-                              onTap: () {},
-                              child: SvgPicture.asset(
-                                'assets/svg/chat.svg',
-                                width: 20,
-                              ),
-                            ),
-                            horizontalGap(10),
-                            InkWell(
-                              onTap: () {},
-                              child: Icon(
-                                Icons.favorite,
-                                color: Color(0xFFC22B1A),
-                                size: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 10, left: 10, top: 5),
-                          child: Text(
-                            '24 days ago',
-                            style: TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                }
+                for (FeedModel moment in momentsList) ...{getMomentCard(moment)}
               } else ...{
                 ListTile(
                   leading: CircleAvatar(
@@ -222,6 +155,105 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           ),
         )
       ],
+    );
+  }
+
+  Container getMomentCard(FeedModel moment) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              horizontalGap(pagePadding / 2),
+              CircularImage(imagePath: moment.image ?? '', diameter: 35),
+              horizontalGap(pagePadding / 2),
+              Text(
+                moment.name ?? '',
+                style: TextStyle(fontSize: 18),
+              ),
+              Spacer(),
+              PopupMenuButton<String>(
+                onSelected: (value) => {},
+                position: PopupMenuPosition.under,
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem<String>(
+                      value: 'report',
+                      child: Text('Report'),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'remove',
+                      child: Text('Remove'),
+                    ),
+                  ];
+                },
+              ),
+            ],
+          ),
+          // Image.asset('assets/dummy/banner1.jpeg'),
+          Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(
+              maxHeight: 300.0, // Set your desired maximum height here
+            ),
+            color: Colors.white,
+            child: moment.mediaStatus == '1'
+                ? FeedVideoPlayer(
+                    url: moment.media ?? '',
+                    play: false,
+                  )
+                : CachedNetworkImage(
+                    imageUrl: moment.media ?? '',
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text('Error ${error.toString()}'),
+                    ),
+                    fit: BoxFit.fitWidth,
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 10,
+              bottom: 5,
+              top: 5,
+            ),
+            child: Text('${moment.likeCount ?? 0} likes'),
+          ),
+          Row(
+            children: [
+              horizontalGap(10),
+              InkWell(
+                onTap: () {},
+                child: SvgPicture.asset(
+                  'assets/svg/chat.svg',
+                  width: 20,
+                ),
+              ),
+              horizontalGap(10),
+              InkWell(
+                onTap: () {},
+                child: Icon(
+                  Icons.favorite,
+                  color: Color(0xFFC22B1A),
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10, left: 10, top: 5),
+            child: Text(
+              getTimesAgo(moment.postCreateddateTime ?? ''),
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -471,6 +503,21 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
         setState(() {
           user = value;
         });
+      },
+    );
+  }
+
+  void loadMoments() async {
+    momentsList.clear();
+    Map<String, dynamic> reqBody = {'userId': 41, 'otherId': 41};
+    apiCallProvider.postRequest(API.feedDetails, reqBody).then(
+      (value) {
+        if (value['details'] != null) {
+          for (Map<String, dynamic> item in value['details']) {
+            momentsList.add(FeedModel.fromMap(item));
+          }
+          setState(() {});
+        }
       },
     );
   }

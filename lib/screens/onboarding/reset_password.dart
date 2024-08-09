@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
+import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/gaps.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -18,6 +22,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _phoneCtrl = TextEditingController();
   bool obsurePassword = true;
+  late ApiCallProvider apiCallProvider;
 
   @override
   void initState() {
@@ -27,6 +32,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -82,10 +88,31 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                SplashScreen.route,
-                (route) => false,
-                arguments: widget.phoneNumberModel,
+              Map<String, dynamic> reqBody = {
+                'phone':
+                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
+                        .replaceAll('+', ''),
+                'password': _passwordCtrl.text,
+              };
+
+              apiCallProvider.postRequest(API.resetPassword, reqBody).then(
+                (value) {
+                  if (apiCallProvider.status == ApiStatus.success) {
+                    if (value['success'] == '1') {
+                      showToastMessageWithLogo('${value['message']}', context);
+
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        SplashScreen.route,
+                        (route) => false,
+                        arguments: widget.phoneNumberModel,
+                      );
+                    } else {
+                      showToastMessageWithLogo('${value['message']}', context);
+                    }
+                  } else {
+                    showToastMessageWithLogo('Request failed', context);
+                  }
+                },
               );
             },
             child: gradientButton(),
