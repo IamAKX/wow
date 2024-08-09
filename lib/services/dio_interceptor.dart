@@ -16,9 +16,10 @@ class DioTokenInterceptor extends Interceptor {
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     if (await _tokenManager.isTokenExpired()) {
+      log('JWT Token expired, fetching new token');
       await _refreshToken();
     }
-
+      
     final token = await _tokenManager.getToken();
     if (token != null) {
       options.headers['Content-Type'] = 'application/x-www-form-urlencoded';

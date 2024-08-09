@@ -27,6 +27,10 @@ class ApiCallProvider extends ChangeNotifier {
               (X509Certificate cert, String host, int port) => true;
   }
 
+  bool containsNonLoggableFile(Map<String, dynamic> map) {
+    return map.values.any((value) => value is MultipartFile);
+  }
+
   Future<dynamic> getRequest(String endpoint) async {
     status = ApiStatus.loading;
     notifyListeners();
@@ -61,7 +65,8 @@ class ApiCallProvider extends ChangeNotifier {
     status = ApiStatus.loading;
     notifyListeners();
     debugPrint('API [POST]: $endpoint');
-    debugPrint('Request : ${jsonEncode(requestBody)}');
+    debugPrint(
+        'Request : ${containsNonLoggableFile(requestBody) ? requestBody : jsonEncode(requestBody)}');
     try {
       Response response = await _dio.post(
         endpoint,

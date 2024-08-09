@@ -164,7 +164,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void fetchLocationInfo() async {
-    countryContinent =
-        await LocationService(context: context).getCurrentLocation();
+    countryContinent = await LocationService().getCurrentLocation();
   }
 }

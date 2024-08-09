@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
@@ -9,7 +10,9 @@ import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../models/user_profile_detail.dart';
 import '../../../utils/colors.dart';
+import '../../../utils/generic_api_calls.dart';
 
 class ProfileDeatilScreen extends StatefulWidget {
   const ProfileDeatilScreen({super.key});
@@ -22,6 +25,7 @@ class ProfileDeatilScreen extends StatefulWidget {
 class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  UserProfileDetail? user;
 
   @override
   void initState() {
@@ -33,6 +37,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
         setState(() {});
       },
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
   }
 
   @override
@@ -223,12 +230,26 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
       height: 350,
       child: Stack(
         children: [
-          Image.asset(
-            'assets/dummy/girl.jpeg',
-            height: 300,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
+          (user?.image ?? '').isEmpty
+              ? Container(
+                  color: Colors.grey,
+                  height: 300,
+                  width: double.infinity,
+                )
+              : CachedNetworkImage(
+                  imageUrl: user?.image ?? '',
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey,
+                    height: 300,
+                    width: double.infinity,
+                  ),
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
           AppBar(
             iconTheme: const IconThemeData(color: Colors.white),
             backgroundColor: Colors.transparent,
@@ -239,7 +260,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             actions: [
               IconButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamed(EditProfile.route);
+                  Navigator.of(context).pushNamed(EditProfile.route).then(
+                    (value) {
+                      loadUserData();
+                    },
+                  );
                 },
                 icon: SvgPicture.asset(
                   'assets/svg/edit__2___1_.svg',
@@ -254,11 +279,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             left: 10,
             child: Row(
               children: [
-                const BorderedCircularImage(
+                BorderedCircularImage(
                   borderColor: Colors.white,
                   borderThickness: 1,
                   diameter: 100,
-                  imagePath: 'assets/dummy/girl.jpeg',
+                  imagePath: user?.image ?? '',
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,8 +295,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           Chip(
                             backgroundColor:
                                 Colors.transparent.withOpacity(0.5),
-                            label: const Text(
-                              'Deepika',
+                            label: Text(
+                              user?.name ?? '',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -437,6 +462,16 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           ),
         ),
       ],
+    );
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
     );
   }
 }

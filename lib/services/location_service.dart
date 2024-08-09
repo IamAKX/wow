@@ -9,10 +9,6 @@ import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import '../utils/country_continent_map.dart';
 
 class LocationService {
-  final BuildContext context;
-
-  LocationService({required this.context});
-
   Future<CountryContinent?> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -28,7 +24,7 @@ class LocationService {
       if (permission != LocationPermission.whileInUse &&
           permission != LocationPermission.always) {
         // Permissions are denied, don't continue
-        showToastMessageWithLogo('Location permission denied', context);
+        showToastMessage('Location permission denied');
         return countryContinent;
       }
     }
@@ -57,7 +53,7 @@ class LocationService {
       }
     } catch (e) {
       log(e.toString());
-      showToastMessageWithLogo('Error in fetching country/continent', context);
+      showToastMessage('Error in fetching country/continent');
     }
     return countryContinent;
   }

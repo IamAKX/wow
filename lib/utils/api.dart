@@ -9,4 +9,6 @@ class API {
   static const String checkNumber = '$baseUrl/checkNumber';
   static const String registration = '$baseUrl/registration';
   static const String mobileLogin = '$baseUrl/mobileLogin';
+  static const String getUserDataById = '$baseUrl/getUserDataById';
+  static const String updateUserProfile = '$baseUrl/updateUserProfile';
 }

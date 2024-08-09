@@ -15,7 +15,7 @@ Future<void> openInBrowser(String url) async {
 void showToastMessage(String message) {
   Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
       backgroundColor: const Color(0xFFF8F9FC),
@@ -28,7 +28,7 @@ void showToastMessageWithLogo(String message, BuildContext context) {
   fToast = FToast();
   fToast.init(context);
   fToast.showToast(
-    toastDuration: const Duration(seconds: 1),
+    toastDuration: const Duration(seconds: 3),
     child: Material(
       elevation: 10.0,
       borderRadius: BorderRadius.circular(30),

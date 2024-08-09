@@ -3,12 +3,11 @@ on:
     branches:
       - main
       - staging
-      - development
   push:
     branches:
       - main
       - staging
-      - development
+
 name: "Build & Release"
 jobs:
   build:

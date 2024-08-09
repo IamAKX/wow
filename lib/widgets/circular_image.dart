@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class CircularImage extends StatelessWidget {
@@ -13,11 +14,28 @@ class CircularImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(diameter),
-      child: Image.asset(
-        imagePath,
-        width: diameter,
-        height: diameter,
-      ),
+      child: imagePath.isEmpty
+          ? Image.asset(
+              'assets/dummy/demo_user_profile.png',
+              width: diameter,
+              height: diameter,
+              fit: BoxFit.cover,
+            )
+          : CachedNetworkImage(
+              imageUrl: imagePath,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) =>
+                  Image.asset('assets/dummy/demo_user_profile.png'),
+              imageBuilder: (context, imageProvider) => CircleAvatar(
+                backgroundImage: imageProvider,
+                radius: diameter / 2,
+              ),
+              width: diameter,
+              height: diameter,
+              fit: BoxFit.cover,
+            ),
     );
   }
 }

@@ -134,6 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value['success'] == '1') {
                       showToastMessageWithLogo('${value['message']}', context);
                       prefs.setString(PrefsKey.userId, value['details']['id']);
+                      prefs.setString(
+                          PrefsKey.userName, value['details']['username']);
                       prefs.setString(PrefsKey.loginProvider, 'Phone');
                       prefs.setBool(PrefsKey.showProfileUpdatePopup,
                           value['details']['name'].toString().isEmpty);

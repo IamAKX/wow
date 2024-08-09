@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:worldsocialintegrationapp/providers/generic_auth_provider.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -17,6 +20,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  UserProfileDetail? user;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -317,21 +330,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   SizedBox getProfileHeader() {
+    log('user name : ${user?.name}');
     return SizedBox(
       height: 200,
       width: double.infinity,
       child: Row(
         children: [
           horizontalGap(pagePadding),
-          const CircularImage(
-              imagePath: 'assets/dummy/girl.jpeg', diameter: 60),
+          CircularImage(imagePath: user?.image ?? '', diameter: 60),
           horizontalGap(pagePadding),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${GenericAuthProvider.instance.user?.displayName}',
+                user?.name ?? '',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -347,7 +360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               verticalGap(5),
               Text(
-                'ID: 873562893',
+                'ID: ${user?.username}',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -366,7 +379,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Spacer(),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(ProfileDeatilScreen.route);
+              Navigator.of(context).pushNamed(ProfileDeatilScreen.route).then(
+                (value) {
+                  loadUserData();
+                },
+              );
             },
             icon: const Icon(
               Icons.chevron_right,
@@ -375,6 +392,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
     );
   }
 }

@@ -3,7 +3,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -116,11 +115,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 apiCallProvider.postRequest(API.socialLogin, reqBody).then(
                   (value) {
                     if (apiCallProvider.status == ApiStatus.success) {
-                      if (value['status'] == 1) {
+                      if (value['success'] == '1') {
                         showToastMessageWithLogo(
                             '${value['message']}', context);
                         prefs.setString(
                             PrefsKey.userId, value['details']['id']);
+                        prefs.setString(
+                            PrefsKey.userName, value['details']['username']);
                         prefs.setString(PrefsKey.loginProvider, 'Google');
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           HomeContainer.route,
@@ -181,11 +182,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 apiCallProvider.postRequest(API.socialLogin, reqBody).then(
                   (value) {
                     if (apiCallProvider.status == ApiStatus.success) {
-                      if (value['status'] == 1) {
+                      if (value['success'] == '1') {
                         showToastMessageWithLogo(
                             '${value['message']}', context);
                         prefs.setString(
                             PrefsKey.userId, value['details']['id']);
+                        prefs.setString(
+                            PrefsKey.userName, value['details']['username']);
                         prefs.setString(PrefsKey.loginProvider, 'Facebook');
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           HomeContainer.route,
@@ -344,8 +347,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void fetchLocationInfo() async {
-    countryContinent =
-        await LocationService(context: context).getCurrentLocation();
+    countryContinent = await LocationService().getCurrentLocation();
     log('Fetched user location');
     log('Country : ${countryContinent?.country}');
     log('continent : ${countryContinent?.continent}');
