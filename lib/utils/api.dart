@@ -13,5 +13,10 @@ class API {
   static const String updateUserProfile = '$baseUrl/updateUserProfile';
   static const String userPostAndVideo = '$baseUrl/userPostAndVideo';
   static const String feedDetails = '$baseUrl/feedDetails';
+  static const String likeDislike = '$baseUrl/likeDislike';
   static const String resetPassword = '$baseUrl/resetPassword';
+  static const String getComments = '$baseUrl/getComments';
+  static const String addComment = '$baseUrl/addComment';
+  static const String deleteComment = '$baseUrl/deleteComment';
+  static const String removeUserPost = '$baseUrl/removeUserPost';
 }

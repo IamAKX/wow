@@ -23,6 +23,8 @@ import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 
+import '../screens/home_container/profile/comment.dart';
+
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -97,6 +99,11 @@ class NavRoute {
         return MaterialPageRoute(
             builder: (_) => MediaPreviewFullScreen(
                   filePathOrUrl: settings.arguments as String,
+                ));
+      case CommentScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => CommentScreen(
+                  feedId: settings.arguments as String,
                 ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());

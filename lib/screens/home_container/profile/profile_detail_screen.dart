@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/profile/comment.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
@@ -174,7 +175,14 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               ),
               Spacer(),
               PopupMenuButton<String>(
-                onSelected: (value) => {},
+                onSelected: (value) {
+                  switch (value) {
+                    case 'remove':
+                      deletePost(moment);
+
+                      break;
+                  }
+                },
                 position: PopupMenuPosition.under,
                 itemBuilder: (BuildContext context) {
                   return [
@@ -191,11 +199,10 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               ),
             ],
           ),
-          // Image.asset('assets/dummy/banner1.jpeg'),
           Container(
             alignment: Alignment.center,
             constraints: BoxConstraints(
-              maxHeight: 300.0, // Set your desired maximum height here
+              maxHeight: 300.0,
             ),
             color: Colors.white,
             child: moment.mediaStatus == '1'
@@ -226,7 +233,10 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             children: [
               horizontalGap(10),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(CommentScreen.route,
+                      arguments: moment.mediaId);
+                },
                 child: SvgPicture.asset(
                   'assets/svg/chat.svg',
                   width: 20,
@@ -234,14 +244,44 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               ),
               horizontalGap(10),
               InkWell(
-                onTap: () {},
-                child: Icon(
-                  Icons.favorite,
-                  color: Color(0xFFC22B1A),
-                  size: 20,
-                ),
+                onTap: () {
+                  apiCallProvider.postRequest(API.likeDislike,
+                      {'userId': '41', 'feedId': moment.mediaId}).then(
+                    (value) {
+                      setState(() {
+                        moment.likeCount = value['likeCount'].toString();
+                        moment.likeStatus = value['likeUnLikestatus'];
+                      });
+                    },
+                  );
+                },
+                child: moment.likeStatus ?? false
+                    ? Icon(
+                        Icons.favorite,
+                        color: Color(0xFFC22B1A),
+                        size: 20,
+                      )
+                    : Icon(
+                        Icons.favorite_border,
+                        size: 20,
+                      ),
               ),
             ],
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.of(context)
+                  .pushNamed(CommentScreen.route, arguments: moment.mediaId);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 0, left: 10, top: 5),
+              child: Text(
+                'View all comments',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 10, left: 10, top: 5),
@@ -516,6 +556,18 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           for (Map<String, dynamic> item in value['details']) {
             momentsList.add(FeedModel.fromMap(item));
           }
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  void deletePost(FeedModel moment) {
+    apiCallProvider.postRequest(
+        API.removeUserPost, {'userId': '41', 'id': moment.mediaId}).then(
+      (value) {
+        if (value['success'] == '1') {
+          momentsList.remove(moment);
           setState(() {});
         }
       },
