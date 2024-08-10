@@ -7,6 +7,7 @@ import 'package:worldsocialintegrationapp/screens/onboarding/signup.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../providers/api_call_provider.dart';
@@ -28,7 +29,8 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
   final TextEditingController _countryCtrl = TextEditingController();
   final TextEditingController _phoneCtrl = TextEditingController();
   late ApiCallProvider apiCallProvider;
-
+  bool isLoading = false;
+  
   @override
   void initState() {
     super.initState();
@@ -86,27 +88,29 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
             ),
           ),
           InkWell(
-            onTap: () async {
-              Map<String, dynamic> reqBody = {
-                'phone':
-                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
-                        .replaceAll('+', '')
-              };
-              apiCallProvider.postRequest(API.checkNumber, reqBody).then(
-                (value) {
-                  if (apiCallProvider.status == ApiStatus.success) {
-                    if (value['isRegistered'] == 'false') {
-                      sendOtp(context);
-                    } else {
-                      Navigator.of(context).pushNamed(LoginScreen.route,
-                          arguments: widget.phoneNumberModel);
-                    }
-                  } else {
-                    showToastMessageWithLogo('Request failed', context);
-                  }
-                },
-              );
-            },
+            onTap: isLoading || apiCallProvider.status == ApiStatus.loading
+                ? null
+                : () async {
+                    Map<String, dynamic> reqBody = {
+                      'phone':
+                          '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
+                              .replaceAll('+', '')
+                    };
+                    apiCallProvider.postRequest(API.checkNumber, reqBody).then(
+                      (value) {
+                        if (apiCallProvider.status == ApiStatus.success) {
+                          if (value['isRegistered'] == 'false') {
+                            sendOtp(context);
+                          } else {
+                            Navigator.of(context).pushNamed(LoginScreen.route,
+                                arguments: widget.phoneNumberModel);
+                          }
+                        } else {
+                          showToastMessageWithLogo('Request failed', context);
+                        }
+                      },
+                    );
+                  },
             child: gradientButton(),
           )
         ],
@@ -115,16 +119,25 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
   }
 
   Future<void> sendOtp(BuildContext context) {
+    setState(() {
+      isLoading = true;
+    });
     return FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber:
           '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
       verificationCompleted: (phoneAuthCredential) {},
       verificationFailed: (firebaseAuthException) {
+        setState(() {
+          isLoading = false;
+        });
         log(firebaseAuthException.toString());
         showToastMessageWithLogo(
             'Error : ${firebaseAuthException.message}', context);
       },
       codeSent: (verificationId, forceResendingToken) {
+        setState(() {
+          isLoading = false;
+        });
         widget.phoneNumberModel.verificationId = verificationId;
         Navigator.of(context)
             .pushNamed(VerifyOtpScreen.route,
@@ -137,6 +150,9 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
         });
       },
       codeAutoRetrievalTimeout: (verificationId) {
+        setState(() {
+          isLoading = false;
+        });
         showToastMessageWithLogo('Error : Code retrieval timeout', context);
       },
     );
@@ -154,14 +170,16 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
         ),
         borderRadius: BorderRadius.circular(30.0),
       ),
-      child: const Text(
-        'Sign Up/Login with Phone',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: isLoading || apiCallProvider.status == ApiStatus.loading
+          ? const ButtonLoader()
+          : const Text(
+              'Sign Up/Login with Phone',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 }

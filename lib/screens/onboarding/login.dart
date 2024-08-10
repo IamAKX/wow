@@ -16,6 +16,7 @@ import '../../providers/generic_auth_provider.dart';
 import '../../utils/api.dart';
 import '../../utils/helpers.dart';
 import '../../utils/prefs_key.dart';
+import '../../widgets/button_loader.dart';
 import '../../widgets/gaps.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneCtrl = TextEditingController();
   bool obsurePassword = true;
   late ApiCallProvider apiCallProvider;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -111,44 +113,50 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           InkWell(
-            onTap: () {
-              if (_passwordCtrl.text.isEmpty) {
-                showToastMessageWithLogo('Password is mandatory', context);
-                return;
-              }
-
-              Map<String, dynamic> reqBody = {
-                'phone':
-                    '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
-                        .replaceAll('+', ''),
-                'password': _passwordCtrl.text,
-              };
-              apiCallProvider.postRequest(API.mobileLogin, reqBody).then(
-                (value) {
-                  if (apiCallProvider.status == ApiStatus.success) {
-                    if (value['success'] == '1') {
-                      showToastMessageWithLogo('${value['message']}', context);
-                      prefs.setString(PrefsKey.userId, value['details']['id']);
-                      prefs.setString(
-                          PrefsKey.userName, value['details']['username']);
-                      prefs.setString(PrefsKey.loginProvider, 'Phone');
-                      prefs.setBool(PrefsKey.showProfileUpdatePopup,
-                          value['details']['name'].toString().isEmpty);
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        HomeContainer.route,
-                        (route) => false,
-                      );
-                    } else {
-                      GenericAuthProvider.instance.logoutUser();
-                      showToastMessageWithLogo('${value['message']}', context);
+            onTap: isLoading || apiCallProvider.status == ApiStatus.loading
+                ? null
+                : () {
+                    if (_passwordCtrl.text.isEmpty) {
+                      showToastMessageWithLogo(
+                          'Password is mandatory', context);
+                      return;
                     }
-                  } else {
-                    GenericAuthProvider.instance.logoutUser();
-                    showToastMessageWithLogo('Request failed', context);
-                  }
-                },
-              );
-            },
+
+                    Map<String, dynamic> reqBody = {
+                      'phone':
+                          '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}'
+                              .replaceAll('+', ''),
+                      'password': _passwordCtrl.text,
+                    };
+                    apiCallProvider.postRequest(API.mobileLogin, reqBody).then(
+                      (value) {
+                        if (apiCallProvider.status == ApiStatus.success) {
+                          if (value['success'] == '1') {
+                            showToastMessageWithLogo(
+                                '${value['message']}', context);
+                            prefs.setString(
+                                PrefsKey.userId, value['details']['id']);
+                            prefs.setString(PrefsKey.userName,
+                                value['details']['username']);
+                            prefs.setString(PrefsKey.loginProvider, 'Phone');
+                            prefs.setBool(PrefsKey.showProfileUpdatePopup,
+                                value['details']['name'].toString().isEmpty);
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              HomeContainer.route,
+                              (route) => false,
+                            );
+                          } else {
+                            GenericAuthProvider.instance.logoutUser();
+                            showToastMessageWithLogo(
+                                '${value['message']}', context);
+                          }
+                        } else {
+                          GenericAuthProvider.instance.logoutUser();
+                          showToastMessageWithLogo('Request failed', context);
+                        }
+                      },
+                    );
+                  },
             child: gradientButton(),
           )
         ],
@@ -167,28 +175,39 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         borderRadius: BorderRadius.circular(30.0),
       ),
-      child: const Text(
-        'Next',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: isLoading || apiCallProvider.status == ApiStatus.loading
+          ? const ButtonLoader()
+          : const Text(
+              'Next',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 
   Future<void> sendOtp(BuildContext context) {
+    setState(() {
+      isLoading = true;
+    });
     return FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber:
           '${widget.phoneNumberModel.countryCode?.dialCode}${widget.phoneNumberModel.phoneNumber}',
       verificationCompleted: (phoneAuthCredential) {},
       verificationFailed: (firebaseAuthException) {
+        setState(() {
+          isLoading = false;
+        });
         log(firebaseAuthException.toString());
         showToastMessageWithLogo(
             'Error : ${firebaseAuthException.message}', context);
       },
       codeSent: (verificationId, forceResendingToken) {
+        setState(() {
+          isLoading = false;
+        });
         widget.phoneNumberModel.verificationId = verificationId;
         Navigator.of(context)
             .pushNamed(VerifyOtpScreen.route,
@@ -201,6 +220,9 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       },
       codeAutoRetrievalTimeout: (verificationId) {
+        setState(() {
+          isLoading = false;
+        });
         showToastMessageWithLogo('Error : Code retrieval timeout', context);
       },
     );

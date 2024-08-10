@@ -20,6 +20,8 @@ import 'package:worldsocialintegrationapp/screens/onboarding/signup.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
+import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
+import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
@@ -86,6 +88,16 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const AboutUsScreen());
       case AddMoments.route:
         return MaterialPageRoute(builder: (_) => const AddMoments());
+      case MediaPreview.route:
+        return MaterialPageRoute(
+            builder: (_) => MediaPreview(
+                  filePathOrUrl: settings.arguments as String,
+                ));
+      case MediaPreviewFullScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => MediaPreviewFullScreen(
+                  filePathOrUrl: settings.arguments as String,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

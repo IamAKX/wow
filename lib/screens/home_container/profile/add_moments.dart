@@ -12,9 +12,11 @@ import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
+import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
+import '../../../widgets/button_loader.dart';
 
 class AddMoments extends StatefulWidget {
   static const String route = '/addMoments';
@@ -95,6 +97,13 @@ class _AddMomentsState extends State<AddMoments> {
                   width: MediaQuery.of(context).size.width * 2 / 5,
                   height: double.infinity,
                   child: InkWell(
+                    onLongPress: () {
+                      if (file != null) {
+                        Navigator.of(context).pushNamed(
+                            MediaPreviewFullScreen.route,
+                            arguments: file!.path);
+                      }
+                    },
                     onTap: () async {
                       FilePickerResult? result =
                           await FilePicker.platform.pickFiles(
@@ -174,41 +183,49 @@ class _AddMomentsState extends State<AddMoments> {
           horizontalGap(10),
           Expanded(
             child: InkWell(
-              onTap: () async {
-                if (_descCtrl.text.isEmpty || file == null) {
-                  showToastMessageWithLogo('All fields are mandatory', context);
-                  return;
-                }
-                String fileExtension = extension(file!.path).toLowerCase();
-                int type = -1;
-                if (videoExtensions.contains(fileExtension)) {
-                  type = 1;
-                }
-                if (imageExtensions.contains(fileExtension)) {
-                  type = 0;
-                }
+              onTap: apiCallProvider.status == ApiStatus.loading
+                  ? null
+                  : () async {
+                      if (_descCtrl.text.isEmpty || file == null) {
+                        showToastMessageWithLogo(
+                            'All fields are mandatory', context);
+                        return;
+                      }
+                      String fileExtension = extension(file!.path)
+                          .toLowerCase()
+                          .replaceAll('.', '');
+                      log(fileExtension);
+                      int type = -1;
+                      if (videoExtensions.contains(fileExtension)) {
+                        type = 1;
+                      }
+                      if (imageExtensions.contains(fileExtension)) {
+                        type = 0;
+                      }
 
-                MultipartFile img = await MultipartFile.fromFile(file!.path,
-                    filename: basename(file!.path));
-                Map<String, dynamic> reqBody = {
-                  'userId': prefs.getString(PrefsKey.userId),
-                  'description': _descCtrl.text,
-                  'status': type,
-                  'image': img,
-                };
-                apiCallProvider
-                    .postRequest(API.userPostAndVideo, reqBody)
-                    .then((value) {
-                  if (apiCallProvider.status == ApiStatus.success) {
-                    // showToastMessageWithLogo('${value['message']}', context);
-                    // if (value['success'] == '1') {
-                    //   Navigator.of(context).pop();
-                    // }
-                  } else {
-                    showToastMessageWithLogo('Request failed', context);
-                  }
-                });
-              },
+                      MultipartFile img = await MultipartFile.fromFile(
+                          file!.path,
+                          filename: basename(file!.path));
+                      Map<String, dynamic> reqBody = {
+                        'userId': prefs.getString(PrefsKey.userId),
+                        'description': _descCtrl.text,
+                        'status': type,
+                        'image': img,
+                      };
+                      apiCallProvider
+                          .postRequest(API.userPostAndVideo, reqBody)
+                          .then((value) {
+                        if (apiCallProvider.status == ApiStatus.success) {
+                          showToastMessageWithLogo(
+                              '${value['message']}', context);
+                          if (value['success'] == '1') {
+                            Navigator.of(context).pop();
+                          }
+                        } else {
+                          showToastMessageWithLogo('Request failed', context);
+                        }
+                      });
+                    },
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 15,
@@ -223,13 +240,15 @@ class _AddMomentsState extends State<AddMoments> {
                   ),
                 ),
                 alignment: Alignment.center,
-                child: const Text(
-                  'Upload',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
+                child: apiCallProvider.status == ApiStatus.loading
+                    ? const ButtonLoader()
+                    : const Text(
+                        'Upload',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ),
           ),

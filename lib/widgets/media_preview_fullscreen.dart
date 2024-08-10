@@ -1,12 +1,13 @@
 import 'dart:io';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class MediaPreview extends StatelessWidget {
+class MediaPreviewFullScreen extends StatelessWidget {
   final String filePathOrUrl;
-  static const String route = '/mediaPreview';
+  static const String route = '/mediaPreviewFullScreen';
 
-  const MediaPreview({super.key, required this.filePathOrUrl});
+  const MediaPreviewFullScreen({super.key, required this.filePathOrUrl});
 
   bool isImage(String path) {
     final imageExtensions = [
@@ -28,19 +29,32 @@ class MediaPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isImage(filePathOrUrl)) {
-      return Image.file(
-        File(filePathOrUrl),
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const Icon(Icons.error, size: 50);
-        },
-      );
-    } else if (isVideo(filePathOrUrl)) {
-      return VideoPlayerPreview(filePathOrUrl: filePathOrUrl);
-    } else {
-      return const Center(child: Text('Unsupported media type'));
-    }
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: (isImage(filePathOrUrl))
+                ? Image.file(
+                    File(filePathOrUrl),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.error, size: 50);
+                    },
+                  )
+                : (isVideo(filePathOrUrl))
+                    ? VideoPlayerPreview(filePathOrUrl: filePathOrUrl)
+                    : const Center(
+                        child: Text('Unsupported media type'),
+                      ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -55,12 +69,18 @@ class VideoPlayerPreview extends StatefulWidget {
 
 class VideoPlayerPreviewState extends State<VideoPlayerPreview> {
   late VideoPlayerController _controller;
+  late ChewieController _chewieController;
 
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.file(File(widget.filePathOrUrl))
       ..initialize().then((_) {
+        _chewieController = ChewieController(
+          videoPlayerController: _controller,
+          autoPlay: true,
+          looping: true,
+        );
         setState(() {});
         _controller.play();
         _controller.setLooping(true);
@@ -69,6 +89,7 @@ class VideoPlayerPreviewState extends State<VideoPlayerPreview> {
 
   @override
   void dispose() {
+    _chewieController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -78,7 +99,9 @@ class VideoPlayerPreviewState extends State<VideoPlayerPreview> {
     return _controller.value.isInitialized
         ? AspectRatio(
             aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
+            child: Chewie(
+              controller: _chewieController,
+            ),
           )
         : const Center(child: CircularProgressIndicator());
   }
