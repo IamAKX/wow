@@ -74,11 +74,17 @@ class _CommentScreenState extends State<CommentScreen> {
   @override
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comments'),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, commentList.length);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Comments'),
+        ),
+        body: getBody(context),
       ),
-      body: getBody(context),
     );
   }
 

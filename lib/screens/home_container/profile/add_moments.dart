@@ -68,7 +68,7 @@ class _AddMomentsState extends State<AddMoments> {
         Card(
           child: SizedBox(
             width: double.infinity,
-            height: 200,
+            height: 250,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,51 +93,62 @@ class _AddMomentsState extends State<AddMoments> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 2 / 5,
-                  height: double.infinity,
-                  child: InkWell(
-                    onLongPress: () {
-                      if (file != null) {
-                        Navigator.of(context).pushNamed(
-                            MediaPreviewFullScreen.route,
-                            arguments: file!.path);
-                      }
-                    },
-                    onTap: () async {
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles(
-                        allowedExtensions: [
-                          ...imageExtensions,
-                          ...videoExtensions,
-                        ],
-                        type: FileType.custom,
-                      );
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 2 / 5,
+                        child: InkWell(
+                          onTap: () async {
+                            FilePickerResult? result =
+                                await FilePicker.platform.pickFiles(
+                              allowedExtensions: [
+                                ...imageExtensions,
+                                ...videoExtensions,
+                              ],
+                              type: FileType.custom,
+                            );
 
-                      if (result != null) {
-                        file = File(result.files.single.path!);
-                        log('File : ${file!.path}');
-                        setState(() {});
-                      }
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: file != null
-                          ? MediaPreview(
-                              key: ValueKey(file!.path),
-                              filePathOrUrl: file!.path)
-                          : const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 70,
+                            if (result != null) {
+                              file = File(result.files.single.path!);
+                              log('File : ${file!.path}');
+                              setState(() {});
+                            }
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
                             ),
+                            child: file != null
+                                ? MediaPreview(
+                                    key: ValueKey(file!.path),
+                                    filePathOrUrl: file!.path)
+                                : const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                    size: 70,
+                                  ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: file == null
+                          ? null
+                          : () {
+                              if (file != null) {
+                                Navigator.of(context).pushNamed(
+                                    MediaPreviewFullScreen.route,
+                                    arguments: file!.path);
+                              }
+                            },
+                      child: Text('Preview'),
+                    )
+                  ],
                 )
               ],
             ),

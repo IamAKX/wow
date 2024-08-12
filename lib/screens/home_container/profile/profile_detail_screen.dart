@@ -4,12 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/comment.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/feed_video_player.dart';
@@ -66,7 +68,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
       body: getBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddMoments.route);
+          Navigator.of(context).pushNamed(AddMoments.route).then(
+            (value) {
+              loadMoments();
+            },
+          );
         },
         backgroundColor: themePinkDark,
         child: Icon(
@@ -133,7 +139,20 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 ],
               ),
               if (_tabController.index == 0) ...{
-                for (FeedModel moment in momentsList) ...{getMomentCard(moment)}
+                if (momentsList.isEmpty) ...{
+                  Container(
+                    alignment: Alignment.center,
+                    height: 200,
+                    child: Text(
+                      'No moments created yet!',
+                      style: TextStyle(color: hintColor),
+                    ),
+                  )
+                } else ...{
+                  for (FeedModel moment in momentsList) ...{
+                    getMomentCard(moment)
+                  }
+                }
               } else ...{
                 ListTile(
                   leading: CircleAvatar(
@@ -178,7 +197,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 onSelected: (value) {
                   switch (value) {
                     case 'remove':
-                      deletePost(moment);
+                      showDeleteMomentPopup(moment);
 
                       break;
                   }
@@ -186,10 +205,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 position: PopupMenuPosition.under,
                 itemBuilder: (BuildContext context) {
                   return [
-                    PopupMenuItem<String>(
-                      value: 'report',
-                      child: Text('Report'),
-                    ),
+                    if (moment.userId != user?.id)
+                      PopupMenuItem<String>(
+                        value: 'report',
+                        child: Text('Report'),
+                      ),
                     PopupMenuItem<String>(
                       value: 'remove',
                       child: Text('Remove'),
@@ -232,10 +252,21 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           Row(
             children: [
               horizontalGap(10),
+              Text(
+                '${moment.commentCount}',
+                style: TextStyle(fontSize: 16),
+              ),
+              horizontalGap(10),
               InkWell(
                 onTap: () {
-                  Navigator.of(context).pushNamed(CommentScreen.route,
-                      arguments: moment.mediaId);
+                  Navigator.of(context)
+                      .pushNamed(CommentScreen.route, arguments: moment.mediaId)
+                      .then(
+                    (value) {
+                      moment.commentCount = '$value';
+                      setState(() {});
+                    },
+                  );
                 },
                 child: SvgPicture.asset(
                   'assets/svg/chat.svg',
@@ -245,8 +276,10 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               horizontalGap(10),
               InkWell(
                 onTap: () {
-                  apiCallProvider.postRequest(API.likeDislike,
-                      {'userId': '41', 'feedId': moment.mediaId}).then(
+                  apiCallProvider.postRequest(API.likeDislike, {
+                    'userId': user?.id ?? '0',
+                    'feedId': moment.mediaId
+                  }).then(
                     (value) {
                       setState(() {
                         moment.likeCount = value['likeCount'].toString();
@@ -271,7 +304,13 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           InkWell(
             onTap: () {
               Navigator.of(context)
-                  .pushNamed(CommentScreen.route, arguments: moment.mediaId);
+                  .pushNamed(CommentScreen.route, arguments: moment.mediaId)
+                  .then(
+                (value) {
+                  moment.commentCount = '$value';
+                  setState(() {});
+                },
+              );
             },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 0, left: 10, top: 5),
@@ -354,7 +393,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 BorderedCircularImage(
                   borderColor: Colors.white,
                   borderThickness: 1,
-                  diameter: 100,
+                  diameter: 75,
                   imagePath: user?.image ?? '',
                 ),
                 Column(
@@ -377,6 +416,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           ),
                           horizontalGap(10),
                           Container(
+                            constraints: BoxConstraints(minWidth: 70),
                             padding: const EdgeInsets.all(5),
                             decoration: const BoxDecoration(
                               image: DecorationImage(
@@ -403,6 +443,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           ),
                           horizontalGap(10),
                           Container(
+                            constraints: BoxConstraints(minWidth: 70),
                             padding: const EdgeInsets.all(5),
                             decoration: const BoxDecoration(
                               image: DecorationImage(
@@ -470,6 +511,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             width: 40,
                           ),
                           horizontalGap(5),
+                          Image.asset(
+                            'assets/image/dollarrr.png',
+                            width: 25,
+                          ),
+                          horizontalGap(10),
                           Image.asset(
                             'assets/image/microphoneicon.png',
                             width: 40,
@@ -549,7 +595,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
 
   void loadMoments() async {
     momentsList.clear();
-    Map<String, dynamic> reqBody = {'userId': 41, 'otherId': 41};
+    String? userId = await prefs.getString(PrefsKey.userId) ?? '0';
+    Map<String, dynamic> reqBody = {'userId': userId, 'otherId': userId};
     apiCallProvider.postRequest(API.feedDetails, reqBody).then(
       (value) {
         if (value['details'] != null) {
@@ -563,13 +610,47 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
   }
 
   void deletePost(FeedModel moment) {
-    apiCallProvider.postRequest(
-        API.removeUserPost, {'userId': '41', 'id': moment.mediaId}).then(
+    apiCallProvider.postRequest(API.removeUserPost,
+        {'userId': user?.id ?? '0', 'id': moment.mediaId}).then(
       (value) {
         if (value['success'] == '1') {
           momentsList.remove(moment);
           setState(() {});
         }
+      },
+    );
+  }
+
+  void showDeleteMomentPopup(FeedModel moment) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Moment'),
+          content: const Text('Are you sure you want to delete?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'CANCEL',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                deletePost(moment);
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+          ],
+        );
       },
     );
   }

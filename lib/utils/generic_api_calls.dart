@@ -8,7 +8,7 @@ import '../models/user_profile_detail.dart';
 Future<UserProfileDetail?> getCurrentUser() async {
   UserProfileDetail? user;
   Map<String, dynamic> reqBody = {
-    'userId': prefs.getString(PrefsKey.userId) ?? '41'
+    'userId': prefs.getString(PrefsKey.userId) ?? '0'
   };
   await ApiCallProvider.instance
       .postRequest(API.getUserDataById, reqBody)
