@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_member.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family_failed.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
@@ -111,6 +118,21 @@ class NavRoute {
             builder: (_) => CommentScreen(
                   feedId: settings.arguments as String,
                 ));
+      case CreateFamily.route:
+        return MaterialPageRoute(builder: (_) => const CreateFamily());
+      case EditFamily.route:
+        return MaterialPageRoute(builder: (_) => const EditFamily());
+      case FamilyLeaderboard.route:
+        return MaterialPageRoute(builder: (_) => const FamilyLeaderboard());
+      case FamilyMemberScreen.route:
+        return MaterialPageRoute(builder: (_) => const FamilyMemberScreen());
+      case FamilyScreen.route:
+        return MaterialPageRoute(builder: (_) => const FamilyScreen());
+      case PromptCreateFamily.route:
+        return MaterialPageRoute(builder: (_) => const PromptCreateFamily());
+      case PromptCreateFamilyFailed.route:
+        return MaterialPageRoute(
+            builder: (_) => const PromptCreateFamilyFailed());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

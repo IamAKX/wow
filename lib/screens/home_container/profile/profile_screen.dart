@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
@@ -261,7 +263,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 contentPadding: EdgeInsets.zero,
-                onTap: () {},
+                onTap: () {
+                  if (user?.familyJoinStatus ?? false) {
+                    Navigator.of(context).pushNamed(FamilyScreen.route);
+                  } else {
+                    Navigator.of(context).pushNamed(FamilyLeaderboard.route);
+                  }
+                },
               ),
               ListTile(
                 leading: Image.asset(
