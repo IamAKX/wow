@@ -160,24 +160,26 @@ class _CommentScreenState extends State<CommentScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                if (_commentCtrl.text.isEmpty) {
-                  return;
-                }
-                apiCallProvider.postRequest(API.addComment, {
-                  'feedId': widget.feedId,
-                  'userId': prefs.getString(PrefsKey.userId),
-                  'comment': _commentCtrl.text
-                }).then(
-                  (value) {
-                    _focusNode.unfocus();
-                    if (value['success'] == '1') {
-                      _commentCtrl.text = '';
-                      loadComment();
-                    }
-                  },
-                );
-              },
+              onPressed: apiCallProvider.status == ApiStatus.loading
+                  ? null
+                  : () {
+                      if (_commentCtrl.text.isEmpty) {
+                        return;
+                      }
+                      apiCallProvider.postRequest(API.addComment, {
+                        'feedId': widget.feedId,
+                        'userId': prefs.getString(PrefsKey.userId),
+                        'comment': _commentCtrl.text
+                      }).then(
+                        (value) {
+                          _focusNode.unfocus();
+                          if (value['success'] == '1') {
+                            _commentCtrl.text = '';
+                            loadComment();
+                          }
+                        },
+                      );
+                    },
               child: const Text(
                 'Post',
                 style: TextStyle(color: Colors.blue),

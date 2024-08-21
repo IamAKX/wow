@@ -16,6 +16,7 @@ import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/feed_video_player.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
 import '../../../models/feed.dart';
 import '../../../models/user_profile_detail.dart';
@@ -241,22 +242,25 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                     fit: BoxFit.fitWidth,
                   ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 10,
-              bottom: 5,
-              top: 5,
+          if (moment.likeCount != '0')
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 10,
+                bottom: 5,
+                top: 5,
+              ),
+              child: Text('${moment.likeCount ?? 0} likes'),
             ),
-            child: Text('${moment.likeCount ?? 0} likes'),
-          ),
           Row(
             children: [
               horizontalGap(10),
-              Text(
-                '${moment.commentCount}',
-                style: TextStyle(fontSize: 16),
-              ),
-              horizontalGap(10),
+              if (moment.commentCount != '0') ...{
+                Text(
+                  '${moment.commentCount}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                horizontalGap(10),
+              },
               InkWell(
                 onTap: () {
                   Navigator.of(context)
@@ -322,6 +326,34 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               ),
             ),
           ),
+          Visibility(
+            visible:
+                moment.comment != null && (moment.comment ?? '').isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  bottom: 10, left: 10, top: 5, right: 10),
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${moment.commentByame ?? ''} ',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    TextSpan(
+                      text: moment.comment ?? '',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 10, left: 10, top: 5),
             child: Text(
@@ -347,54 +379,68 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                   height: 300,
                   width: double.infinity,
                 )
-              : CachedNetworkImage(
-                  imageUrl: user?.image ?? '',
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey,
+              : InkWell(
+                  onTap: () => Navigator.of(context).pushNamed(
+                      NetworkImagePreviewFullScreen.route,
+                      arguments: user?.image ?? ''),
+                  child: CachedNetworkImage(
+                    imageUrl: user?.image ?? '',
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey,
+                      height: 300,
+                      width: double.infinity,
+                    ),
                     height: 300,
                     width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
-                  height: 300,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
                 ),
-          AppBar(
-            iconTheme: const IconThemeData(color: Colors.white),
-            backgroundColor: Colors.transparent,
-            title: const Text(
-              'Profile',
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(EditProfile.route).then(
-                    (value) {
-                      loadUserData();
-                    },
-                  );
-                },
-                icon: SvgPicture.asset(
-                  'assets/svg/edit__2___1_.svg',
-                  width: 30,
-                  color: Colors.white,
-                ),
+          SizedBox(
+            height: 80,
+            child: AppBar(
+              toolbarHeight: 50,
+              iconTheme: const IconThemeData(color: Colors.white),
+              backgroundColor: Colors.transparent,
+              title: const Text(
+                'Profile',
+                style: TextStyle(color: Colors.white),
               ),
-            ],
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(EditProfile.route).then(
+                      (value) {
+                        loadUserData();
+                      },
+                    );
+                  },
+                  icon: SvgPicture.asset(
+                    'assets/svg/edit__2___1_.svg',
+                    width: 30,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
           Positioned(
             top: 250,
             left: 10,
             child: Row(
               children: [
-                BorderedCircularImage(
-                  borderColor: Colors.white,
-                  borderThickness: 1,
-                  diameter: 75,
-                  imagePath: user?.image ?? '',
+                InkWell(
+                  onTap: () => Navigator.of(context).pushNamed(
+                      NetworkImagePreviewFullScreen.route,
+                      arguments: user?.image ?? ''),
+                  child: BorderedCircularImage(
+                    borderColor: Colors.white,
+                    borderThickness: 1,
+                    diameter: 75,
+                    imagePath: user?.image ?? '',
+                  ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

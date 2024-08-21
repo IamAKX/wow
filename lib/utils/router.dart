@@ -22,6 +22,7 @@ import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
+import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
 import '../screens/home_container/profile/comment.dart';
 
@@ -98,6 +99,11 @@ class NavRoute {
       case MediaPreviewFullScreen.route:
         return MaterialPageRoute(
             builder: (_) => MediaPreviewFullScreen(
+                  filePathOrUrl: settings.arguments as String,
+                ));
+      case NetworkImagePreviewFullScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => NetworkImagePreviewFullScreen(
                   filePathOrUrl: settings.arguments as String,
                 ));
       case CommentScreen.route:
