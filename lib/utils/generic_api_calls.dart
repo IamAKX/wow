@@ -8,13 +8,15 @@ import '../models/user_profile_detail.dart';
 Future<UserProfileDetail?> getCurrentUser() async {
   UserProfileDetail? user;
   Map<String, dynamic> reqBody = {
-    'userId': prefs.getString(PrefsKey.userId) ?? '0'
+    'userId': prefs.getString(PrefsKey.userId) ?? '0',
+    'otherUserId': prefs.getString(PrefsKey.userId) ?? '0',
+    'kickTo': prefs.getString(PrefsKey.userId) ?? '0'
   };
   await ApiCallProvider.instance
       .postRequest(API.getUserDataById, reqBody)
       .then((value) {
-    if (value['data'] != null) {
-      user = UserProfileDetail.fromMap(value['data']);
+    if (value['details'] != null) {
+      user = UserProfileDetail.fromMap(value['details']);
     }
   });
   return user;
