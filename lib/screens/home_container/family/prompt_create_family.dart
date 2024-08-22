@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -7,8 +8,9 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import '../../../providers/api_call_provider.dart';
 
 class PromptCreateFamily extends StatefulWidget {
-  const PromptCreateFamily({super.key});
+  const PromptCreateFamily({super.key, required this.userProfileDetail});
   static const String route = '/promptCreateFamily';
+  final UserProfileDetail userProfileDetail;
 
   @override
   State<PromptCreateFamily> createState() => _PromptCreateFamilyState();
@@ -59,7 +61,7 @@ class _PromptCreateFamilyState extends State<PromptCreateFamily> {
             ),
           ),
           Container(
-            margin: EdgeInsets.fromLTRB(80, 70, 80, 10),
+            margin: const EdgeInsets.fromLTRB(80, 70, 80, 10),
             child: Image.asset(
                 'assets/image/createFamilyScreenImageBackgroundRemoved.png'),
           ),
@@ -106,19 +108,25 @@ class _PromptCreateFamilyState extends State<PromptCreateFamily> {
                   fontWeight: FontWeight.bold),
             ),
           ),
-          Spacer(),
+          const Spacer(),
           InkWell(
-            onTap: () => Navigator.of(context).pushNamed(CreateFamily.route),
+            onTap: () {
+              if (isEligible()) {
+                Navigator.of(context).pushNamed(CreateFamily.route);
+              } else {
+                showErrorPopup();
+              }
+            },
             child: Container(
               width: double.infinity,
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(vertical: 15),
-              margin: EdgeInsets.all(pagePadding),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              margin: const EdgeInsets.all(pagePadding),
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Color(0xFF714926),
+                    color: const Color(0xFF714926),
                   )),
               child: const Text(
                 'Create a Family',
@@ -132,6 +140,61 @@ class _PromptCreateFamilyState extends State<PromptCreateFamily> {
           )
         ],
       ),
+    );
+  }
+
+  bool isEligible() {
+    try {
+      String sendLevel =
+          widget.userProfileDetail.lavelInfomation?.sendLevel ?? '0';
+      int sendLevelVal = int.parse(sendLevel);
+      return sendLevelVal >= 30;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void showErrorPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Tips',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              verticalGap(20),
+              const Text(
+                'You need a wealth level >= 30 to create a family. Upgrade your level or try to join a fun family!',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              verticalGap(10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFFF73201),
+                  ),
+                  child: const Text('CONFIRM'),
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -264,6 +264,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 contentPadding: EdgeInsets.zero,
                 onTap: () {
+                  if (user == null) {
+                    return;
+                  }
                   if (user?.familyJoinStatus ?? false) {
                     Navigator.of(context).pushNamed(FamilyScreen.route);
                   } else {

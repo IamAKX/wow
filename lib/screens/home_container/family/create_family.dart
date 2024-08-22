@@ -1,9 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:developer';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
+
+import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
 import '../../../utils/dimensions.dart';
-import '../../../widgets/circular_image.dart';
+import '../../../utils/generic_api_calls.dart';
 import '../../../widgets/gaps.dart';
 
 class CreateFamily extends StatefulWidget {
@@ -18,13 +28,27 @@ class _CreateFamilyState extends State<CreateFamily> {
   late ApiCallProvider apiCallProvider;
   final TextEditingController familyNameCtrl = TextEditingController();
   final TextEditingController familyDescCtrl = TextEditingController();
+  UserProfileDetail? user;
+
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Todo: call api after screen load
+      loadUserData();
     });
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
+    );
   }
 
   @override
@@ -46,9 +70,38 @@ class _CreateFamilyState extends State<CreateFamily> {
       padding: EdgeInsets.all(pagePadding),
       children: [
         verticalGap(pagePadding),
-        const CircularImage(
-          imagePath: 'hcdg',
-          diameter: 80,
+        InkWell(
+          onTap: () async {
+            final pickedFile =
+                await _picker.pickImage(source: ImageSource.gallery);
+            setState(() {
+              if (pickedFile != null) {
+                _image = File(pickedFile.path);
+              } else {
+                log('No image selected.');
+              }
+            });
+          },
+          child: Align(
+            alignment: Alignment.center,
+            child: _image != null
+                ? ClipOval(
+                    child: Image.file(
+                      _image!,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : ClipOval(
+                    child: Image.asset(
+                      'assets/dummy/demo_user_profile.png',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+          ),
         ),
         verticalGap(pagePadding),
         TextField(
@@ -123,10 +176,37 @@ class _CreateFamilyState extends State<CreateFamily> {
                 borderRadius: BorderRadius.circular(8.0),
               ),
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Submit'),
+            onPressed: apiCallProvider.status == ApiStatus.loading
+                ? null
+                : () async {
+                    if (familyNameCtrl.text.isEmpty ||
+                        familyDescCtrl.text.isEmpty ||
+                        _image == null) {
+                      showToastMessageWithLogo(
+                          'All fields are mandatory', context);
+                      return;
+                    }
+                    Map<String, dynamic> reqBody = {
+                      'userId': user?.id,
+                      'familyName': familyNameCtrl.text,
+                      'description': familyDescCtrl.text
+                    };
+                    MultipartFile profileImage = await MultipartFile.fromFile(
+                        _image!.path,
+                        filename: basename(_image!.path));
+                    reqBody['image'] = profileImage;
+                    apiCallProvider
+                        .postRequest(API.createFamily, reqBody)
+                        .then((value) {
+                      if (value['message'] != null) {
+                        showToastMessageWithLogo(value['message'], context);
+                        Navigator.pop(context);
+                      }
+                    });
+                  },
+            child: apiCallProvider.status == ApiStatus.loading
+                ? const ButtonLoader()
+                : const Text('Save'),
           ),
         )
       ],

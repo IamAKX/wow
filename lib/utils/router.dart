@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
@@ -129,7 +130,10 @@ class NavRoute {
       case FamilyScreen.route:
         return MaterialPageRoute(builder: (_) => const FamilyScreen());
       case PromptCreateFamily.route:
-        return MaterialPageRoute(builder: (_) => const PromptCreateFamily());
+        return MaterialPageRoute(
+            builder: (_) => PromptCreateFamily(
+                  userProfileDetail: settings.arguments as UserProfileDetail,
+                ));
       case PromptCreateFamilyFailed.route:
         return MaterialPageRoute(
             builder: (_) => const PromptCreateFamilyFailed());

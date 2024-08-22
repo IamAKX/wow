@@ -19,4 +19,9 @@ class API {
   static const String addComment = '$baseUrl/addComment';
   static const String deleteComment = '$baseUrl/deleteComment';
   static const String removeUserPost = '$baseUrl/removeUserPost';
+  static const String getFamiliesDetails = '$baseUrl/getFamiliesDetails';
+  static const String getLiveJoiners = '$baseUrl/getLiveJoiners';
+  static const String getFamilyLevelDetail = '$baseUrl/getFamilyLevelDetail';
+  static const String createFamily = '$baseUrl/createFamily';
+  static const String editFamily = '$baseUrl/editFamily';
 }

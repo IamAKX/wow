@@ -51,10 +51,7 @@ class FramedCircularImage extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.center,
-            child: Container(
-              margin: const EdgeInsets.only(top: 5),
-              child: Image.asset(framePath),
-            ),
+            child: Image.asset(framePath),
           ),
         ],
       ),
