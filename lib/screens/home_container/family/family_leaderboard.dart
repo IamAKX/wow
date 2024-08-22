@@ -208,14 +208,14 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
         Container(
           width: double.infinity,
           height: 50,
-          margin: EdgeInsets.all(pagePadding),
+          margin: const EdgeInsets.all(pagePadding),
           child: ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
               foregroundColor: const Color(0xFF5B4420),
               backgroundColor: const Color(0xFFBD9A60),
             ),
-            child: Text(
+            child: const Text(
               'Create a Family',
               style: TextStyle(
                 fontSize: 18,
