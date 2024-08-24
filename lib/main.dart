@@ -81,7 +81,8 @@ class MyApp extends StatelessWidget {
   }
 
   bool isUserLoggedIn() {
-    return prefs.containsKey(PrefsKey.loginProvider);
+    // return prefs.containsKey(PrefsKey.loginProvider);
+    return true;
   }
 }
 

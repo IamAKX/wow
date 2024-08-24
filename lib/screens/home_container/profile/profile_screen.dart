@@ -7,6 +7,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_l
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
@@ -231,7 +232,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, MallScreen.route);
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(

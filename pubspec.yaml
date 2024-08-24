@@ -45,6 +45,7 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.2.3
   social_login_buttons: ^1.0.7
+  svgaplayer_flutter_rhr: ^2.2.1
   timeago: ^3.7.0
   url_launcher: ^6.3.0
   video_player: ^2.9.1

@@ -10,6 +10,8 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_c
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/mall/send_friend.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
@@ -137,6 +139,10 @@ class NavRoute {
       case PromptCreateFamilyFailed.route:
         return MaterialPageRoute(
             builder: (_) => const PromptCreateFamilyFailed());
+      case MallScreen.route:
+        return MaterialPageRoute(builder: (_) => const MallScreen());
+      case SendFriendScreen.route:
+        return MaterialPageRoute(builder: (_) => const SendFriendScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
