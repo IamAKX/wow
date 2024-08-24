@@ -10,6 +10,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor
 import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
@@ -172,7 +173,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 contentPadding: EdgeInsets.zero,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(UserLevelScreen.route);
+                },
               ),
               Divider(
                 color: Colors.grey.withOpacity(0.4),

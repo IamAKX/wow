@@ -22,6 +22,9 @@ import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_
 import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_level/how_to_level_up.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level_cars.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
@@ -143,6 +146,12 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const MallScreen());
       case SendFriendScreen.route:
         return MaterialPageRoute(builder: (_) => const SendFriendScreen());
+      case UserLevelScreen.route:
+        return MaterialPageRoute(builder: (_) => const UserLevelScreen());
+      case UserLevelCars.route:
+        return MaterialPageRoute(builder: (_) => const UserLevelCars());
+      case HowToLevelUp.route:
+        return MaterialPageRoute(builder: (_) => const HowToLevelUp());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
