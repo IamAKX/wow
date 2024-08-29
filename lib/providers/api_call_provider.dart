@@ -83,7 +83,7 @@ class ApiCallProvider extends ChangeNotifier {
       var resBody = e.response?.data ?? {};
       notifyListeners();
       debugPrint(e.toString());
-      return resBody;
+      return jsonDecode(resBody);
     } catch (e) {
       status = ApiStatus.failed;
       notifyListeners();

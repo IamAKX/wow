@@ -3,7 +3,8 @@ class API {
   static const String termsOfService =
       'https://wows.co.in/Terms-and-Condition.html';
 
-  static const String baseUrl = 'https://api.wows.co.in';
+  // static const String baseUrl = 'https://api.wows.co.in';
+  static const String baseUrl = 'https://apiwows.xrdsimulators.tech';
   static const String generateToken = '$baseUrl/generateToken';
   static const String socialLogin = '$baseUrl/socialLogin';
   static const String checkNumber = '$baseUrl/checkNumber';
@@ -24,4 +25,9 @@ class API {
   static const String getFamilyLevelDetail = '$baseUrl/getFamilyLevelDetail';
   static const String createFamily = '$baseUrl/createFamily';
   static const String editFamily = '$baseUrl/editFamily';
+  static const String getTopGifter = '$baseUrl/getTopGifter';
+  static const String getSingleFamilyDetails =
+      '$baseUrl/get_single_family_details';
+  static const String searchUsers = '$baseUrl/searchUsers';
+  static const String sendJoinRequest = '$baseUrl/sendJoinRequest';
 }

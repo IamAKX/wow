@@ -85,7 +85,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
               ? CategorizedCircularImage(
                   imagePath: member?.userProfileImage ?? '',
                   imageSize: 50,
-                  categoryPath: 'assets/image/lion.png')
+                  categoryPath: 'assets/image/leaderimage.png')
               : CircularImage(
                   imagePath: member?.userProfileImage ?? '',
                   diameter: 50,

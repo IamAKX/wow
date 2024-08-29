@@ -34,14 +34,14 @@ class DioTokenInterceptor extends Interceptor {
   Future<void> _refreshToken() async {
     final Dio dio = Dio();
     String userId = prefs.getString(PrefsKey.userId) ?? '41';
-    log('Fetching token for userId=$userId from $_refreshTokenUrl');
+    // log('Fetching token for userId=$userId from $_refreshTokenUrl');
     final response = await dio.post(
       _refreshTokenUrl,
       data: FormData.fromMap({'userId': userId}),
     );
-    log('Response : ${response.data}');
+    // log('Response : ${response.data}');
     final newToken = response.data['token'];
-    log('Token : $newToken');
+    // log('Token : $newToken');
     await _tokenManager.saveToken(newToken);
   }
 }

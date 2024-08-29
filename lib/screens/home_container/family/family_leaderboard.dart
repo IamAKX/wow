@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
+import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/framed_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../models/family_leaderboard_member.dart';
+import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/generic_api_calls.dart';
 
 class FamilyLeaderboard extends StatefulWidget {
   const FamilyLeaderboard({super.key});
@@ -20,14 +26,20 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
   late TabController _tabController;
 
   late ApiCallProvider apiCallProvider;
+  List<FamilyLeaderboardMember> list = [];
+  UserProfileDetail? user;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-
+    _tabController.addListener(
+      () {
+        loadFamilyLeaderboard(_tabController.index + 1);
+      },
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Todo: call api after screen load
+      loadFamilyLeaderboard(1);
     });
   }
 
@@ -41,61 +53,66 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: const Text(
-            'Family',
-            style: TextStyle(color: Colors.white),
+        title: const Text(
+          'Family',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Image.asset(
+              'assets/image/invitation.png',
+              width: 20,
+              color: Colors.white,
+            ),
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Image.asset(
-                'assets/image/invitation.png',
-                width: 20,
-                color: Colors.white,
-              ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicator: const UnderlineTabIndicator(
+            borderSide: BorderSide(
+              width: 2.0,
+              color: Color(0xFFA9945A),
+              strokeAlign: BorderSide.strokeAlignCenter,
+            ),
+            insets: EdgeInsets.symmetric(horizontal: 50.0),
+          ),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 5),
+          indicatorColor: const Color(0xFFA9945A),
+          indicatorPadding: const EdgeInsets.only(bottom: 10),
+          labelStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFA9945A),
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFFCAB69B),
+          ),
+          tabs: const [
+            Tab(
+              text: 'NEW',
+            ),
+            Tab(
+              text: 'WEEKLY',
+            ),
+            Tab(
+              text: 'MONTHLY',
             ),
           ],
-          bottom: TabBar(
-            controller: _tabController,
-            indicator: const UnderlineTabIndicator(
-              borderSide: BorderSide(
-                width: 2.0,
-                color: Color(0xFFA9945A),
-                strokeAlign: BorderSide.strokeAlignCenter,
-              ),
-              insets: EdgeInsets.symmetric(horizontal: 50.0),
-            ),
-            labelPadding: const EdgeInsets.symmetric(horizontal: 5),
-            indicatorColor: const Color(0xFFA9945A),
-            indicatorPadding: const EdgeInsets.only(bottom: 10),
-            labelStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFA9945A),
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFFCAB69B),
-            ),
-            tabs: const [
-              Tab(
-                text: 'NEW',
-              ),
-              Tab(
-                text: 'WEEKLY',
-              ),
-              Tab(
-                text: 'MONTHLY',
-              ),
-            ],
-          ),
         ),
-        body: getBody(context));
+      ),
+      body: apiCallProvider.status == ApiStatus.loading
+          ? const DefaultPageLoader(
+              progressColor: Colors.amber,
+            )
+          : getBody(context),
+    );
   }
 
   getBody(BuildContext context) {
@@ -108,28 +125,29 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 children: [
                   Expanded(
                     child: getFamilyProfile(
-                        'https://xrdsimulators.tech/wow_project/uploads/adminImg/1720068930_IMG_20240704_102328610.jpg',
-                        'Testersss',
-                        '0',
-                        '2'),
+                      list.elementAt(1).image ?? '',
+                      list.elementAt(1).familyName ?? '',
+                      list.elementAt(1).familyLevel ?? '',
+                      '2',
+                    ),
                   ),
                   Expanded(
                     child: getFamilyProfile(
-                        'https://xrdsimulators.tech/wow_project/uploads/adminImg/1720068930_IMG_20240704_102328610.jpg',
-                        'Wow',
-                        '0',
+                        list.elementAt(0).image ?? '',
+                        list.elementAt(0).familyName ?? '',
+                        list.elementAt(0).familyLevel ?? '',
                         '1'),
                   ),
                   Expanded(
                     child: getFamilyProfile(
-                        'https://xrdsimulators.tech/wow_project/uploads/adminImg/1720068930_IMG_20240704_102328610.jpg',
-                        'Astro',
-                        '0',
+                        list.elementAt(2).image ?? '',
+                        list.elementAt(2).familyName ?? '',
+                        list.elementAt(2).familyLevel ?? '',
                         '3'),
                   )
                 ],
               ),
-              for (int i = 4; i <= 6; i++) ...{
+              for (int i = 3; i < list.length; i++) ...{
                 ListTile(
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -137,7 +155,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '$i',
+                        '${i + 1}',
                         style: const TextStyle(
                           color: Color(0xFFB7945C),
                           fontSize: 25,
@@ -145,17 +163,17 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                         ),
                       ),
                       horizontalGap(20),
-                      const BorderedCircularImage(
-                          imagePath: 'jkds',
+                      BorderedCircularImage(
+                          imagePath: list.elementAt(i).image ?? '',
                           diameter: 50,
-                          borderColor: Color(0xFFB7945C),
+                          borderColor: const Color(0xFFB7945C),
                           borderThickness: 2)
                     ],
                   ),
                   title: Row(
                     children: [
                       Text(
-                        'Test user $i',
+                        list.elementAt(i).familyName ?? '',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -168,9 +186,9 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                       )
                     ],
                   ),
-                  subtitle: const Text(
-                    'zzzz',
-                    style: TextStyle(
+                  subtitle: Text(
+                    list.elementAt(i).description ?? '',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                     ),
@@ -188,9 +206,10 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          '0',
-                          style: TextStyle(fontSize: 10, color: Colors.white),
+                        Text(
+                          list.elementAt(i).familyLevel ?? '',
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.white),
                         ),
                         horizontalGap(2),
                         Image.asset(
@@ -205,25 +224,92 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
             ],
           ),
         ),
-        Container(
-          width: double.infinity,
-          height: 50,
-          margin: const EdgeInsets.all(pagePadding),
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              foregroundColor: const Color(0xFF5B4420),
-              backgroundColor: const Color(0xFFBD9A60),
-            ),
-            child: const Text(
-              'Create a Family',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        )
+        user == null
+            ? Container(
+                margin: const EdgeInsets.all(pagePadding / 2),
+                child: const DefaultPageLoader(
+                  progressColor: Color(0xFFB7945C),
+                ),
+              )
+            : (user?.familyJoinStatus ?? false)
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(pagePadding / 2),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFFB7945C),
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 10),
+                      leading: BorderedCircularImage(
+                          imagePath: user?.familyImage ?? '',
+                          diameter: 50,
+                          borderColor: const Color(0xFFB7945C),
+                          borderThickness: 2),
+                      title: Row(
+                        children: [
+                          Text(
+                            user?.familyName ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          horizontalGap(10),
+                          Image.asset(
+                            'assets/image/levelbadge.jpeg',
+                            width: 18,
+                          )
+                        ],
+                      ),
+                      subtitle: const Text(
+                        'zzzz',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: Container(
+                        width: 60,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/image/family_points_border.png'),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          'assets/image/fire.png',
+                          width: 9,
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(
+                    width: double.infinity,
+                    height: 50,
+                    margin: const EdgeInsets.all(pagePadding),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, PromptCreateFamily.route,
+                            arguments: user);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color(0xFF5B4420),
+                        backgroundColor: const Color(0xFFBD9A60),
+                      ),
+                      child: const Text(
+                        'Create a Family',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  )
       ],
     );
   }
@@ -347,5 +433,29 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
       default:
         return 'assets/image/family1_name_border.png';
     }
+  }
+
+  void loadFamilyLeaderboard(int i) async {
+    Map<String, dynamic> reqBody = {'type': i};
+    await apiCallProvider.postRequest(API.getTopGifter, reqBody).then((value) {
+      list.clear();
+      if (value['details'] != null) {
+        for (var element in value['details']) {
+          list.add(FamilyLeaderboardMember.fromJson(element));
+        }
+      }
+      setState(() {});
+      loadUserData();
+    });
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
+    );
   }
 }

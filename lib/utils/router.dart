@@ -3,8 +3,12 @@ import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_medal.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_member.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family_failed.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
@@ -152,6 +156,21 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const UserLevelCars());
       case HowToLevelUp.route:
         return MaterialPageRoute(builder: (_) => const HowToLevelUp());
+      case InviteFamilyMember.route:
+        return MaterialPageRoute(
+          builder: (_) => InviteFamilyMember(
+            userProfileDetail: settings.arguments as UserProfileDetail,
+          ),
+        );
+      case FamilyMedalScreen.route:
+        return MaterialPageRoute(builder: (_) => const FamilyMedalScreen());
+      case FamilyRule.route:
+        return MaterialPageRoute(builder: (_) => FamilyRule());
+      case InvitationRequestScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => InvitationRequestScreen(
+                  userProfileDetail: settings.arguments as UserProfileDetail,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

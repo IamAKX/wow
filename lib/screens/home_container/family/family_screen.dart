@@ -1,11 +1,19 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors
 
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/family_details.dart';
+import 'package:worldsocialintegrationapp/models/single_family_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_medal.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_member.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
@@ -32,6 +40,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
   late ApiCallProvider apiCallProvider;
   FamilyDetails? familyDetails;
   UserProfileDetail? user;
+  SingleFamilyDetailModel? singleFamilyDetailModel;
+  int familyLevel = 0;
 
   @override
   void initState() {
@@ -43,20 +53,35 @@ class _FamilyScreenState extends State<FamilyScreen> {
 
   void loadUserData() async {
     await getCurrentUser().then(
-      (value) {
-        setState(() {
-          user = value;
-        });
-        loadFamilyDeatilsData(value?.id ?? '', value?.familyId ?? '');
+      (value) async {
+        user = value;
+        await loadFamilyDeatilsData(value?.id ?? '', value?.familyId ?? '');
       },
     );
   }
 
-  void loadFamilyDeatilsData(String userId, String familyId) async {
+  Future<void> loadFamilyDeatilsData(String userId, String familyId) async {
     Map<String, dynamic> reqBody = {'userId': userId, 'familyId': familyId};
     apiCallProvider.postRequest(API.getFamiliesDetails, reqBody).then((value) {
       if (value['details'] != null) {
         familyDetails = FamilyDetails.fromJson(value['details']);
+        familyLevel = familyDetails?.familyLevel ?? 1;
+        if (familyLevel == 0) familyLevel = 1;
+        setState(() {});
+        loadSingleFamilyDeatilsData('${familyLevel}');
+      }
+    });
+  }
+
+  Future<void> loadSingleFamilyDeatilsData(String type) async {
+    log('type : $type');
+    Map<String, dynamic> reqBody = {'type': type};
+    apiCallProvider
+        .postRequest(API.getSingleFamilyDetails, reqBody)
+        .then((value) {
+      if (value['details'] != null && null != value['details'][0]) {
+        singleFamilyDetailModel =
+            SingleFamilyDetailModel.fromJson(value['details'][0]);
         setState(() {});
       }
     });
@@ -67,8 +92,13 @@ class _FamilyScreenState extends State<FamilyScreen> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7F9),
-      body:
-          familyDetails == null ? const DefaultPageLoader() : getBody(context),
+      body: apiCallProvider.status == ApiStatus.loading
+          ? const DefaultPageLoader()
+          // : familyDetails == null
+          //     ? Center(
+          //         child: Text('details not found!'),
+          //       )
+          : getBody(context),
     );
   }
 
@@ -81,11 +111,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
             Container(
               height: 300,
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(
+                  image: CachedNetworkImageProvider(singleFamilyDetailModel
+                          ?.exclusiveBackground ??
                       'https://images.pexels.com/photos/66869/green-leaf-natural-wallpaper-royalty-free-66869.jpeg'),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
               child: getHeader(context),
@@ -97,34 +128,37 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 child: getCenterWidget(context),
               ),
             ),
-            Container(
-              margin: const EdgeInsets.all(pagePadding),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xffFE3400),
-                    Color(0xffFBC108),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.transparent, // Text color
-                  shadowColor: Colors.transparent, // No shadow
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+            Visibility(
+              visible: user?.id == familyDetails?.leaderId,
+              child: Container(
+                margin: const EdgeInsets.all(pagePadding),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xffFE3400),
+                      Color(0xffFBC108),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushNamed(PromptCreateFamily.route, arguments: user);
-                },
-                child: const Text('Invite'),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent, // Text color
+                    shadowColor: Colors.transparent, // No shadow
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(InviteFamilyMember.route, arguments: user);
+                  },
+                  child: const Text('Invite'),
+                ),
               ),
             )
           ],
@@ -152,7 +186,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(FamilyRule.route);
+                  },
                   icon: SvgPicture.asset(
                     'assets/svg/question.svg',
                     width: 20,
@@ -160,7 +196,11 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                        InvitationRequestScreen.route,
+                        arguments: user);
+                  },
                   icon: Image.asset(
                     'assets/image/invitation.png',
                     width: 20,
@@ -177,10 +217,20 @@ class _FamilyScreenState extends State<FamilyScreen> {
           child: SizedBox(
             width: 60,
             height: 60,
-            child: Image.asset(
-              'assets/image/monster.png',
-              fit: BoxFit.cover,
-              width: 60,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).pushNamed(FamilyMedalScreen.route);
+              },
+              child: CachedNetworkImage(
+                imageUrl: singleFamilyDetailModel?.rankMedal ?? '',
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text('Error ${error.toString()}'),
+                ),
+                fit: BoxFit.fitWidth,
+              ),
             ),
           ),
         )
@@ -221,8 +271,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              '2',
+            Text(
+              '$familyLevel',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -233,15 +283,16 @@ class _FamilyScreenState extends State<FamilyScreen> {
             Container(
               width: 200,
               child: LinearProgressIndicator(
-                value: 0.4,
+                value: (familyDetails?.totalContribution ?? 1) /
+                    (familyDetails?.totalExp ?? 1),
                 color: const Color(0xFFF9BF02),
                 minHeight: 5,
                 backgroundColor: const Color(0xFFF9BF02).withOpacity(0.4),
               ),
             ),
             horizontalGap(10),
-            const Text(
-              '3',
+            Text(
+              '${familyLevel + 1}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -251,8 +302,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
           ],
         ),
         verticalGap(5),
-        const Text(
-          '1352773/9999999',
+        Text(
+          '${familyDetails?.totalContribution}/${familyDetails?.totalExp}',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -389,23 +440,69 @@ class _FamilyScreenState extends State<FamilyScreen> {
     for (AllMembers members in familyDetails?.allMembers ?? []) {
       if (members.isFamilyLeader == '1' || joinerId.contains(members.userId)) {
         familyMember.add(
-          CategorizedCircularImage(
-              imagePath: members.userProfileImage ?? '',
-              imageSize: 50,
-              categoryPath: members.isFamilyLeader == '1'
-                  ? 'assets/image/lion.png'
-                  : 'assets/image/joinericon.png'),
+          InkWell(
+            onTap: () => showBottomSheet(context),
+            child: CategorizedCircularImage(
+                imagePath: members.userProfileImage ?? '',
+                imageSize: 50,
+                categoryPath: members.isFamilyLeader == '1'
+                    ? 'assets/image/leaderimage.png'
+                    : 'assets/image/joinericon.png'),
+          ),
         );
       } else {
         familyMember.add(
-          CircularImage(
-            imagePath: members.userProfileImage ?? '',
-            diameter: 50,
+          InkWell(
+            onTap: () => showBottomSheet(context),
+            child: CircularImage(
+              imagePath: members.userProfileImage ?? '',
+              diameter: 50,
+            ),
           ),
         );
       }
       familyMember.add(horizontalGap(pagePadding));
     }
     return familyMember;
+  }
+
+  void showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Profile'),
+                onTap: () {
+                  // Handle Profile tap
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.admin_panel_settings),
+                title: Text('Set Admin'),
+                onTap: () {
+                  // Handle Set Admin tap
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.remove_circle),
+                title: Text('Kick Out of Family'),
+                onTap: () {
+                  // Handle Kick Out of Family tap
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
