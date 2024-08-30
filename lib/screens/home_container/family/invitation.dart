@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/models/family_details.dart';
 
 import '../../../providers/api_call_provider.dart';
 
 class Invitation extends StatefulWidget {
-  const Invitation({super.key, required this.userProfileDetail});
-  final UserProfileDetail userProfileDetail;
+  const Invitation({super.key, required this.familyDetails});
+  final FamilyDetails familyDetails;
 
   @override
   State<Invitation> createState() => _InvitationState();

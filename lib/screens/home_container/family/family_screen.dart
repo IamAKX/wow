@@ -1,12 +1,12 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors
 
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/family_details.dart';
+import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/single_family_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_medal.dart';
@@ -14,10 +14,10 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_m
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/categorized_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -29,8 +29,9 @@ import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/framed_circular_image.dart';
 
 class FamilyScreen extends StatefulWidget {
-  const FamilyScreen({super.key});
+  const FamilyScreen({super.key, required this.familyIdModel});
   static const String route = '/familyScreen';
+  final FamilyIdModel familyIdModel;
 
   @override
   State<FamilyScreen> createState() => _FamilyScreenState();
@@ -55,13 +56,16 @@ class _FamilyScreenState extends State<FamilyScreen> {
     await getCurrentUser().then(
       (value) async {
         user = value;
-        await loadFamilyDeatilsData(value?.id ?? '', value?.familyId ?? '');
+        await loadFamilyDeatilsData();
       },
     );
   }
 
-  Future<void> loadFamilyDeatilsData(String userId, String familyId) async {
-    Map<String, dynamic> reqBody = {'userId': userId, 'familyId': familyId};
+  Future<void> loadFamilyDeatilsData() async {
+    Map<String, dynamic> reqBody = {
+      'userId': widget.familyIdModel.userId,
+      'familyId': widget.familyIdModel.familyId
+    };
     apiCallProvider.postRequest(API.getFamiliesDetails, reqBody).then((value) {
       if (value['details'] != null) {
         familyDetails = FamilyDetails.fromJson(value['details']);
@@ -74,7 +78,6 @@ class _FamilyScreenState extends State<FamilyScreen> {
   }
 
   Future<void> loadSingleFamilyDeatilsData(String type) async {
-    log('type : $type');
     Map<String, dynamic> reqBody = {'type': type};
     apiCallProvider
         .postRequest(API.getSingleFamilyDetails, reqBody)
@@ -109,7 +112,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
         Column(
           children: [
             Container(
-              height: 300,
+              margin: EdgeInsets.only(top: 50),
+              height: 250,
               width: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -129,7 +133,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
               ),
             ),
             Visibility(
-              visible: user?.id == familyDetails?.leaderId,
+              visible: widget.familyIdModel.userId == user?.id &&
+                  user?.id == familyDetails?.leaderId,
               child: Container(
                 margin: const EdgeInsets.all(pagePadding),
                 width: double.infinity,
@@ -168,21 +173,43 @@ class _FamilyScreenState extends State<FamilyScreen> {
           child: SizedBox(
             height: 100,
             child: AppBar(
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Color(0xFF5E2694),
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.light,
+              ),
               iconTheme: const IconThemeData(color: Colors.white),
               actions: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(EditFamily.route).then(
-                      (value) {
-                        loadFamilyDeatilsData(
-                            user?.id ?? '', user?.familyId ?? '');
-                      },
-                    );
-                  },
-                  icon: SvgPicture.asset(
-                    'assets/svg/edit__2___1_.svg',
-                    width: 25,
-                    color: Colors.white,
+                Visibility(
+                  visible: widget.familyIdModel.userId == user?.id &&
+                      familyDetails?.family?.leaderId != user?.id,
+                  child: IconButton(
+                    onPressed: () {
+                      showLeaveFamilyPopup(context);
+                    },
+                    icon: Icon(
+                      Icons.settings,
+                      size: 25,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: widget.familyIdModel.userId == user?.id &&
+                      familyDetails?.family?.leaderId == user?.id,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(EditFamily.route).then(
+                        (value) {
+                          loadFamilyDeatilsData();
+                        },
+                      );
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/svg/edit__2___1_.svg',
+                      width: 25,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -195,17 +222,31 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     color: Colors.white,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                        InvitationRequestScreen.route,
-                        arguments: user);
-                  },
-                  icon: Image.asset(
-                    'assets/image/invitation.png',
-                    width: 20,
-                    color: Colors.white,
-                  ),
+                Visibility(
+                  visible: widget.familyIdModel.userId == user?.id &&
+                      familyDetails?.family?.leaderId == user?.id,
+                  child: IconButton(
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushNamed(InvitationRequestScreen.route,
+                                arguments: familyDetails)
+                            .then(
+                          (value) {
+                            loadFamilyDeatilsData();
+                          },
+                        );
+                      },
+                      icon: Badge(
+                        isLabelVisible: (familyDetails?.requestCount ?? 0) > 0,
+                        label: Text('${familyDetails?.requestCount ?? 0}'),
+                        offset: const Offset(0, -10),
+                        backgroundColor: Colors.red,
+                        child: Image.asset(
+                          'assets/image/invitation.png',
+                          width: 20,
+                          color: Colors.white,
+                        ),
+                      )),
                 ),
               ],
             ),
@@ -217,21 +258,23 @@ class _FamilyScreenState extends State<FamilyScreen> {
           child: SizedBox(
             width: 60,
             height: 60,
-            child: InkWell(
-              onTap: () {
-                Navigator.of(context).pushNamed(FamilyMedalScreen.route);
-              },
-              child: CachedNetworkImage(
-                imageUrl: singleFamilyDetailModel?.rankMedal ?? '',
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) => Center(
-                  child: Text('Error ${error.toString()}'),
-                ),
-                fit: BoxFit.fitWidth,
-              ),
-            ),
+            child: singleFamilyDetailModel == null
+                ? SizedBox()
+                : InkWell(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(FamilyMedalScreen.route);
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl: singleFamilyDetailModel?.rankMedal ?? '',
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text('Error ${error.toString()}'),
+                      ),
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
           ),
         )
       ],
@@ -241,7 +284,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
   getHeader(BuildContext context) {
     return Column(
       children: [
-        verticalGap(90),
+        verticalGap(30),
         Align(
           alignment: Alignment.center,
           child: FramedCircularImage(
@@ -438,10 +481,10 @@ class _FamilyScreenState extends State<FamilyScreen> {
         [];
 
     for (AllMembers members in familyDetails?.allMembers ?? []) {
-      if (members.isFamilyLeader == '1' || joinerId.contains(members.userId)) {
+      if (members.isFamilyLeader == '1' || members.isAdmin == '1') {
         familyMember.add(
           InkWell(
-            onTap: () => showBottomSheet(context),
+            onTap: () => null,
             child: CategorizedCircularImage(
                 imagePath: members.userProfileImage ?? '',
                 imageSize: 50,
@@ -453,7 +496,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
       } else {
         familyMember.add(
           InkWell(
-            onTap: () => showBottomSheet(context),
+            onTap: () => showBottomSheet(
+                context, members.userId ?? '', members.isAdmin ?? ''),
             child: CircularImage(
               imagePath: members.userProfileImage ?? '',
               diameter: 50,
@@ -466,7 +510,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
     return familyMember;
   }
 
-  void showBottomSheet(BuildContext context) {
+  void showBottomSheet(
+      BuildContext context, String secondaryUserId, String isAdmin) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -478,31 +523,99 @@ class _FamilyScreenState extends State<FamilyScreen> {
               ListTile(
                 leading: Icon(Icons.person),
                 title: Text('Profile'),
-                onTap: () {
-                  // Handle Profile tap
-                  Navigator.pop(context);
-                },
+                onTap:
+                    apiCallProvider.status == ApiStatus.loading ? null : () {},
               ),
-              ListTile(
-                leading: Icon(Icons.admin_panel_settings),
-                title: Text('Set Admin'),
-                onTap: () {
-                  // Handle Set Admin tap
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.remove_circle),
-                title: Text('Kick Out of Family'),
-                onTap: () {
-                  // Handle Kick Out of Family tap
-                  Navigator.pop(context);
-                },
-              ),
+              if (widget.familyIdModel.userId == user?.id)
+                ListTile(
+                  leading: Icon(Icons.admin_panel_settings),
+                  title: Text(isAdmin == '0' ? 'Set Admin' : 'Remove Admin'),
+                  onTap: apiCallProvider.status == ApiStatus.loading
+                      ? null
+                      : () async {
+                          await familyRemoveAdmin(
+                              '2', secondaryUserId, isAdmin);
+                        },
+                ),
+              if (widget.familyIdModel.userId == user?.id)
+                ListTile(
+                  leading: Icon(Icons.remove_circle),
+                  title: Text('Kick Out of Family'),
+                  onTap: apiCallProvider.status == ApiStatus.loading
+                      ? null
+                      : () async {
+                          await familyRemoveAdmin(
+                              '1', secondaryUserId, isAdmin);
+                        },
+                ),
             ],
           ),
         );
       },
     );
+  }
+
+  void showLeaveFamilyPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Alert!'),
+          content: const Text('Are you sure you want to leave this family?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Map<String, dynamic> reqBody = {
+                  'userId': '${user?.id}',
+                  'familyId': '${familyDetails?.id}'
+                };
+                await apiCallProvider
+                    .postRequest(API.leavefamilyGroup, reqBody)
+                    .then((value) {
+                  if (value['message'] != null) {
+                    showToastMessage(value['message']);
+                    Navigator.pop(context);
+                  }
+                });
+              },
+              child: const Text(
+                'Yes',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> familyRemoveAdmin(
+      String type, String secondaryUserId, String isAdmin) async {
+    Map<String, dynamic> reqBody = {
+      'type': type,
+      'familyId': familyDetails?.id,
+      'otherUserId': secondaryUserId,
+      'userId': user?.id,
+      'is_admin': isAdmin
+    };
+    await apiCallProvider
+        .postRequest(API.familyAdminRemove, reqBody)
+        .then((value) async {
+      if (value['message'] != null) {
+        showToastMessage(value['message']);
+        Navigator.pop(context);
+        await loadFamilyDeatilsData();
+      }
+    });
   }
 }

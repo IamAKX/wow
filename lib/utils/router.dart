@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
@@ -41,6 +42,7 @@ import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
+import '../models/family_details.dart';
 import '../screens/home_container/profile/comment.dart';
 
 class NavRoute {
@@ -137,7 +139,10 @@ class NavRoute {
       case FamilyMemberScreen.route:
         return MaterialPageRoute(builder: (_) => const FamilyMemberScreen());
       case FamilyScreen.route:
-        return MaterialPageRoute(builder: (_) => const FamilyScreen());
+        return MaterialPageRoute(
+            builder: (_) => FamilyScreen(
+                  familyIdModel: settings.arguments as FamilyIdModel,
+                ));
       case PromptCreateFamily.route:
         return MaterialPageRoute(
             builder: (_) => PromptCreateFamily(
@@ -165,11 +170,11 @@ class NavRoute {
       case FamilyMedalScreen.route:
         return MaterialPageRoute(builder: (_) => const FamilyMedalScreen());
       case FamilyRule.route:
-        return MaterialPageRoute(builder: (_) => FamilyRule());
+        return MaterialPageRoute(builder: (_) => const FamilyRule());
       case InvitationRequestScreen.route:
         return MaterialPageRoute(
             builder: (_) => InvitationRequestScreen(
-                  userProfileDetail: settings.arguments as UserProfileDetail,
+                  familyDetails: settings.arguments as FamilyDetails,
                 ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());

@@ -7,11 +7,15 @@ import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/framed_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../models/family_details.dart';
+import '../../../models/family_id_model.dart';
 import '../../../models/family_leaderboard_member.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
+import 'family_screen.dart';
+import 'invitation_request.dart';
 
 class FamilyLeaderboard extends StatefulWidget {
   const FamilyLeaderboard({super.key});
@@ -28,6 +32,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
   late ApiCallProvider apiCallProvider;
   List<FamilyLeaderboardMember> list = [];
   UserProfileDetail? user;
+  FamilyDetails? familyDetails;
 
   @override
   void initState() {
@@ -39,7 +44,28 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
       },
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
       loadFamilyLeaderboard(1);
+    });
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) async {
+        user = value;
+        setState(() {});
+        await loadFamilyDeatilsData(value?.id ?? '', value?.familyId ?? '');
+      },
+    );
+  }
+
+  Future<void> loadFamilyDeatilsData(String userId, String familyId) async {
+    Map<String, dynamic> reqBody = {'userId': userId, 'familyId': familyId};
+    apiCallProvider.postRequest(API.getFamiliesDetails, reqBody).then((value) {
+      if (value['details'] != null) {
+        familyDetails = FamilyDetails.fromJson(value['details']);
+        setState(() {});
+      }
     });
   }
 
@@ -63,13 +89,27 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Image.asset(
-              'assets/image/invitation.png',
-              width: 20,
-              color: Colors.white,
-            ),
-          ),
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(InvitationRequestScreen.route,
+                        arguments: familyDetails)
+                    .then(
+                  (value) {
+                    loadFamilyDeatilsData(user?.id ?? '', user?.familyId ?? '');
+                  },
+                );
+              },
+              icon: Badge(
+                isLabelVisible: (familyDetails?.requestCount ?? 0) > 0,
+                label: Text('${familyDetails?.requestCount ?? 0}'),
+                offset: const Offset(0, -10),
+                backgroundColor: Colors.red,
+                child: Image.asset(
+                  'assets/image/invitation.png',
+                  width: 20,
+                  color: Colors.white,
+                ),
+              )),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -124,26 +164,52 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
               Row(
                 children: [
                   Expanded(
-                    child: getFamilyProfile(
-                      list.elementAt(1).image ?? '',
-                      list.elementAt(1).familyName ?? '',
-                      list.elementAt(1).familyLevel ?? '',
-                      '2',
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: list.elementAt(1).leaderId,
+                                familyId: list.elementAt(1).id));
+                      },
+                      child: getFamilyProfile(
+                        list.elementAt(1).image ?? '',
+                        list.elementAt(1).familyName ?? '',
+                        list.elementAt(1).total ?? '',
+                        '2',
+                      ),
                     ),
                   ),
                   Expanded(
-                    child: getFamilyProfile(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: list.elementAt(0).leaderId,
+                                familyId: list.elementAt(0).id));
+                      },
+                      child: getFamilyProfile(
                         list.elementAt(0).image ?? '',
                         list.elementAt(0).familyName ?? '',
-                        list.elementAt(0).familyLevel ?? '',
-                        '1'),
+                        list.elementAt(0).total ?? '',
+                        '1',
+                      ),
+                    ),
                   ),
                   Expanded(
-                    child: getFamilyProfile(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: list.elementAt(2).leaderId,
+                                familyId: list.elementAt(2).id));
+                      },
+                      child: getFamilyProfile(
                         list.elementAt(2).image ?? '',
                         list.elementAt(2).familyName ?? '',
-                        list.elementAt(2).familyLevel ?? '',
-                        '3'),
+                        list.elementAt(2).total ?? '',
+                        '3',
+                      ),
+                    ),
                   )
                 ],
               ),
@@ -193,6 +259,12 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                       fontSize: 12,
                     ),
                   ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(FamilyScreen.route,
+                        arguments: FamilyIdModel(
+                            userId: list.elementAt(i).leaderId,
+                            familyId: list.elementAt(i).id));
+                  },
                   trailing: Container(
                     width: 60,
                     decoration: const BoxDecoration(
@@ -207,7 +279,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          list.elementAt(i).familyLevel ?? '',
+                          list.elementAt(i).total ?? '',
                           style: const TextStyle(
                               fontSize: 10, color: Colors.white),
                         ),
@@ -249,6 +321,11 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                           diameter: 50,
                           borderColor: const Color(0xFFB7945C),
                           borderThickness: 2),
+                      onTap: () {
+                        Navigator.of(context).pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: user?.id, familyId: user?.familyId));
+                      },
                       title: Row(
                         children: [
                           Text(
@@ -447,15 +524,5 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
       setState(() {});
       loadUserData();
     });
-  }
-
-  void loadUserData() async {
-    await getCurrentUser().then(
-      (value) {
-        setState(() {
-          user = value;
-        });
-      },
-    );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
@@ -274,7 +275,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return;
                   }
                   if (user?.familyJoinStatus ?? false) {
-                    Navigator.of(context).pushNamed(FamilyScreen.route);
+                    Navigator.of(context).pushNamed(FamilyScreen.route,
+                        arguments: FamilyIdModel(
+                            userId: user?.id, familyId: user?.familyId));
                   } else {
                     Navigator.of(context).pushNamed(FamilyLeaderboard.route);
                   }

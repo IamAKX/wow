@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invitation.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/request.dart';
 
+import '../../../models/family_details.dart';
 import '../../../providers/api_call_provider.dart';
 
 class InvitationRequestScreen extends StatefulWidget {
-  const InvitationRequestScreen({super.key, required this.userProfileDetail});
+  const InvitationRequestScreen({super.key, required this.familyDetails});
   static const String route = '/invitationScreen';
-  final UserProfileDetail userProfileDetail;
+  final FamilyDetails familyDetails;
 
   @override
   State<InvitationRequestScreen> createState() =>
@@ -40,6 +41,11 @@ class _InvitationRequestScreenState extends State<InvitationRequestScreen>
 
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF5E2694),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.light,
+        ),
         title: TabBar(
           controller: _tabController,
           indicator: const UnderlineTabIndicator(
@@ -76,10 +82,10 @@ class _InvitationRequestScreenState extends State<InvitationRequestScreen>
         controller: _tabController,
         children: [
           Invitation(
-            userProfileDetail: widget.userProfileDetail,
+            familyDetails: widget.familyDetails,
           ),
           Request(
-            userProfileDetail: widget.userProfileDetail,
+            familyDetails: widget.familyDetails,
           ),
         ],
       ),
