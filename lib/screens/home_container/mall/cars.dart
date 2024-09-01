@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:svgaplayer_flutter_rhr/player.dart';
+import 'package:worldsocialintegrationapp/models/lucky_model.dart';
+import 'package:worldsocialintegrationapp/models/send_friend_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/mall/send_friend.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../../main.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/prefs_key.dart';
 
 class CarsScreen extends StatefulWidget {
   const CarsScreen({super.key});
@@ -11,8 +20,51 @@ class CarsScreen extends StatefulWidget {
 }
 
 class _CarsScreenState extends State<CarsScreen> {
+  late ApiCallProvider apiCallProvider;
+  List<LuckyModel> carList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getLuck();
+    });
+  }
+
+  getLuck() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    carList.clear();
+    await apiCallProvider.postRequest(API.getLuckyId, reqBody).then((value) {
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          carList.add(LuckyModel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
+  }
+
+  purchaseLuckyId(String luckyId, int index) async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'luckyId': luckyId
+    };
+    await apiCallProvider
+        .postRequest(API.purchaseLuckyId, reqBody)
+        .then((value) {
+      showToastMessage(value['message'] ?? '');
+
+      if (value['success'] != 1) {
+        carList.elementAt(index).isMy = true;
+        setState(() {});
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -21,7 +73,7 @@ class _CarsScreenState extends State<CarsScreen> {
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.95,
       ),
-      itemCount: 20,
+      itemCount: carList.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
           child: Padding(
@@ -36,9 +88,9 @@ class _CarsScreenState extends State<CarsScreen> {
                       color: Colors.grey,
                     ),
                     horizontalGap(5),
-                    const Text(
-                      '5',
-                      style: TextStyle(
+                    Text(
+                      '${carList.elementAt(index).validity}',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
                       ),
@@ -46,8 +98,7 @@ class _CarsScreenState extends State<CarsScreen> {
                     const Spacer(),
                     InkWell(
                       onTap: () {
-                        showTestDrivePopup(
-                            'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true');
+                        showTestDrivePopup('${carList.elementAt(index).image}');
                       },
                       child: const Text(
                         'Test drive',
@@ -59,12 +110,11 @@ class _CarsScreenState extends State<CarsScreen> {
                     )
                   ],
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 80,
                   height: 80,
                   child: SVGASimpleImage(
-                    resUrl:
-                        'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true',
+                    resUrl: '${carList.elementAt(index).image}',
                   ),
                 ),
                 Row(
@@ -75,10 +125,10 @@ class _CarsScreenState extends State<CarsScreen> {
                       width: 20,
                     ),
                     horizontalGap(5),
-                    const Text(
-                      '4000',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Text(
+                      '${carList.elementAt(index).price}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -87,9 +137,11 @@ class _CarsScreenState extends State<CarsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     InkWell(
-                      onTap: () {
-                        showBuyPopUp();
-                      },
+                      onTap: carList.elementAt(index).isMy ?? false
+                          ? null
+                          : () {
+                              showBuyPopUp(carList.elementAt(index).id!, index);
+                            },
                       child: Container(
                         width: 70,
                         height: 30,
@@ -105,16 +157,24 @@ class _CarsScreenState extends State<CarsScreen> {
                           ),
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        child: const Text(
-                          'Buy',
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          carList.elementAt(index).isMy ?? false
+                              ? 'Bought'
+                              : 'Buy',
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
                     horizontalGap(10),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, SendFriendScreen.route);
+                        SendFriendModel model = SendFriendModel(
+                            isCar: true,
+                            id: carList.elementAt(index).id,
+                            price: carList.elementAt(index).price,
+                            validity: carList.elementAt(index).validity);
+                        Navigator.pushNamed(context, SendFriendScreen.route,
+                            arguments: model);
                       },
                       child: Container(
                         width: 70,
@@ -152,8 +212,11 @@ class _CarsScreenState extends State<CarsScreen> {
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width - 40,
             height: MediaQuery.of(context).size.width - 40,
-            child: SVGASimpleImage(
-              resUrl: link,
+            child: InkWell(
+              onTap: () => Navigator.pop(context),
+              child: SVGASimpleImage(
+                resUrl: link,
+              ),
             ),
           ),
         );
@@ -161,7 +224,7 @@ class _CarsScreenState extends State<CarsScreen> {
     );
   }
 
-  void showBuyPopUp() {
+  void showBuyPopUp(String luckyId, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -218,6 +281,7 @@ class _CarsScreenState extends State<CarsScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        purchaseLuckyId(luckyId, index);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,

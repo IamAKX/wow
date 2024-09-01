@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
+import 'package:worldsocialintegrationapp/models/lucky_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
@@ -43,6 +44,7 @@ import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart'
 import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
 import '../models/family_details.dart';
+import '../models/send_friend_model.dart';
 import '../screens/home_container/profile/comment.dart';
 
 class NavRoute {
@@ -154,7 +156,10 @@ class NavRoute {
       case MallScreen.route:
         return MaterialPageRoute(builder: (_) => const MallScreen());
       case SendFriendScreen.route:
-        return MaterialPageRoute(builder: (_) => const SendFriendScreen());
+        return MaterialPageRoute(
+            builder: (_) => SendFriendScreen(
+                  sendFriendModel: settings.arguments as SendFriendModel,
+                ));
       case UserLevelScreen.route:
         return MaterialPageRoute(builder: (_) => const UserLevelScreen());
       case UserLevelCars.route:

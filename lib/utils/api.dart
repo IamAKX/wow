@@ -36,4 +36,11 @@ class API {
   static const String responseJoinRequest = '$baseUrl/responseJoinRequest';
   static const String getLevelList = '$baseUrl/getLevelList';
   static const String getCarsByLevel = '$baseUrl/getCarsByLevel';
+  static const String getLuckyId = '$baseUrl/getLuckyId';
+  static const String purchaseLuckyId = '$baseUrl/purchaseLuckyId';
+  static const String getFriendsDetails = '$baseUrl/getFriendsDetails';
+  static const String sendLuckyId = '$baseUrl/sendLuckyId';
+  static const String getFrames = '$baseUrl/getFrames';
+  static const String purchaseFrames = '$baseUrl/purchaseFrames';
+  static const String sendFrames = '$baseUrl/sendFrames';
 }

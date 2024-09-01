@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:svgaplayer_flutter_rhr/svgaplayer_flutter.dart';
+import 'package:worldsocialintegrationapp/models/frame_model.dart';
 
+import '../../../main.dart';
+import '../../../models/send_friend_model.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/helpers.dart';
+import '../../../utils/prefs_key.dart';
 import '../../../widgets/gaps.dart';
 import 'send_friend.dart';
 
@@ -12,8 +20,51 @@ class FramesScreen extends StatefulWidget {
 }
 
 class _FramesScreenState extends State<FramesScreen> {
+  late ApiCallProvider apiCallProvider;
+  List<FrameModel> frameList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getFrames();
+    });
+  }
+
+  getFrames() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    frameList.clear();
+    await apiCallProvider.postRequest(API.getFrames, reqBody).then((value) {
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          frameList.add(FrameModel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
+  }
+
+  purchaseFrame(String frameId, int index) async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'frameId': frameId
+    };
+    await apiCallProvider
+        .postRequest(API.purchaseFrames, reqBody)
+        .then((value) {
+      showToastMessage(value['message'] ?? '');
+      if (value['success'] != 1) {
+        setState(() {
+          frameList.elementAt(index).isMy = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -22,7 +73,7 @@ class _FramesScreenState extends State<FramesScreen> {
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.95,
       ),
-      itemCount: 20,
+      itemCount: frameList.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
           child: Padding(
@@ -37,9 +88,9 @@ class _FramesScreenState extends State<FramesScreen> {
                       color: Colors.grey,
                     ),
                     horizontalGap(5),
-                    const Text(
-                      '5',
-                      style: TextStyle(
+                    Text(
+                      '${frameList.elementAt(index).validity}',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
                       ),
@@ -48,7 +99,7 @@ class _FramesScreenState extends State<FramesScreen> {
                     InkWell(
                       onTap: () {
                         showTestDrivePopup(
-                            'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true');
+                            '${frameList.elementAt(index).frameImg}');
                       },
                       child: const Text(
                         'Test Wear',
@@ -60,12 +111,11 @@ class _FramesScreenState extends State<FramesScreen> {
                     )
                   ],
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 80,
                   height: 80,
                   child: SVGASimpleImage(
-                    resUrl:
-                        'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true',
+                    resUrl: '${frameList.elementAt(index).frameImg}',
                   ),
                 ),
                 Row(
@@ -76,10 +126,10 @@ class _FramesScreenState extends State<FramesScreen> {
                       width: 20,
                     ),
                     horizontalGap(5),
-                    const Text(
-                      '4000',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Text(
+                      '${frameList.elementAt(index).price}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -88,9 +138,12 @@ class _FramesScreenState extends State<FramesScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     InkWell(
-                      onTap: () {
-                        showBuyPopUp();
-                      },
+                      onTap: frameList.elementAt(index).isMy ?? false
+                          ? null
+                          : () {
+                              showBuyPopUp(
+                                  frameList.elementAt(index).id!, index);
+                            },
                       child: Container(
                         width: 70,
                         height: 30,
@@ -106,16 +159,24 @@ class _FramesScreenState extends State<FramesScreen> {
                           ),
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        child: const Text(
-                          'Buy',
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          frameList.elementAt(index).isMy ?? false
+                              ? 'Bought'
+                              : 'Buy',
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
                     horizontalGap(10),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, SendFriendScreen.route);
+                        SendFriendModel model = SendFriendModel(
+                            isCar: false,
+                            id: frameList.elementAt(index).id,
+                            price: frameList.elementAt(index).price,
+                            validity: frameList.elementAt(index).validity);
+                        Navigator.pushNamed(context, SendFriendScreen.route,
+                            arguments: model);
                       },
                       child: Container(
                         width: 70,
@@ -162,7 +223,7 @@ class _FramesScreenState extends State<FramesScreen> {
     );
   }
 
-  void showBuyPopUp() {
+  void showBuyPopUp(String frameId, int index) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -219,6 +280,7 @@ class _FramesScreenState extends State<FramesScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        purchaseFrame(frameId, index);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,

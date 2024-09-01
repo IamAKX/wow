@@ -1,21 +1,65 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/friend_model.dart';
+
+import '../../../main.dart';
+import '../../../models/send_friend_model.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/helpers.dart';
+import '../../../utils/prefs_key.dart';
 import '../../../widgets/circular_image.dart';
 import '../../../widgets/gaps.dart';
 
 class SendFriendScreen extends StatefulWidget {
-  const SendFriendScreen({super.key});
+  const SendFriendScreen({super.key, required this.sendFriendModel});
   static const String route = '/sendFriendScreen';
+  final SendFriendModel sendFriendModel;
 
   @override
   State<SendFriendScreen> createState() => _SendFriendScreenState();
 }
 
 class _SendFriendScreenState extends State<SendFriendScreen> {
+  late ApiCallProvider apiCallProvider;
+  List<FriendModel> friendList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getFriends();
+    });
+  }
+
+  getFriends() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    await apiCallProvider
+        .postRequest(API.getFriendsDetails, reqBody)
+        .then((value) {
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          friendList.add(FriendModel.fromJson(item));
+        }
+        log(friendList.length.toString());
+        setState(() {});
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.orange,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.light,
+        ),
         title: const Text('Friends'),
       ),
       body: getBody(context),
@@ -24,21 +68,23 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
 
   getBody(BuildContext context) {
     return ListView.builder(
-      itemCount: 5,
+      itemCount: friendList.length,
       itemBuilder: (context, index) {
         return ListTile(
-          leading: const CircularImage(
-            imagePath: 'someimgae.com',
+          leading: CircularImage(
+            imagePath: friendList.elementAt(index).image ?? '',
             diameter: 50,
           ),
           title: Text(
-            'Test $index',
+            friendList.elementAt(index).name ?? '',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           trailing: InkWell(
-            onTap: () {
-              showSendUp();
-            },
+            onTap: apiCallProvider.status == ApiStatus.loading
+                ? null
+                : () {
+                    showSendUp(friendList.elementAt(index));
+                  },
             child: Container(
               width: 70,
               height: 30,
@@ -125,7 +171,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
     );
   }
 
-  void showSendUp() {
+  void showSendUp(FriendModel friend) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -143,8 +189,8 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                       color: Color(0xFF7A7A7A),
                     ),
                     horizontalGap(5),
-                    const Text(
-                      '30',
+                    Text(
+                      '${widget.sendFriendModel.validity}',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
@@ -154,7 +200,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                 ),
               ),
               verticalGap(20),
-              CircularImage(imagePath: 'cdsd', diameter: 100),
+              CircularImage(imagePath: friend.image ?? '', diameter: 100),
               verticalGap(20),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -163,8 +209,8 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     'assets/image/coins_img.png',
                     width: 20,
                   ),
-                  const Text(
-                    '4000',
+                  Text(
+                    '${widget.sendFriendModel.price}',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   )
                 ],
@@ -204,6 +250,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        sendLucky(friend.id!);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -221,5 +268,21 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
         );
       },
     );
+  }
+
+  void sendLucky(String otherId) async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      widget.sendFriendModel.isCar! ? 'luckyId' : 'frameId':
+          widget.sendFriendModel.id,
+      'otherUserId': otherId
+    };
+    await apiCallProvider
+        .postRequest(
+            widget.sendFriendModel.isCar! ? API.sendLuckyId : API.sendFrames,
+            reqBody)
+        .then((value) {
+      showToastMessage(value['message'] ?? '');
+    });
   }
 }
