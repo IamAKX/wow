@@ -1,20 +1,55 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:svgaplayer_flutter_rhr/player.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/level_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level_cars.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
+import '../../../main.dart';
+import '../../../models/car_by_level.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/prefs_key.dart';
 import '../../../widgets/gaps.dart';
+import 'how_to_level_up.dart';
 
 class SendingScreen extends StatefulWidget {
-  const SendingScreen({super.key});
+  const SendingScreen({super.key, required this.levelModel});
+  final LevelModel levelModel;
 
   @override
   State<SendingScreen> createState() => _SendingScreenState();
 }
 
 class _SendingScreenState extends State<SendingScreen> {
+  late ApiCallProvider apiCallProvider;
+  List<CarByLevel> carList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getCarByLevel();
+    });
+  }
+
+  getCarByLevel() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    apiCallProvider.postRequest(API.getCarsByLevel, reqBody).then((value) {
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          carList.add(CarByLevel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+    int sendLevel = getSendLevel();
+
     return Column(
       children: [
         Padding(
@@ -27,27 +62,27 @@ class _SendingScreenState extends State<SendingScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'LV.22',
-              style: TextStyle(
+            Text(
+              'LV.$sendLevel',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
               ),
             ),
             horizontalGap(10),
-            Container(
+            SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: 0.4,
+                value: (widget.levelModel.sendEnd ?? 1) / 2000,
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
               ),
             ),
             horizontalGap(10),
-            const Text(
-              'LV.23',
-              style: TextStyle(
+            Text(
+              'LV.${sendLevel + 1}',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
               ),
@@ -55,8 +90,8 @@ class _SendingScreenState extends State<SendingScreen> {
           ],
         ),
         verticalGap(5),
-        const Text(
-          '1352773/9999999',
+        Text(
+          '${widget.levelModel.sendEnd}/2000',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -106,11 +141,11 @@ class _SendingScreenState extends State<SendingScreen> {
                     )
                   ],
                 ),
-                Container(
+                SizedBox(
                   height: 160,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: 5,
+                    itemCount: carList.length,
                     itemBuilder: (context, index) {
                       return Container(
                         padding: const EdgeInsets.all(5),
@@ -123,7 +158,7 @@ class _SendingScreenState extends State<SendingScreen> {
                         ),
                         child: Column(
                           children: [
-                            Align(
+                            const Align(
                               alignment: Alignment.centerLeft,
                               child: CircleAvatar(
                                 backgroundColor: Color(0xFFFF9B55),
@@ -138,18 +173,29 @@ class _SendingScreenState extends State<SendingScreen> {
                             SizedBox(
                               width: 80,
                               height: 80,
-                              child: SVGASimpleImage(
-                                resUrl:
-                                    'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true',
+                              // child: SVGASimpleImage(
+                              //   resUrl:
+                              //       'https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true',
+                              // ),
+                              child: CachedNetworkImage(
+                                imageUrl: carList.elementAt(index).image ?? '',
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text('Error ${error.toString()}'),
+                                ),
+                                width: 80,
+                                height: 80,
                               ),
                             ),
-                            const Text(
-                              '10(s)',
-                              style: TextStyle(fontSize: 12),
+                            Text(
+                              '${carList.elementAt(index).validity}(s)',
+                              style: const TextStyle(fontSize: 12),
                             ),
-                            const Text(
-                              'Unlock LV 100',
-                              style: TextStyle(fontSize: 12),
+                            Text(
+                              'Unlock LV ${carList.elementAt(index).level}',
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ],
                         ),
@@ -212,7 +258,7 @@ class _SendingScreenState extends State<SendingScreen> {
         Padding(
           padding: const EdgeInsets.all(pagePadding),
           child: InkWell(
-            onTap: () {},
+            onTap: () => Navigator.pushNamed(context, HowToLevelUp.route),
             child: Container(
               width: double.infinity,
               height: 50,
@@ -237,5 +283,16 @@ class _SendingScreenState extends State<SendingScreen> {
         ),
       ],
     );
+  }
+
+  int getSendLevel() {
+    int lv = 1;
+    try {
+      lv = int.parse(widget.levelModel.sendLevel ?? '1');
+      if (lv == 0) lv = 1;
+    } catch (e) {
+      lv = 1;
+    }
+    return lv;
   }
 }

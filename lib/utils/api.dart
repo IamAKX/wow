@@ -34,4 +34,6 @@ class API {
   static const String familyAdminRemove = '$baseUrl/family_admin_remove';
   static const String getJoinRequest = '$baseUrl/getJoinRequest';
   static const String responseJoinRequest = '$baseUrl/responseJoinRequest';
+  static const String getLevelList = '$baseUrl/getLevelList';
+  static const String getCarsByLevel = '$baseUrl/getCarsByLevel';
 }

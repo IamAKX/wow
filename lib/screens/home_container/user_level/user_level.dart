@@ -1,7 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/level_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/receiving_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/sending_screen.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
 
 class UserLevelScreen extends StatefulWidget {
   const UserLevelScreen({super.key});
@@ -14,6 +22,8 @@ class UserLevelScreen extends StatefulWidget {
 class _UserLevelScreenState extends State<UserLevelScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late ApiCallProvider apiCallProvider;
+  LevelModel? levelModel;
 
   @override
   void initState() {
@@ -24,7 +34,19 @@ class _UserLevelScreenState extends State<UserLevelScreen>
         setState(() {});
       },
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getLevelModel();
+    });
+  }
+
+  getLevelModel() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    apiCallProvider.postRequest(API.getLevelList, reqBody).then((value) {
+      if (value['details'] != null) {
+        levelModel = LevelModel.fromJson(value['details']);
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -35,6 +57,7 @@ class _UserLevelScreenState extends State<UserLevelScreen>
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       body: getBody(context),
     );
@@ -43,10 +66,38 @@ class _UserLevelScreenState extends State<UserLevelScreen>
   getBody(BuildContext context) {
     return Stack(
       children: [
-        _tabController.index == 1
-            ? Image.asset('assets/image/levell_13.png')
-            : Image.asset('assets/image/levell_1.png'),
-        Container(
+        _tabController.index == 0
+            ? CachedNetworkImage(
+                imageUrl: levelModel?.sandBgImage ?? '',
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/image/levell_1.png',
+                  height: 350,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.fitWidth,
+                ),
+                height: 350,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fitWidth,
+              )
+            : CachedNetworkImage(
+                imageUrl: levelModel?.reciveBgImage ?? '',
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/image/levell_1.png',
+                  height: 350,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.fitWidth,
+                ),
+                height: 350,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fitWidth,
+              ),
+        SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           child: Column(
@@ -57,8 +108,12 @@ class _UserLevelScreenState extends State<UserLevelScreen>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    SendingScreen(),
-                    ReceivingScreen(),
+                    SendingScreen(
+                      levelModel: levelModel ?? LevelModel(),
+                    ),
+                    ReceivingScreen(
+                      levelModel: levelModel ?? LevelModel(),
+                    ),
                   ],
                 ),
               )

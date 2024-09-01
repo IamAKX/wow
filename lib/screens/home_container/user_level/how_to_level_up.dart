@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 
 class HowToLevelUp extends StatefulWidget {
@@ -16,6 +17,11 @@ class _HowToLevelUpState extends State<HowToLevelUp> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('How to level up?'),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.orange,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.light,
+        ),
         leading: IconButton(
           icon: const Icon(Icons.close), // Replace with your custom icon
           onPressed: () {

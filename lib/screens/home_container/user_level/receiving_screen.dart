@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:svgaplayer_flutter_rhr/player.dart';
+import 'package:worldsocialintegrationapp/models/level_model.dart';
 
-import '../../../utils/dimensions.dart';
 import '../../../widgets/gaps.dart';
 
 class ReceivingScreen extends StatefulWidget {
-  const ReceivingScreen({super.key});
+  const ReceivingScreen({super.key, required this.levelModel});
+  final LevelModel levelModel;
 
   @override
   State<ReceivingScreen> createState() => _ReceivingScreenState();
@@ -14,6 +14,8 @@ class ReceivingScreen extends StatefulWidget {
 class _ReceivingScreenState extends State<ReceivingScreen> {
   @override
   Widget build(BuildContext context) {
+    int receiveLevel = getReceiveLevel();
+
     return Column(
       children: [
         Padding(
@@ -26,27 +28,27 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'LV.22',
-              style: TextStyle(
+            Text(
+              'LV.$receiveLevel',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
               ),
             ),
             horizontalGap(10),
-            Container(
+            SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: 0.4,
+                value: (widget.levelModel.reciveEnd ?? 1) / 2000,
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
               ),
             ),
             horizontalGap(10),
-            const Text(
-              'LV.23',
-              style: TextStyle(
+            Text(
+              'LV.${receiveLevel + 1}',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
               ),
@@ -54,8 +56,8 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
           ],
         ),
         verticalGap(5),
-        const Text(
-          '1352773/9999999',
+        Text(
+          '${widget.levelModel.reciveEnd}/2000',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -149,5 +151,16 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         ),
       ],
     );
+  }
+
+  int getReceiveLevel() {
+    int lv = 1;
+    try {
+      lv = int.parse(widget.levelModel.reciveLevel ?? '1');
+      if (lv == 0) lv = 1;
+    } catch (e) {
+      lv = 1;
+    }
+    return lv;
   }
 }
