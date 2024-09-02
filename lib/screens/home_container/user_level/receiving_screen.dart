@@ -14,8 +14,6 @@ class ReceivingScreen extends StatefulWidget {
 class _ReceivingScreenState extends State<ReceivingScreen> {
   @override
   Widget build(BuildContext context) {
-    int receiveLevel = getReceiveLevel();
-
     return Column(
       children: [
         Padding(
@@ -29,7 +27,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'LV.$receiveLevel',
+              'LV.${widget.levelModel.reciveLevel ?? 1}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
@@ -39,7 +37,9 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: (widget.levelModel.reciveEnd ?? 1) / 2000,
+                value: ((widget.levelModel.receiveRequiredExperience ?? 1) -
+                        (widget.levelModel.reciveExp ?? 1)) /
+                    (widget.levelModel.reciveEnd ?? 1),
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
@@ -47,7 +47,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
             ),
             horizontalGap(10),
             Text(
-              'LV.${receiveLevel + 1}',
+              'LV.${(widget.levelModel.reciveLevel ?? 1) + 1}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
@@ -57,7 +57,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         ),
         verticalGap(5),
         Text(
-          '${widget.levelModel.reciveEnd}/2000',
+          '${((widget.levelModel.receiveRequiredExperience ?? 1) - (widget.levelModel.reciveExp ?? 1))} / ${(widget.levelModel.reciveEnd ?? 1)}',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -151,16 +151,5 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         ),
       ],
     );
-  }
-
-  int getReceiveLevel() {
-    int lv = 1;
-    try {
-      lv = int.parse(widget.levelModel.reciveLevel ?? '1');
-      if (lv == 0) lv = 1;
-    } catch (e) {
-      lv = 1;
-    }
-    return lv;
   }
 }

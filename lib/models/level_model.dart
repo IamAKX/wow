@@ -1,18 +1,18 @@
 class LevelModel {
   String? sandColor;
   String? sandBgImage;
-  String? sendLevel;
-  String? sendExp;
+  int? sendLevel;
+  int? sendExp;
   int? sendStart;
   int? sendEnd;
-  String? requiredExperience;
+  int? requiredExperience;
   String? reciveColor;
   String? reciveBgImage;
-  String? reciveLevel;
-  String? reciveExp;
+  int? reciveLevel;
+  int? reciveExp;
   int? reciveStart;
   int? reciveEnd;
-  String? receiveRequiredExperience;
+  int? receiveRequiredExperience;
 
   LevelModel(
       {this.sandColor,

@@ -48,7 +48,6 @@ class _SendingScreenState extends State<SendingScreen> {
   @override
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
-    int sendLevel = getSendLevel();
 
     return Column(
       children: [
@@ -63,7 +62,7 @@ class _SendingScreenState extends State<SendingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'LV.$sendLevel',
+              'LV.${widget.levelModel.sendLevel ?? 1}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
@@ -73,7 +72,9 @@ class _SendingScreenState extends State<SendingScreen> {
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: (widget.levelModel.sendEnd ?? 1) / 2000,
+                value: ((widget.levelModel.requiredExperience ?? 1) -
+                        (widget.levelModel.sendExp ?? 1)) /
+                    (widget.levelModel.sendEnd ?? 1),
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
@@ -81,7 +82,7 @@ class _SendingScreenState extends State<SendingScreen> {
             ),
             horizontalGap(10),
             Text(
-              'LV.${sendLevel + 1}',
+              'LV.${(widget.levelModel.sendLevel ?? 1) + 1}',
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
@@ -91,7 +92,7 @@ class _SendingScreenState extends State<SendingScreen> {
         ),
         verticalGap(5),
         Text(
-          '${widget.levelModel.sendEnd}/2000',
+          '${((widget.levelModel.requiredExperience ?? 1) - (widget.levelModel.sendExp ?? 1))} / ${(widget.levelModel.sendEnd ?? 1)}',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -283,16 +284,5 @@ class _SendingScreenState extends State<SendingScreen> {
         ),
       ],
     );
-  }
-
-  int getSendLevel() {
-    int lv = 1;
-    try {
-      lv = int.parse(widget.levelModel.sendLevel ?? '1');
-      if (lv == 0) lv = 1;
-    } catch (e) {
-      lv = 1;
-    }
-    return lv;
   }
 }

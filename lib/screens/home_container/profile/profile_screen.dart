@@ -275,11 +275,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return;
                   }
                   if (user?.familyJoinStatus ?? false) {
-                    Navigator.of(context).pushNamed(FamilyScreen.route,
-                        arguments: FamilyIdModel(
-                            userId: user?.id, familyId: user?.familyId));
+                    Navigator.of(context)
+                        .pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: user?.id, familyId: user?.familyId))
+                        .then(
+                      (value) {
+                        loadUserData();
+                      },
+                    );
                   } else {
-                    Navigator.of(context).pushNamed(FamilyLeaderboard.route);
+                    Navigator.of(context)
+                        .pushNamed(FamilyLeaderboard.route)
+                        .then(
+                      (value) {
+                        loadUserData();
+                      },
+                    );
                   }
                 },
               ),

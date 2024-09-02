@@ -179,7 +179,8 @@ class NavRoute {
       case InvitationRequestScreen.route:
         return MaterialPageRoute(
             builder: (_) => InvitationRequestScreen(
-                  familyDetails: settings.arguments as FamilyDetails,
+                  familyDetails:
+                      (settings.arguments ?? FamilyDetails()) as FamilyDetails,
                 ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());

@@ -76,8 +76,8 @@ class _RequestState extends State<Request> {
                       children: [
                         InkWell(
                           onTap: () async {
-                            await respondToJoinRequest(
-                                list.elementAt(index).id, '2');
+                            await respondToJoinRequest(list.elementAt(index).id,
+                                '2', list.elementAt(index).userId);
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -99,8 +99,8 @@ class _RequestState extends State<Request> {
                         horizontalGap(10),
                         InkWell(
                           onTap: () async {
-                            await respondToJoinRequest(
-                                list.elementAt(index).id, '3');
+                            await respondToJoinRequest(list.elementAt(index).id,
+                                '3', list.elementAt(index).userId);
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -126,10 +126,10 @@ class _RequestState extends State<Request> {
               );
   }
 
-  respondToJoinRequest(String? id, String status) async {
+  respondToJoinRequest(String? id, String status, String? userId) async {
     Map<String, dynamic> reqBody = {
       'requestId': id,
-      'userId': prefs.getString(PrefsKey.userId),
+      'userId': userId,
       'status': status
     };
     await apiCallProvider

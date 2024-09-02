@@ -18,13 +18,16 @@ import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/categorized_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../main.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
+import '../../../utils/prefs_key.dart';
 import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/framed_circular_image.dart';
 
@@ -163,6 +166,43 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         .pushNamed(InviteFamilyMember.route, arguments: user);
                   },
                   child: const Text('Invite'),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: widget.familyIdModel.userId != user?.id &&
+                  user?.id != familyDetails?.leaderId,
+              child: Container(
+                margin: const EdgeInsets.all(pagePadding),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xffFE3400),
+                      Color(0xffFBC108),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.transparent, // Text color
+                    shadowColor: Colors.transparent, // No shadow
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: apiCallProvider.status == ApiStatus.loading
+                      ? null
+                      : () async {
+                          await sendJoinRequest();
+                        },
+                  child: apiCallProvider.status == ApiStatus.loading
+                      ? ButtonLoader()
+                      : const Text('Join'),
                 ),
               ),
             )
@@ -484,7 +524,10 @@ class _FamilyScreenState extends State<FamilyScreen> {
       if (members.isFamilyLeader == '1' || members.isAdmin == '1') {
         familyMember.add(
           InkWell(
-            onTap: () => null,
+            onTap: members.isAdmin == '1'
+                ? () => showBottomSheet(context, members.userId ?? '',
+                    members.isAdmin ?? '', familyDetails?.leaderId == user?.id)
+                : null,
             child: CategorizedCircularImage(
                 imagePath: members.userProfileImage ?? '',
                 imageSize: 50,
@@ -496,8 +539,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
       } else {
         familyMember.add(
           InkWell(
-            onTap: () => showBottomSheet(
-                context, members.userId ?? '', members.isAdmin ?? ''),
+            onTap: () => showBottomSheet(context, members.userId ?? '',
+                members.isAdmin ?? '', familyDetails?.leaderId == user?.id),
             child: CircularImage(
               imagePath: members.userProfileImage ?? '',
               diameter: 50,
@@ -510,8 +553,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
     return familyMember;
   }
 
-  void showBottomSheet(
-      BuildContext context, String secondaryUserId, String isAdmin) {
+  void showBottomSheet(BuildContext context, String secondaryUserId,
+      String isAdmin, bool isLeader) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -526,7 +569,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 onTap:
                     apiCallProvider.status == ApiStatus.loading ? null : () {},
               ),
-              if (widget.familyIdModel.userId == user?.id)
+              if (isLeader)
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings),
                   title: Text(isAdmin == '0' ? 'Set Admin' : 'Remove Admin'),
@@ -537,7 +580,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                               '2', secondaryUserId, isAdmin);
                         },
                 ),
-              if (widget.familyIdModel.userId == user?.id)
+              if (isLeader)
                 ListTile(
                   leading: Icon(Icons.remove_circle),
                   title: Text('Kick Out of Family'),
@@ -615,6 +658,20 @@ class _FamilyScreenState extends State<FamilyScreen> {
         showToastMessage(value['message']);
         Navigator.pop(context);
         await loadFamilyDeatilsData();
+      }
+    });
+  }
+
+  sendJoinRequest() async {
+    Map<String, dynamic> reqBody = {
+      'familyId': familyDetails?.family?.id,
+      'userId': prefs.getString(PrefsKey.userId)
+    };
+    await apiCallProvider
+        .postRequest(API.sendJoinRequest, reqBody)
+        .then((value) async {
+      if (value['message'] != null) {
+        showToastMessage(value['message']);
       }
     });
   }

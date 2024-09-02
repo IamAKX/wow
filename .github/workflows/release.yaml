@@ -7,7 +7,7 @@ on:
     branches:
       - main
       - staging
-      - development
+      # - development
 
 name: "Build & Release"
 jobs:

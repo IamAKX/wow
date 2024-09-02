@@ -64,6 +64,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
     apiCallProvider.postRequest(API.getFamiliesDetails, reqBody).then((value) {
       if (value['details'] != null) {
         familyDetails = FamilyDetails.fromJson(value['details']);
+        familyDetails ??= FamilyDetails();
         setState(() {});
       }
     });
@@ -166,10 +167,17 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(FamilyScreen.route,
-                            arguments: FamilyIdModel(
-                                userId: list.elementAt(1).leaderId,
-                                familyId: list.elementAt(1).id));
+                        Navigator.of(context)
+                            .pushNamed(FamilyScreen.route,
+                                arguments: FamilyIdModel(
+                                    userId: list.elementAt(1).leaderId,
+                                    familyId: list.elementAt(1).id))
+                            .then(
+                          (value) {
+                            loadUserData();
+                            loadFamilyLeaderboard(1);
+                          },
+                        );
                       },
                       child: getFamilyProfile(
                         list.elementAt(1).image ?? '',
@@ -182,10 +190,17 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(FamilyScreen.route,
-                            arguments: FamilyIdModel(
-                                userId: list.elementAt(0).leaderId,
-                                familyId: list.elementAt(0).id));
+                        Navigator.of(context)
+                            .pushNamed(FamilyScreen.route,
+                                arguments: FamilyIdModel(
+                                    userId: list.elementAt(0).leaderId,
+                                    familyId: list.elementAt(0).id))
+                            .then(
+                          (value) {
+                            loadUserData();
+                            loadFamilyLeaderboard(1);
+                          },
+                        );
                       },
                       child: getFamilyProfile(
                         list.elementAt(0).image ?? '',
@@ -198,10 +213,17 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(FamilyScreen.route,
-                            arguments: FamilyIdModel(
-                                userId: list.elementAt(2).leaderId,
-                                familyId: list.elementAt(2).id));
+                        Navigator.of(context)
+                            .pushNamed(FamilyScreen.route,
+                                arguments: FamilyIdModel(
+                                    userId: list.elementAt(2).leaderId,
+                                    familyId: list.elementAt(2).id))
+                            .then(
+                          (value) {
+                            loadUserData();
+                            loadFamilyLeaderboard(1);
+                          },
+                        );
                       },
                       child: getFamilyProfile(
                         list.elementAt(2).image ?? '',
@@ -260,10 +282,17 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).pushNamed(FamilyScreen.route,
-                        arguments: FamilyIdModel(
-                            userId: list.elementAt(i).leaderId,
-                            familyId: list.elementAt(i).id));
+                    Navigator.of(context)
+                        .pushNamed(FamilyScreen.route,
+                            arguments: FamilyIdModel(
+                                userId: list.elementAt(i).leaderId,
+                                familyId: list.elementAt(i).id))
+                        .then(
+                      (value) {
+                        loadUserData();
+                        loadFamilyLeaderboard(1);
+                      },
+                    );
                   },
                   trailing: Container(
                     width: 60,
@@ -304,67 +333,79 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 ),
               )
             : (user?.familyJoinStatus ?? false)
-                ? Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(pagePadding / 2),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFB7945C),
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 10),
-                      leading: BorderedCircularImage(
-                          imagePath: user?.familyImage ?? '',
-                          diameter: 50,
-                          borderColor: const Color(0xFFB7945C),
-                          borderThickness: 2),
-                      onTap: () {
-                        Navigator.of(context).pushNamed(FamilyScreen.route,
-                            arguments: FamilyIdModel(
-                                userId: user?.id, familyId: user?.familyId));
-                      },
-                      title: Row(
-                        children: [
-                          Text(
-                            user?.familyName ?? '',
-                            style: const TextStyle(
+                ? list.any(
+                    (element) => element.id == user?.familyId,
+                  )
+                    ? Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.all(pagePadding / 2),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFFB7945C),
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 10),
+                          leading: BorderedCircularImage(
+                              imagePath: user?.familyImage ?? '',
+                              diameter: 50,
+                              borderColor: const Color(0xFFB7945C),
+                              borderThickness: 2),
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed(FamilyScreen.route,
+                                    arguments: FamilyIdModel(
+                                        userId: user?.id,
+                                        familyId: user?.familyId))
+                                .then(
+                              (value) {
+                                loadUserData();
+                                loadFamilyLeaderboard(1);
+                              },
+                            );
+                          },
+                          title: Row(
+                            children: [
+                              Text(
+                                user?.familyName ?? '',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              horizontalGap(10),
+                              Image.asset(
+                                'assets/image/levelbadge.jpeg',
+                                width: 18,
+                              )
+                            ],
+                          ),
+                          subtitle: const Text(
+                            'zzzz',
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: 12,
                             ),
                           ),
-                          horizontalGap(10),
-                          Image.asset(
-                            'assets/image/levelbadge.jpeg',
-                            width: 18,
-                          )
-                        ],
-                      ),
-                      subtitle: const Text(
-                        'zzzz',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                      ),
-                      trailing: Container(
-                        width: 60,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                                'assets/image/family_points_border.png'),
+                          trailing: Container(
+                            width: 60,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    'assets/image/family_points_border.png'),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              'assets/image/fire.png',
+                              width: 9,
+                            ),
                           ),
                         ),
-                        alignment: Alignment.center,
-                        child: Image.asset(
-                          'assets/image/fire.png',
-                          width: 9,
-                        ),
-                      ),
-                    ),
-                  )
+                      )
+                    : Container()
                 : Container(
                     width: double.infinity,
                     height: 50,

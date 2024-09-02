@@ -30,10 +30,13 @@ class API {
       '$baseUrl/get_single_family_details';
   static const String searchUsers = '$baseUrl/searchUsers';
   static const String sendJoinRequest = '$baseUrl/sendJoinRequest';
+  static const String sendInvitation = '$baseUrl/sendInvitation';
   static const String leavefamilyGroup = '$baseUrl/leavefamilyGroup';
   static const String familyAdminRemove = '$baseUrl/family_admin_remove';
   static const String getJoinRequest = '$baseUrl/getJoinRequest';
+  static const String getInvitations = '$baseUrl/getInvitations';
   static const String responseJoinRequest = '$baseUrl/responseJoinRequest';
+  static const String responseInvitation = '$baseUrl/responseInvitation';
   static const String getLevelList = '$baseUrl/getLevelList';
   static const String getCarsByLevel = '$baseUrl/getCarsByLevel';
   static const String getLuckyId = '$baseUrl/getLuckyId';

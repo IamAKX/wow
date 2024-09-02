@@ -62,7 +62,7 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
 
   void inviteUser(String userId, String familyId) {
     Map<String, dynamic> reqBody = {'userId': userId, 'familyId': familyId};
-    apiCallProvider.postRequest(API.sendJoinRequest, reqBody).then((value) {
+    apiCallProvider.postRequest(API.sendInvitation, reqBody).then((value) {
       showToastMessage(value['message']);
     });
   }
