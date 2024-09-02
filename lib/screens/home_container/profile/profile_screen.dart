@@ -79,7 +79,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () {
                         Navigator.of(context).pushNamed(VisitorScreen.route);
                       },
-                      child: getProfileMetric('Visitors', '1'),
+                      child: getProfileMetric(
+                          'Visitors', '${user?.visitorsCount ?? 0}'),
                     ),
                   ),
                   Expanded(
@@ -88,7 +89,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.of(context)
                             .pushNamed(FriendFansFollowing.route, arguments: 0);
                       },
-                      child: getProfileMetric('Friends', '2'),
+                      child: getProfileMetric(
+                          'Friends', '${user?.friendsCount ?? 0}'),
                     ),
                   ),
                   Expanded(
@@ -97,7 +99,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.of(context)
                             .pushNamed(FriendFansFollowing.route, arguments: 1);
                       },
-                      child: getProfileMetric('Following', '1'),
+                      child: getProfileMetric(
+                          'Following', '${user?.followingCount ?? 0}'),
                     ),
                   ),
                   Expanded(
@@ -106,7 +109,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.of(context)
                             .pushNamed(FriendFansFollowing.route, arguments: 2);
                       },
-                      child: getProfileMetric('Fan', '3'),
+                      child: getProfileMetric(
+                          'Fan', '${user?.followersCount ?? 0}'),
                     ),
                   ),
                 ],

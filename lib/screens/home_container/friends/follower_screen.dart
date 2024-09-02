@@ -3,21 +3,20 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/visitor_model.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
-import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
+import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/user_tile.dart';
 
-class VisitorScreen extends StatefulWidget {
-  const VisitorScreen({super.key});
-  static const String route = '/visitorScreen';
+class FollowerScreen extends StatefulWidget {
+  const FollowerScreen({super.key});
 
   @override
-  State<VisitorScreen> createState() => _VisitorScreenState();
+  State<FollowerScreen> createState() => _FollowerScreenState();
 }
 
-class _VisitorScreenState extends State<VisitorScreen> {
+class _FollowerScreenState extends State<FollowerScreen> {
   List<VisitorModel> visitorList = [];
   late ApiCallProvider apiCallProvider;
 
@@ -32,7 +31,7 @@ class _VisitorScreenState extends State<VisitorScreen> {
 
   loadUserData() async {
     Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
-    apiCallProvider.postRequest(API.getSetVisitor, reqBody).then((value) {
+    apiCallProvider.postRequest(API.getFollowersDetails, reqBody).then((value) {
       visitorList.clear();
       if (value['details'] != null) {
         for (var item in value['details']) {
@@ -49,11 +48,6 @@ class _VisitorScreenState extends State<VisitorScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Visitor'),
-        elevation: 1,
-      ),
       body: apiCallProvider.status == ApiStatus.loading
           ? const DefaultPageLoader()
           : getBody(context),

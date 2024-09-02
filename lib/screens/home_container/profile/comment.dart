@@ -10,14 +10,15 @@ import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 
 import '../../../models/comment.dart';
+import '../../../models/comment_data.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/generic_api_calls.dart';
 
 class CommentScreen extends StatefulWidget {
-  const CommentScreen({super.key, required this.feedId});
+  const CommentScreen({super.key, required this.commentData});
   static const String route = '/commentScreen';
-  final String feedId;
+  final CommentData commentData;
 
   @override
   State<CommentScreen> createState() => _CommentScreenState();
@@ -57,8 +58,8 @@ class _CommentScreenState extends State<CommentScreen> {
   }
 
   void loadComment() async {
-    apiCallProvider
-        .postRequest(API.getComments, {'feedId': widget.feedId}).then(
+    apiCallProvider.postRequest(
+        API.getComments, {'feedId': widget.commentData.feedId}).then(
       (value) {
         if (value['success'] == '1' && value['details'] != null) {
           commentList.clear();
@@ -167,7 +168,7 @@ class _CommentScreenState extends State<CommentScreen> {
                         return;
                       }
                       apiCallProvider.postRequest(API.addComment, {
-                        'feedId': widget.feedId,
+                        'feedId': widget.commentData.feedId,
                         'userId': prefs.getString(PrefsKey.userId),
                         'comment': _commentCtrl.text
                       }).then(
@@ -213,8 +214,10 @@ class _CommentScreenState extends State<CommentScreen> {
             TextButton(
               onPressed: () async {
                 _focusNode.unfocus();
-                apiCallProvider.postRequest(API.deleteComment,
-                    {'feedId': widget.feedId, 'commentId': commentId}).then(
+                apiCallProvider.postRequest(API.deleteComment, {
+                  'feedId': widget.commentData.feedId,
+                  'commentId': commentId
+                }).then(
                   (value) {
                     Navigator.of(context).pop();
                     showToastMessageWithLogo(value['message'], context);

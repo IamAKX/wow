@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/follower_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/following_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/friends_screen.dart';
 import 'package:worldsocialintegrationapp/widgets/user_tile.dart';
 
 class FriendFansFollowing extends StatefulWidget {
@@ -78,19 +81,10 @@ class _FriendFansFollowingState extends State<FriendFansFollowing>
     return Expanded(
       child: TabBarView(
         controller: _tabController,
-        children: [
-          ListView.builder(
-            itemBuilder: (context, index) => UserTile(),
-            itemCount: 2,
-          ),
-          ListView.builder(
-            itemBuilder: (context, index) => UserTile(),
-            itemCount: 1,
-          ),
-          ListView.builder(
-            itemBuilder: (context, index) => UserTile(),
-            itemCount: 3,
-          ),
+        children: const [
+          FriendScreen(),
+          FollowingScreen(),
+          FollowerScreen()
         ],
       ),
     );

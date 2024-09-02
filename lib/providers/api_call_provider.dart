@@ -45,14 +45,16 @@ class ApiCallProvider extends ChangeNotifier {
         notifyListeners();
         return jsonDecode(response.data);
       }
-    } on DioException catch (e) {
+     } on DioException catch (e) {
       status = ApiStatus.failed;
       var resBody = e.response?.data ?? {};
       notifyListeners();
-      return resBody;
+      debugPrint(e.toString());
+      return jsonDecode(resBody);
     } catch (e) {
       status = ApiStatus.failed;
       notifyListeners();
+      debugPrint(e.toString());
       return {'message': e.toString()};
     }
     status = ApiStatus.failed;

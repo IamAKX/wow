@@ -18,6 +18,7 @@ import 'package:worldsocialintegrationapp/widgets/feed_video_player.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
+import '../../../models/comment_data.dart';
 import '../../../models/feed.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
@@ -100,7 +101,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                   horizontalGap(20),
                   Text('Bio:'),
                   horizontalGap(10),
-                  Text('Some random bio'),
+                  Text(user?.bio ?? ''),
                 ],
               ),
               verticalGap(10),
@@ -264,7 +265,13 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               InkWell(
                 onTap: () {
                   Navigator.of(context)
-                      .pushNamed(CommentScreen.route, arguments: moment.mediaId)
+                      .pushNamed(
+                    CommentScreen.route,
+                    arguments: CommentData(
+                        feedId: moment.mediaId,
+                        senderId: prefs.getString(PrefsKey.userId),
+                        senderImage: user?.image),
+                  )
                       .then(
                     (value) {
                       moment.commentCount = '$value';
@@ -308,7 +315,13 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           InkWell(
             onTap: () {
               Navigator.of(context)
-                  .pushNamed(CommentScreen.route, arguments: moment.mediaId)
+                  .pushNamed(
+                CommentScreen.route,
+                arguments: CommentData(
+                    feedId: moment.mediaId,
+                    senderId: prefs.getString(PrefsKey.userId),
+                    senderImage: user?.image),
+              )
                   .then(
                 (value) {
                   moment.commentCount = '$value';
@@ -582,8 +595,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
-                                  'Testersss',
+                                Text(
+                                  user?.familyName ?? '',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,

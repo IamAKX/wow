@@ -14,6 +14,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_m
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
@@ -30,6 +31,7 @@ import '../../../utils/api.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/framed_circular_image.dart';
+import '../profile/profile_detail_screen.dart';
 
 class FamilyScreen extends StatefulWidget {
   const FamilyScreen({super.key, required this.familyIdModel});
@@ -524,10 +526,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
       if (members.isFamilyLeader == '1' || members.isAdmin == '1') {
         familyMember.add(
           InkWell(
-            onTap: members.isAdmin == '1'
-                ? () => showBottomSheet(context, members.userId ?? '',
-                    members.isAdmin ?? '', familyDetails?.leaderId == user?.id)
-                : null,
+            onTap: () => showBottomSheet(context, members.userId ?? '',
+                members.isAdmin ?? '', familyDetails?.leaderId == user?.id),
             child: CategorizedCircularImage(
                 imagePath: members.userProfileImage ?? '',
                 imageSize: 50,
@@ -566,8 +566,28 @@ class _FamilyScreenState extends State<FamilyScreen> {
               ListTile(
                 leading: Icon(Icons.person),
                 title: Text('Profile'),
-                onTap:
-                    apiCallProvider.status == ApiStatus.loading ? null : () {},
+                onTap: apiCallProvider.status == ApiStatus.loading
+                    ? null
+                    : () {
+                        if (secondaryUserId == user?.id) {
+                          Navigator.of(context)
+                              .pushNamed(ProfileDeatilScreen.route)
+                              .then(
+                            (value) {
+                              loadUserData();
+                            },
+                          );
+                        } else {
+                          Navigator.of(context)
+                              .pushNamed(OtherUserDeatilScreen.route,
+                                  arguments: secondaryUserId)
+                              .then(
+                            (value) {
+                              Navigator.pop(context);
+                            },
+                          );
+                        }
+                      },
               ),
               if (isLeader)
                 ListTile(

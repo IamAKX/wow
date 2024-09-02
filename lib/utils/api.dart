@@ -46,4 +46,14 @@ class API {
   static const String getFrames = '$baseUrl/getFrames';
   static const String purchaseFrames = '$baseUrl/purchaseFrames';
   static const String sendFrames = '$baseUrl/sendFrames';
+  static const String getUserReportTypeCategories =
+      '$baseUrl/getUserReportTypeCategories';
+  static const String getUserReportTypeSubCategories =
+      '$baseUrl/getUserReportTypeSubCategories';
+  static const String setVisitor = '$baseUrl/setVisitor';
+  static const String blockUnblock = '$baseUrl/blockUnblock';
+  static const String followUnfollow = '$baseUrl/followUnfollow';
+  static const String getSetVisitor = '$baseUrl/getSetVisitor';
+  static const String getFollowingDetails = '$baseUrl/getFollowingDetails';
+  static const String getFollowersDetails = '$baseUrl/getFollowersDetails';
 }

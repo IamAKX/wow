@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/models/visitor_model.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
 
 import 'circular_image.dart';
 import 'gaps.dart';
@@ -7,21 +8,23 @@ import 'gaps.dart';
 class UserTile extends StatelessWidget {
   const UserTile({
     super.key,
+    required this.visitorModel,
   });
+  final VisitorModel visitorModel;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const CircularImage(
-          imagePath: 'assets/dummy/girl.jpeg', diameter: 40),
-      title: const Text(
-        'Test User',
-        style: TextStyle(
+      leading: CircularImage(imagePath: visitorModel.image ?? '', diameter: 40),
+      title: Text(
+        visitorModel.name ?? '',
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),
       ),
-      onTap: () => Navigator.of(context).pushNamed(UserDeatilScreen.route),
+      onTap: () => Navigator.of(context).pushNamed(OtherUserDeatilScreen.route,
+          arguments: visitorModel.id ?? ''),
       subtitle: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/lucky_model.dart';
+import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
@@ -27,7 +29,10 @@ import 'package:worldsocialintegrationapp/screens/home_container/settings/connec
 import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_verification.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_category.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_description.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_subcategory.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/how_to_level_up.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level_cars.dart';
@@ -94,8 +99,11 @@ class NavRoute {
                 ));
       case VisitorScreen.route:
         return MaterialPageRoute(builder: (_) => const VisitorScreen());
-      case UserDeatilScreen.route:
-        return MaterialPageRoute(builder: (_) => const UserDeatilScreen());
+      case OtherUserDeatilScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => OtherUserDeatilScreen(
+                  otherUserId: settings.arguments as String,
+                ));
       case SettingsScreen.route:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       case ConnectedAccountScreen.route:
@@ -130,7 +138,7 @@ class NavRoute {
       case CommentScreen.route:
         return MaterialPageRoute(
             builder: (_) => CommentScreen(
-                  feedId: settings.arguments as String,
+                  commentData: settings.arguments as CommentData,
                 ));
       case CreateFamily.route:
         return MaterialPageRoute(builder: (_) => const CreateFamily());
@@ -182,6 +190,24 @@ class NavRoute {
                   familyDetails:
                       (settings.arguments ?? FamilyDetails()) as FamilyDetails,
                 ));
+      case ReportCategory.route:
+        return MaterialPageRoute(
+          builder: (_) => ReportCategory(
+            reportModel: settings.arguments as ReportModel,
+          ),
+        );
+      case ReportSubCategory.route:
+        return MaterialPageRoute(
+          builder: (_) => ReportSubCategory(
+            reportModel: settings.arguments as ReportModel,
+          ),
+        );
+      case ReportDescription.route:
+        return MaterialPageRoute(
+          builder: (_) => ReportDescription(
+            reportModel: settings.arguments as ReportModel,
+          ),
+        );
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
