@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_category.dart';
+import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
@@ -39,6 +40,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
   UserProfileDetail? otherUser;
   late ApiCallProvider apiCallProvider;
   List<FeedModel> momentsList = [];
+  bool isFriend = false;
 
   @override
   void initState() {
@@ -61,14 +63,14 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
   void setVistor() async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
-      'otherId': widget.otherUserId
+      'otherUserId': widget.otherUserId
     };
     apiCallProvider.postRequest(API.setVisitor, reqBody).then(
           (value) {},
         );
   }
 
-  void followUnfollow(String type) async {
+  Future<void> followUnfollow(String type) async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
       'followingUserId': widget.otherUserId,
@@ -81,7 +83,9 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
         }
 
         setState(() {});
-        loadUserData();
+        if (type == 'follow') {
+          loadUserData();
+        }
       },
     );
   }
@@ -122,6 +126,9 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
   }
 
   loadUserData() async {
+    isFriend = await FirebaseDbService.isMyFriend(
+        prefs.getString(PrefsKey.userId) ?? '', widget.otherUserId);
+
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId) ?? '0',
       'otherUserId': widget.otherUserId,
@@ -153,17 +160,24 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
           horizontalGap(10),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {
-                String type = 'removeFriend ';
-                followUnfollow(type);
+              onPressed: () async {
+                String type = isFriend ? 'removeFriend' : 'friendRequest';
+                followUnfollow(type).then(
+                  (value) async {
+                    await FirebaseDbService.addRemoveFriend(
+                        prefs.getString(PrefsKey.userId) ?? '',
+                        otherUser?.id ?? '');
+                    loadUserData();
+                  },
+                );
               },
-              label: Text('Add'),
+              label: isFriend ? Text('Remove') : Text('Add'),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 backgroundColor: Color(0xFFFBC100),
               ),
               icon: Icon(
-                Icons.person_add_alt_1,
+                isFriend ? Icons.person_remove_alt_1 : Icons.person_add_alt_1,
                 color: Colors.white,
               ),
             ),
@@ -172,8 +186,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
-                String type =
-                    (otherUser?.followStatus ?? false) ? 'unfollow' : 'follow';
+                String type = 'follow';
                 followUnfollow(type);
               },
               label: Text(
@@ -329,7 +342,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                           blockUnblock();
                           break;
                         case 'Unfriend':
-                          String type = 'removeFriend ';
+                          String type = 'follow ';
                           followUnfollow(type);
                           break;
                       }

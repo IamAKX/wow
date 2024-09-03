@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
@@ -82,6 +83,10 @@ class _CommentScreenState extends State<CommentScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
           title: const Text('Comments'),
         ),
         body: getBody(context),

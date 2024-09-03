@@ -56,4 +56,5 @@ class API {
   static const String getSetVisitor = '$baseUrl/getSetVisitor';
   static const String getFollowingDetails = '$baseUrl/getFollowingDetails';
   static const String getFollowersDetails = '$baseUrl/getFollowersDetails';
+  static const String userReport = '$baseUrl/userReport';
 }

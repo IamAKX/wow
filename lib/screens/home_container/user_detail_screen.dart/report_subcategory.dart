@@ -121,7 +121,7 @@ class _ReportSubCategoryState extends State<ReportSubCategory> {
                       'otherUserId': widget.reportModel.otherUserId,
                     };
                     await apiCallProvider
-                        .postRequest(API.getSingleFamilyDetails, reqBody)
+                        .postRequest(API.userReport, reqBody)
                         .then((value) {
                       if (value['message'] != null) {
                         showToastMessageWithLogo(value['message'], context);

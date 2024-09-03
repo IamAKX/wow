@@ -77,7 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(VisitorScreen.route);
+                        Navigator.of(context)
+                            .pushNamed(VisitorScreen.route)
+                            .then(
+                              (value) => loadUserData(),
+                            );
                       },
                       child: getProfileMetric(
                           'Visitors', '${user?.visitorsCount ?? 0}'),
@@ -87,7 +91,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context)
-                            .pushNamed(FriendFansFollowing.route, arguments: 0);
+                            .pushNamed(FriendFansFollowing.route, arguments: 0)
+                            .then(
+                              (value) => loadUserData(),
+                            );
                       },
                       child: getProfileMetric(
                           'Friends', '${user?.friendsCount ?? 0}'),
@@ -95,19 +102,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Expanded(
                     child: InkWell(
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed(FriendFansFollowing.route, arguments: 1);
-                      },
-                      child: getProfileMetric(
-                          'Following', '${user?.followingCount ?? 0}'),
-                    ),
+                        onTap: () {
+                          Navigator.of(context)
+                              .pushNamed(FriendFansFollowing.route,
+                                  arguments: 1)
+                              .then(
+                                (value) => loadUserData(),
+                              );
+                        },
+                        child: getProfileMetric(
+                            'Following', '${user?.followingCount ?? 0}')),
                   ),
                   Expanded(
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context)
-                            .pushNamed(FriendFansFollowing.route, arguments: 2);
+                            .pushNamed(FriendFansFollowing.route, arguments: 2)
+                            .then(
+                              (value) => loadUserData(),
+                            );
                       },
                       child: getProfileMetric(
                           'Fan', '${user?.followersCount ?? 0}'),

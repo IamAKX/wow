@@ -32,5 +32,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:102730474815:ios:46c84deb9ba72507d6df8a</string>
+	<key>DATABASE_URL</key>
+	<string>https://wowcross-d1bf1-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>
 </plist>
