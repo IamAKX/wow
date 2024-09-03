@@ -57,4 +57,10 @@ class API {
   static const String getFollowingDetails = '$baseUrl/getFollowingDetails';
   static const String getFollowersDetails = '$baseUrl/getFollowersDetails';
   static const String userReport = '$baseUrl/userReport';
+  static const String getAllEvents = '$baseUrl/getAllEvents';
+  static const String subscribeUnSubscribeEvent =
+      '$baseUrl/subscribeUnSubscribeEvent';
+  static const String eventSubscriberDetails =
+      '$baseUrl/eventSubscriberDetails';
+  static const String sendEventInvitation = '$baseUrl/sendEventInvitation';
 }

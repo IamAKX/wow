@@ -5,13 +5,14 @@ import 'package:worldsocialintegrationapp/screens/home_container/user_detail_scr
 import 'circular_image.dart';
 import 'gaps.dart';
 
-class UserTile extends StatelessWidget {
-  
-  const UserTile({
+class UserTileWithAction extends StatelessWidget {
+  const UserTileWithAction({
     super.key,
     required this.visitorModel,
+    required this.trailingWidget,
   });
   final VisitorModel visitorModel;
+  final Widget trailingWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class UserTile extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
+      trailing: trailingWidget,
       onTap: () => Navigator.of(context).pushNamed(OtherUserDeatilScreen.route,
           arguments: visitorModel.id ?? ''),
       subtitle: Row(

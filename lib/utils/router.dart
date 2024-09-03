@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
+import 'package:worldsocialintegrationapp/models/create_event.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/lucky_model.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/event/create_event_two.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/event/event_detail.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/event/share_event.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
@@ -48,8 +53,11 @@ import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
 
+import '../models/event_subscriber.dart';
 import '../models/family_details.dart';
 import '../models/send_friend_model.dart';
+import '../models/whats_on_model.dart';
+import '../screens/home_container/event/create_event_one.dart';
 import '../screens/home_container/profile/comment.dart';
 
 class NavRoute {
@@ -208,6 +216,25 @@ class NavRoute {
             reportModel: settings.arguments as ReportModel,
           ),
         );
+      case EventScreen.route:
+        return MaterialPageRoute(builder: (_) => const EventScreen());
+      case EventDetail.route:
+        return MaterialPageRoute(
+            builder: (_) => EventDetail(
+                  whatsonModel: settings.arguments as WhatsonModel,
+                ));
+      case ShareEvent.route:
+        return MaterialPageRoute(
+            builder: (_) => ShareEvent(
+                  event: settings.arguments as String,
+                ));
+      case CreateEventOne.route:
+        return MaterialPageRoute(builder: (_) => const CreateEventOne());
+      case CreateEventTwo.route:
+        return MaterialPageRoute(
+            builder: (_) => CreateEventTwo(
+                  createEvent: settings.arguments as CreateEvent,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

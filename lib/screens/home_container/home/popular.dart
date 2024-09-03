@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -101,7 +102,9 @@ class _PopularScreenState extends State<PopularScreen> {
           horizontalGap(10),
           Expanded(
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, EventScreen.route);
+              },
               child: Container(
                 padding: EdgeInsets.symmetric(
                   vertical: pagePadding,
