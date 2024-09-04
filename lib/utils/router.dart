@@ -22,6 +22,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_c
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family_failed.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home/search_member.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/mall/send_friend.dart';
@@ -235,6 +236,8 @@ class NavRoute {
             builder: (_) => CreateEventTwo(
                   createEvent: settings.arguments as CreateEvent,
                 ));
+      case SearchMember.route:
+        return MaterialPageRoute(builder: (_) => const SearchMember());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

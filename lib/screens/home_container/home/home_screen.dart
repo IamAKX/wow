@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/popular.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/related.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home/search_member.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
 import '../../../main.dart';
@@ -138,7 +139,9 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(SearchMember.route);
+            },
             icon: const Icon(
               Icons.search,
               color: Colors.white,
