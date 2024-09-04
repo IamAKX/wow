@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:polar_tab_bar/models/polar_tab_item.dart';
 import 'package:polar_tab_bar/polar_tab_bar.dart';
 import 'package:polar_tab_bar/widgets/polar_tab_page.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/related/friend_feed_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/related/square_screen.dart';
 
 class MomentsScreen extends StatefulWidget {
@@ -18,14 +19,14 @@ class _MomentsScreenState extends State<MomentsScreen> {
     PolarTabItem(
       index: 0,
       title: 'Sqaure',
-      page: PolarTabPage(
+      page: const PolarTabPage(
         child: SquareScreen(),
       ),
     ),
     PolarTabItem(
       index: 1,
       title: 'Friends & Following',
-      page: PolarTabPage(child: Container()),
+      page: const PolarTabPage(child: FriendFeedScreen()),
     ),
   ];
 

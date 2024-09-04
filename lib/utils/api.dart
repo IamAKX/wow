@@ -65,4 +65,5 @@ class API {
   static const String sendEventInvitation = '$baseUrl/sendEventInvitation';
   static const String createEvent = '$baseUrl/createEvent';
   static const String getAllUserPost = '$baseUrl/getAllUserPost';
+  static const String getFriendsPosts = '$baseUrl/getFriendsPosts';
 }
