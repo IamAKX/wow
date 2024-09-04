@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/related/moments_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -38,7 +39,9 @@ class _RelatedScreenState extends State<RelatedScreen> {
         children: [
           Expanded(
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).pushNamed(MomentsScreen.route);
+              },
               child: Container(
                 padding: EdgeInsets.symmetric(
                   vertical: pagePadding,

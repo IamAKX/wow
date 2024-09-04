@@ -5,7 +5,6 @@ import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
-import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../models/search_user_model.dart';
 import '../../../providers/api_call_provider.dart';

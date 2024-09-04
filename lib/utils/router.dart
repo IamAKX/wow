@@ -29,6 +29,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/mall/send_frien
 import 'package:worldsocialintegrationapp/screens/home_container/profile/add_moments.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/edit_profile.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/related/moments_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/blocked_user.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/connected_account.dart';
@@ -238,6 +239,8 @@ class NavRoute {
                 ));
       case SearchMember.route:
         return MaterialPageRoute(builder: (_) => const SearchMember());
+      case MomentsScreen.route:
+        return MaterialPageRoute(builder: (_) => const MomentsScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

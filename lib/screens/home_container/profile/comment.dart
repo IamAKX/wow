@@ -132,9 +132,13 @@ class _CommentScreenState extends State<CommentScreen> {
                     color: Colors.grey,
                   ),
                 ),
-                onLongPress: () {
-                  showDeleteCommentPopup(commentList.elementAt(index).id ?? '');
-                },
+                onTap: commentList.elementAt(index).userId ==
+                        widget.commentData.senderId
+                    ? () {
+                        showDeleteCommentPopup(
+                            commentList.elementAt(index).id ?? '');
+                      }
+                    : null,
               );
             },
           ),

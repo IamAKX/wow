@@ -86,9 +86,13 @@ Future<String?> getDeviceId() async {
 }
 
 String getTimesAgo(String date) {
-  DateTime parseDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
+  try {
+    DateTime parseDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
 
-  return timeago.format(parseDate, locale: 'en');
+    return timeago.format(parseDate, locale: 'en');
+  } catch (e) {
+    return '';
+  }
 }
 
 Future<File> getFileFromAssets(String path) async {
