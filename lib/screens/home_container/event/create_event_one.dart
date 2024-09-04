@@ -176,7 +176,7 @@ class _CreateEventOneState extends State<CreateEventOne> {
           minLines: 2,
           maxLines: 2,
           textInputAction: TextInputAction.done,
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
           textAlignVertical: TextAlignVertical.center,
           decoration: const InputDecoration(
             hintText: 'Event rule',
@@ -252,7 +252,10 @@ class _CreateEventOneState extends State<CreateEventOne> {
                         context, CreateEventTwo.route,
                         arguments: createEvent);
                   },
-            child: const Text('Next'),
+            child: const Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Text('Next'),
+            ),
           ),
         )
       ],

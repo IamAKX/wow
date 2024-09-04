@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
@@ -89,153 +90,172 @@ class _WhatsOnScreenState extends State<WhatsOnScreen> {
                   );
                 },
                 child: Container(
-                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(10),
                   width: MediaQuery.of(context).size.width,
                   height: 150,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    image: DecorationImage(
-                        image: AssetImage(
-                          'assets/image/birthday_image_11.jpeg',
-                        ),
-                        fit: BoxFit.fill),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      Row(
-                        children: [
-                          BorderedCircularImage(
-                            imagePath: list.elementAt(index).imageDp ?? '',
-                            diameter: 30,
-                            borderColor: Colors.white,
-                            borderThickness: 2,
-                          ),
-                          horizontalGap(10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                list.elementAt(index).name ?? '',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Text(
-                                'Id : ${list.elementAt(index).username ?? ''}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
+                      CachedNetworkImage(
+                        imageUrl: list.elementAt(index).eventImage ?? '',
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/image/birthday_image_11.jpeg',
+                          width: MediaQuery.of(context).size.width,
+                          height: 150,
+                          fit: BoxFit.fill,
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        height: 150,
+                        fit: BoxFit.fill,
                       ),
-                      verticalGap(5),
-                      Expanded(
-                        child: Row(
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            horizontalGap(10),
+                            Row(
+                              children: [
+                                BorderedCircularImage(
+                                  imagePath:
+                                      list.elementAt(index).imageDp ?? '',
+                                  diameter: 30,
+                                  borderColor: Colors.white,
+                                  borderThickness: 2,
+                                ),
+                                horizontalGap(10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      list.elementAt(index).name ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Id : ${list.elementAt(index).username ?? ''}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            verticalGap(5),
                             Expanded(
-                              child: Column(
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    list.elementAt(index).eventTopic ?? '',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                  horizontalGap(10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          list.elementAt(index).eventTopic ??
+                                              '',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          list.elementAt(index).description ??
+                                              '',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    list.elementAt(index).description ?? '',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  (list.elementAt(index).eventCreaterId ==
+                                          prefs.getString(PrefsKey.userId))
+                                      ? ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor:
+                                                Colors.blue, // Text color
+                                            shadowColor:
+                                                Colors.blue, // No shadow
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pushNamed(
+                                                ShareEvent.route,
+                                                arguments:
+                                                    list.elementAt(index).id ??
+                                                        '');
+                                          },
+                                          child: const Text('SHARE'),
+                                        )
+                                      : ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor:
+                                                Colors.green, // Text color
+                                            shadowColor:
+                                                Colors.green, // No shadow
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            subscribeUnSubscribeEvent(
+                                                list.elementAt(index).id ?? '');
+                                          },
+                                          child: const Text('SUBSCRIBE'),
+                                        ),
                                 ],
                               ),
                             ),
-                            (list.elementAt(index).eventCreaterId ==
-                                    prefs.getString(PrefsKey.userId))
-                                ? ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          Colors.blue, // Text color
-                                      shadowColor: Colors.blue, // No shadow
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed(
-                                          ShareEvent.route,
-                                          arguments:
-                                              list.elementAt(index).id ?? '');
-                                    },
-                                    child: const Text('SHARE'),
-                                  )
-                                : ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor:
-                                          Colors.green, // Text color
-                                      shadowColor: Colors.green, // No shadow
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      subscribeUnSubscribeEvent(
-                                          list.elementAt(index).id ?? '');
-                                    },
-                                    child: const Text('SUBSCRIBE'),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.access_time_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                horizontalGap(5),
+                                Text(
+                                  'will start on ${list.elementAt(index).eventStartTime ?? ''}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
                                   ),
+                                ),
+                                const Spacer(),
+                                const Icon(
+                                  Icons.bookmark_outline,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                horizontalGap(2),
+                                Text(
+                                  list.elementAt(index).eventSubscriberCounts ??
+                                      '',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                horizontalGap(5),
+                              ],
+                            )
                           ],
                         ),
                       ),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          horizontalGap(5),
-                          Text(
-                            'will start on ${list.elementAt(index).eventStartTime ?? ''}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const Spacer(),
-                          const Icon(
-                            Icons.bookmark_outline,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          horizontalGap(2),
-                          Text(
-                            list.elementAt(index).eventSubscriberCounts ?? '',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                          horizontalGap(5),
-                        ],
-                      )
                     ],
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,6 +7,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'dart:async';
+
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 Future<void> openInBrowser(String url) async {
   if (await launchUrl(Uri.parse(url))) {
@@ -84,4 +89,15 @@ String getTimesAgo(String date) {
   DateTime parseDate = DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
 
   return timeago.format(parseDate, locale: 'en');
+}
+
+Future<File> getFileFromAssets(String path) async {
+  final byteData = await rootBundle.load(path);
+
+  final file = File('${(await getTemporaryDirectory()).path}/$path');
+  await file.create(recursive: true);
+  await file.writeAsBytes(byteData.buffer
+      .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+  return file;
 }
