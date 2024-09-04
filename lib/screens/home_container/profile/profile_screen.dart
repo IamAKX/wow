@@ -9,6 +9,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_s
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/my_look/my_look_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_detail_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
@@ -271,7 +272,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    MyLookScreen.route,
+                  ).then(
+                    (value) => loadUserData(),
+                  );
+                },
               ),
               Divider(
                 color: Colors.grey.withOpacity(0.4),
