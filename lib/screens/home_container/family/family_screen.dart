@@ -14,7 +14,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_m
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/other_user_detail_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';

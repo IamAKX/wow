@@ -36,10 +36,10 @@ import 'package:worldsocialintegrationapp/screens/home_container/settings/connec
 import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_verification.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_category.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_description.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_subcategory.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/other_user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_category.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_description.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_subcategory.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/how_to_level_up.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level_cars.dart';

@@ -14,7 +14,7 @@ import '../../../utils/prefs_key.dart';
 import '../../../widgets/bordered_circular_image.dart';
 import '../../../widgets/gaps.dart';
 import '../profile/profile_detail_screen.dart';
-import '../user_detail_screen.dart/other_user_detail_screen.dart';
+import '../user_detail_screen/other_user_detail_screen.dart';
 
 class EventDetail extends StatefulWidget {
   const EventDetail({super.key, required this.whatsonModel});

@@ -19,7 +19,7 @@ import '../../../widgets/circular_image.dart';
 import '../../../widgets/feed_video_player.dart';
 import '../../../widgets/gaps.dart';
 import '../profile/comment.dart';
-import '../user_detail_screen.dart/report_category.dart';
+import '../user_detail_screen/report_category.dart';
 
 class SquareScreen extends StatefulWidget {
   const SquareScreen({super.key});

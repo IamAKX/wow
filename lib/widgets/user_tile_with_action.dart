@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/models/visitor_model.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/other_user_detail_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/other_user_detail_screen.dart';
 
 import 'circular_image.dart';
 import 'gaps.dart';

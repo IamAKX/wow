@@ -10,7 +10,7 @@ import '../../../models/search_user_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
-import '../user_detail_screen.dart/other_user_detail_screen.dart';
+import '../user_detail_screen/other_user_detail_screen.dart';
 
 class SearchMember extends StatefulWidget {
   const SearchMember({

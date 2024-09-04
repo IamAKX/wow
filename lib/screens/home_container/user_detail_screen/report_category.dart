@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/report_category.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_subcategory.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_subcategory.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../providers/api_call_provider.dart';

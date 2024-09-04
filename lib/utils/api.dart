@@ -66,4 +66,8 @@ class API {
   static const String createEvent = '$baseUrl/createEvent';
   static const String getAllUserPost = '$baseUrl/getAllUserPost';
   static const String getFriendsPosts = '$baseUrl/getFriendsPosts';
+  static const String getPurchaseLuckyId = '$baseUrl/getPurchaseLuckyId';
+  static const String getPurchaseFrame = '$baseUrl/getPurchaseFrame';
+  static const String getVipImages = '$baseUrl/getVipImages';
+  static const String getPurchaseThemes = '$baseUrl/getPurchaseThemes';
 }

@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
-import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen.dart/report_category.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_category.dart';
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
