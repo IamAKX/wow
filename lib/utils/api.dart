@@ -70,4 +70,7 @@ class API {
   static const String getPurchaseFrame = '$baseUrl/getPurchaseFrame';
   static const String getVipImages = '$baseUrl/getVipImages';
   static const String getPurchaseThemes = '$baseUrl/getPurchaseThemes';
+  static const String applyLuckyId = '$baseUrl/applyLuckyId';
+  static const String applyFrame = '$baseUrl/applyFrame';
+  static const String applyVip = '$baseUrl/applyVip';
 }
