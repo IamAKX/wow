@@ -73,4 +73,5 @@ class API {
   static const String applyLuckyId = '$baseUrl/applyLuckyId';
   static const String applyFrame = '$baseUrl/applyFrame';
   static const String applyVip = '$baseUrl/applyVip';
+  static const String getTopGiftReceiver = '$baseUrl/getTopGiftReceiver';
 }
