@@ -52,6 +52,7 @@ import 'package:worldsocialintegrationapp/screens/onboarding/signup.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_otp.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/verify_phone.dart';
+import 'package:worldsocialintegrationapp/widgets/custom_webview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview.dart';
 import 'package:worldsocialintegrationapp/widgets/media_preview_fullscreen.dart';
 import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscreen.dart';
@@ -244,6 +245,11 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const MomentsScreen());
       case MyLookScreen.route:
         return MaterialPageRoute(builder: (_) => const MyLookScreen());
+      case CustomWebview.route:
+        return MaterialPageRoute(
+            builder: (_) => CustomWebview(
+                  url: settings.arguments as String,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
