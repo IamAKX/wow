@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/gift_wall_more.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -30,7 +31,9 @@ class _MoreScreenState extends State<MoreScreen> {
                   style: TextStyle(fontSize: 16),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(GiftWallMore.route);
+                  },
                   label: const Text(
                     'More',
                     style: TextStyle(

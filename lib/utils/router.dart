@@ -9,6 +9,8 @@ import 'package:worldsocialintegrationapp/screens/home_container/event/create_ev
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/share_event.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/gift_wall.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/gift_wall_more.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
@@ -250,6 +252,10 @@ class NavRoute {
             builder: (_) => CustomWebview(
                   url: settings.arguments as String,
                 ));
+      case GiftWallMore.route:
+        return MaterialPageRoute(builder: (_) => const GiftWallMore());
+      case GiftWall.route:
+        return MaterialPageRoute(builder: (_) => const GiftWall());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

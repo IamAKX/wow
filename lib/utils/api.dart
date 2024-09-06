@@ -74,4 +74,6 @@ class API {
   static const String applyFrame = '$baseUrl/applyFrame';
   static const String applyVip = '$baseUrl/applyVip';
   static const String getTopGiftReceiver = '$baseUrl/getTopGiftReceiver';
+  static const String getSenderReceiverGifting =
+      '$baseUrl/getSenderReceiverGifting';
 }
