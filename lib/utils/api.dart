@@ -68,10 +68,11 @@ class API {
   static const String getFriendsPosts = '$baseUrl/getFriendsPosts';
   static const String getPurchaseLuckyId = '$baseUrl/getPurchaseLuckyId';
   static const String getPurchaseFrame = '$baseUrl/getPurchaseFrame';
-  static const String getVipImages = '$baseUrl/getVipImages';
   static const String getPurchaseThemes = '$baseUrl/getPurchaseThemes';
+  static const String getVipImages = '$baseUrl/getVipImages';
   static const String applyLuckyId = '$baseUrl/applyLuckyId';
   static const String applyFrame = '$baseUrl/applyFrame';
+  static const String applyTheme = '$baseUrl/applyTheme';
   static const String applyVip = '$baseUrl/applyVip';
   static const String getTopGiftReceiver = '$baseUrl/getTopGiftReceiver';
   static const String getSenderReceiverGifting =

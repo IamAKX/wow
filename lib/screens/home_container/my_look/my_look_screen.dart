@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/my_look/my_bubble.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/my_look/my_frame.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/my_look/my_theme.dart';
 
 import 'my_car.dart';
 
@@ -75,11 +76,11 @@ class _MyLookScreenState extends State<MyLookScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           MyCars(),
           MyFrame(),
           MyBubble(),
-          Container(),
+          MyTheme(),
         ],
       ),
     );
