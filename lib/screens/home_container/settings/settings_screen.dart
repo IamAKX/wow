@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +10,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/settings/connec
 import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/splash.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -166,7 +168,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                var appDir = (await getTemporaryDirectory()).path;
+                Directory(appDir).delete(recursive: true);
                 Navigator.of(context).pop();
               },
               child: const Text(

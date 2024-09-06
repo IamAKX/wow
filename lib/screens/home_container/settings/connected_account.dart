@@ -1,8 +1,24 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/providers/connect_social_account.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_verification.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../../models/country_continent.dart';
+import '../../../models/user_profile_detail.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../providers/generic_auth_provider.dart';
+import '../../../services/fcm_service.dart';
+import '../../../services/location_service.dart';
+import '../../../utils/api.dart';
+import '../../../utils/generic_api_calls.dart';
+import '../../../utils/helpers.dart';
 
 class ConnectedAccountScreen extends StatefulWidget {
   const ConnectedAccountScreen({super.key});
@@ -13,8 +29,32 @@ class ConnectedAccountScreen extends StatefulWidget {
 }
 
 class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
+  UserProfileDetail? user;
+  late ApiCallProvider apiCallProvider;
+  CountryContinent? countryContinent;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
+  }
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return Scaffold(
       body: getBody(context),
     );
@@ -31,11 +71,11 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             color: const Color(0xFF92BA7C),
           ),
           title: const Text('Phone'),
-          trailing: const Row(
+          trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('919999999992'),
-              Icon(Icons.chevron_right),
+              Text(user?.phone ?? ''),
+              const Icon(Icons.chevron_right),
             ],
           ),
           tileColor: Colors.white,
@@ -53,36 +93,77 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             width: 22,
           ),
           title: const Text('Facebook'),
-          trailing: const Row(
+          trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Add'),
+              Text((user?.facebookUserName?.isNotEmpty ?? false)
+                  ? user!.facebookUserName!
+                  : 'ADD'),
               Icon(Icons.chevron_right),
             ],
           ),
           tileColor: Colors.white,
-          onTap: () {},
+          onTap: () async {
+            Map<String, dynamic> facebookUserData =
+                await ConnectSocialAccount().loginWithFacebook();
+            if (facebookUserData['id'] != null) {
+              Map<String, dynamic> reqBody = {
+                'isAddGoogleId': 'No',
+                'googleSocialId': '',
+                'googleEmailId': '',
+                'facebookId': facebookUserData['id'],
+                'facebookUserName': facebookUserData['name'],
+                'userId': user?.id
+              };
+              apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
+                (value) {
+                  showToastMessage(value['message']);
+                  loadUserData();
+                },
+              );
+            }
+          },
         ),
         const Divider(
           height: 1,
           color: Color(0xFFE5E5E5),
         ),
         ListTile(
-          leading: SvgPicture.asset(
-            'assets/svg/google.svg',
-            width: 22,
-          ),
-          title: const Text('Google'),
-          trailing: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Add'),
-              Icon(Icons.chevron_right),
-            ],
-          ),
-          tileColor: Colors.white,
-          onTap: () {},
-        ),
+            leading: SvgPicture.asset(
+              'assets/svg/google.svg',
+              width: 22,
+            ),
+            title: const Text('Google'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text((user?.email?.isNotEmpty ?? false)
+                    ? user?.email ?? 'ADD'
+                    : 'ADD'),
+                Icon(Icons.chevron_right),
+              ],
+            ),
+            tileColor: Colors.white,
+            onTap: () async {
+              GoogleSignInAccount? googleSignInAccount =
+                  await ConnectSocialAccount().loginWithGoogle();
+              if (googleSignInAccount != null) {
+                Map<String, dynamic> reqBody = {
+                  'isAddGoogleId': 'Yes',
+                  'googleSocialId': googleSignInAccount.id,
+                  'googleEmailId': googleSignInAccount.email,
+                  'facebookId': '',
+                  'facebookUserName': '',
+                  'userId': user?.id
+                };
+                apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
+                  (value) {
+                    showToastMessage(value['message']);
+                    loadUserData();
+                  },
+                );
+              }
+            }),
         const Divider(
           height: 1,
           color: Color(0xFFE5E5E5),

@@ -7,6 +7,7 @@ class API {
   static const String baseUrl = 'https://apiwows.xrdsimulators.tech';
   static const String generateToken = '$baseUrl/generateToken';
   static const String socialLogin = '$baseUrl/socialLogin';
+  static const String addSocialIds = '$baseUrl/addSocialIds';
   static const String checkNumber = '$baseUrl/checkNumber';
   static const String registration = '$baseUrl/registration';
   static const String mobileLogin = '$baseUrl/mobileLogin';
@@ -77,4 +78,6 @@ class API {
   static const String getTopGiftReceiver = '$baseUrl/getTopGiftReceiver';
   static const String getSenderReceiverGifting =
       '$baseUrl/getSenderReceiverGifting';
+  static const String hideUnHideCountry = '$baseUrl/hideUnHideCountry';
+  static const String getBlockUsers = '$baseUrl/getBlockUsers';
 }

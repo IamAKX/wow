@@ -1,4 +1,3 @@
-
 import 'package:country_code_picker/country_code_picker.dart';
 
 class PhoneNumberModel {
@@ -24,7 +23,7 @@ class PhoneNumberModel {
   }
 
   @override
-  String toString() => '${countryCode?.dialCode} $phoneNumber';
+  String toString() => '${countryCode?.dialCode ?? ''} $phoneNumber';
 
   @override
   bool operator ==(Object other) {

@@ -30,7 +30,7 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
   final TextEditingController _phoneCtrl = TextEditingController();
   late ApiCallProvider apiCallProvider;
   bool isLoading = false;
-  
+
   @override
   void initState() {
     super.initState();

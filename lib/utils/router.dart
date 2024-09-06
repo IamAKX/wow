@@ -35,6 +35,8 @@ import 'package:worldsocialintegrationapp/screens/home_container/profile/profile
 import 'package:worldsocialintegrationapp/screens/home_container/related/moments_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/about_us.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/blocked_user.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/change_password.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/settings/change_phone.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/connected_account.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/phone_verification.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/settings/privacy.dart';
@@ -91,6 +93,11 @@ class NavRoute {
       case ResetPasswordScreen.route:
         return MaterialPageRoute(
             builder: (_) => ResetPasswordScreen(
+                  phoneNumberModel: settings.arguments as PhoneNumberModel,
+                ));
+      case ChangePasswordScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => ChangePasswordScreen(
                   phoneNumberModel: settings.arguments as PhoneNumberModel,
                 ));
 
@@ -256,6 +263,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const GiftWallMore());
       case GiftWall.route:
         return MaterialPageRoute(builder: (_) => const GiftWall());
+      case ChangePhoneScreen.route:
+        return MaterialPageRoute(builder: (_) => const ChangePhoneScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
