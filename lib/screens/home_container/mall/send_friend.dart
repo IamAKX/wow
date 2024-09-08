@@ -6,12 +6,17 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/friend_model.dart';
 
 import '../../../main.dart';
+import '../../../models/chat_model.dart';
 import '../../../models/send_friend_model.dart';
+import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
+import '../../../services/firebase_db_service.dart';
 import '../../../utils/api.dart';
+import '../../../utils/generic_api_calls.dart';
 import '../../../utils/helpers.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/circular_image.dart';
+import '../../../widgets/enum.dart';
 import '../../../widgets/gaps.dart';
 
 class SendFriendScreen extends StatefulWidget {
@@ -26,13 +31,25 @@ class SendFriendScreen extends StatefulWidget {
 class _SendFriendScreenState extends State<SendFriendScreen> {
   late ApiCallProvider apiCallProvider;
   List<FriendModel> friendList = [];
+  UserProfileDetail? user;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadSelfUserData();
       getFriends();
     });
+  }
+
+  void loadSelfUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
+    );
   }
 
   getFriends() async {
@@ -250,7 +267,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        sendLucky(friend.id!);
+                        sendLucky(friend);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -270,18 +287,30 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
     );
   }
 
-  void sendLucky(String otherId) async {
+  void sendLucky(FriendModel otherUser) async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
       widget.sendFriendModel.isCar! ? 'luckyId' : 'frameId':
           widget.sendFriendModel.id,
-      'otherUserId': otherId
+      'otherUserId': otherUser.id
     };
     await apiCallProvider
         .postRequest(
             widget.sendFriendModel.isCar! ? API.sendLuckyId : API.sendFrames,
             reqBody)
-        .then((value) {
+        .then((value) async {
+      ChatModel chat = ChatModel(
+          assetId: '',
+          message: '',
+          msgType: widget.sendFriendModel.isCar!
+              ? MessageType.CAR.name
+              : MessageType.FRAME.name,
+          senderId: prefs.getString(PrefsKey.userId),
+          url: widget.sendFriendModel.url,
+          videoThumbnaiil: '');
+      await FirebaseDbService.sendChat(
+          getChatRoomId(otherUser.id ?? '0', prefs.getString(PrefsKey.userId)!),
+          chat);
       showToastMessage(value['message'] ?? '');
     });
   }

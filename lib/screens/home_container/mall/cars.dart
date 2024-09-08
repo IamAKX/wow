@@ -172,7 +172,8 @@ class _CarsScreenState extends State<CarsScreen> {
                             isCar: true,
                             id: carList.elementAt(index).id,
                             price: carList.elementAt(index).price,
-                            validity: carList.elementAt(index).validity);
+                            validity: carList.elementAt(index).validity,
+                            url: carList.elementAt(index).image);
                         Navigator.pushNamed(context, SendFriendScreen.route,
                             arguments: model);
                       },

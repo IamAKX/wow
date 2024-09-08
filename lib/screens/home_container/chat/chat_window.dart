@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:svgaplayer_flutter_rhr/player.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/chat_model.dart';
 import 'package:worldsocialintegrationapp/models/chat_window_model.dart';
@@ -131,7 +132,7 @@ class _ChatWindowState extends State<ChatWindow> {
                     return (a.timestamp ?? 0).compareTo(b.timestamp ?? 0);
                   },
                 );
-
+                _scrollToBottom();
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: messageList.length,
@@ -314,9 +315,39 @@ class _ChatWindowState extends State<ChatWindow> {
       case 'AUDIO':
         return getAudioTypeChat(chat);
 
+      case 'CAR':
+      case 'FRAME':
+        return getSVGATypeChat(chat);
+
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  Widget getSVGATypeChat(ChatModel chat) {
+    return Column(
+      crossAxisAlignment: chat.senderId == prefs.getString(PrefsKey.userId)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 150,
+          height: 150,
+          child: SVGASimpleImage(
+            resUrl: chat.url ?? '',
+          ),
+        ),
+        verticalGap(5),
+        Text(
+          getChatTimesAgo(chat.timestamp ?? 0),
+          style: TextStyle(
+              color: chat.senderId == prefs.getString(PrefsKey.userId)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12),
+        ),
+      ],
+    );
   }
 
   Widget getTextTypeChat(ChatModel chat) {
@@ -462,6 +493,7 @@ class _ChatWindowState extends State<ChatWindow> {
                         });
                         textCtrl.text = '';
                         _scrollToBottom();
+                        
                       },
                     );
                     Navigator.pop(context);

@@ -174,7 +174,8 @@ class _FramesScreenState extends State<FramesScreen> {
                             isCar: false,
                             id: frameList.elementAt(index).id,
                             price: frameList.elementAt(index).price,
-                            validity: frameList.elementAt(index).validity);
+                            validity: frameList.elementAt(index).validity,
+                            url: frameList.elementAt(index).frameImg);
                         Navigator.pushNamed(context, SendFriendScreen.route,
                             arguments: model);
                       },
