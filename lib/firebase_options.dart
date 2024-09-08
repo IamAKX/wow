@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:102730474815:android:19859ecace9a3f49d6df8a',
     messagingSenderId: '102730474815',
     projectId: 'wowcross-d1bf1',
+    databaseURL: 'https://wowcross-d1bf1-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'wowcross-d1bf1.appspot.com',
   );
 
@@ -62,8 +63,9 @@ class DefaultFirebaseOptions {
     appId: '1:102730474815:ios:46c84deb9ba72507d6df8a',
     messagingSenderId: '102730474815',
     projectId: 'wowcross-d1bf1',
+    databaseURL: 'https://wowcross-d1bf1-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'wowcross-d1bf1.appspot.com',
-    androidClientId: '102730474815-j59kk8mfce2rla89tu4mg0sp0jl8pnbg.apps.googleusercontent.com',
+    androidClientId: '102730474815-4rnf3brnh4cs4n11afi0t406vsncktut.apps.googleusercontent.com',
     iosClientId: '102730474815-ve7fo2q41gvb81nq6m0vukop4i2vm1hq.apps.googleusercontent.com',
     iosBundleId: 'com.live.worldsocialintegrationapp',
   );

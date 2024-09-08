@@ -22,6 +22,7 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_database: ^11.1.0
   firebase_messaging: ^15.0.4
+  firebase_storage: ^12.2.0
   flutter:
     sdk: flutter
   flutter_carousel_widget: ^2.3.0
@@ -46,6 +47,7 @@ dependencies:
   permission_handler: ^11.3.1
   polar_tab_bar: ^0.0.2
   provider: ^6.1.2
+  record: ^5.1.2
   shared_preferences: ^2.2.3
   social_login_buttons: ^1.0.7
   svgaplayer_flutter_rhr: ^2.2.1

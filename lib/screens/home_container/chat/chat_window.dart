@@ -1,11 +1,13 @@
-import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/chat_model.dart';
 import 'package:worldsocialintegrationapp/models/chat_window_model.dart';
@@ -14,8 +16,11 @@ import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+import 'package:path/path.dart' as p;
 
+import '../../../services/storage_service.dart';
 import '../../../widgets/enum.dart';
+import '../../../widgets/network_image_preview_fullscreen.dart';
 
 class ChatWindow extends StatefulWidget {
   const ChatWindow({super.key, required this.chatWindowDetails});
@@ -30,6 +35,8 @@ class _ChatWindowState extends State<ChatWindow> {
   final TextEditingController textCtrl = TextEditingController();
   DatabaseReference chatWindowRef = FirebaseDatabase.instance.ref();
   final ScrollController _scrollController = ScrollController();
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -83,7 +90,7 @@ class _ChatWindowState extends State<ChatWindow> {
             child: StreamBuilder(
               stream: chatWindowRef
                   .child('message/${widget.chatWindowDetails.chatWindowId}')
-                  .orderByChild('timestamp')
+                  // .orderByChild('timestamp')
                   .onValue,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -106,6 +113,12 @@ class _ChatWindowState extends State<ChatWindow> {
 
                 chatData.values.forEach(
                     (value) => messageList.add(ChatModel.fromMap(value)));
+
+                messageList.sort(
+                  (a, b) {
+                    return (a.timestamp ?? 0).compareTo(b.timestamp ?? 0);
+                  },
+                );
 
                 return ListView.builder(
                   controller: _scrollController,
@@ -137,7 +150,18 @@ class _ChatWindowState extends State<ChatWindow> {
                   width: 20,
                   color: const Color(0xFFFF0095),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  final pickedFile =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                  setState(() {
+                    if (pickedFile != null) {
+                      _image = File(pickedFile.path);
+                      showSendImagePopup(_image, context);
+                    } else {
+                      log('No image selected.');
+                    }
+                  });
+                },
               ),
               Expanded(
                 child: TextField(
@@ -231,6 +255,9 @@ class _ChatWindowState extends State<ChatWindow> {
       case 'TEXT':
         return getTextTypeChat(chat);
 
+      case 'IMAGE':
+        return getImageTypeChat(chat);
+
       default:
         return const SizedBox.shrink();
     }
@@ -260,6 +287,120 @@ class _ChatWindowState extends State<ChatWindow> {
               fontSize: 12),
         ),
       ],
+    );
+  }
+
+  Widget getImageTypeChat(ChatModel chat) {
+    return Column(
+      crossAxisAlignment: chat.senderId == prefs.getString(PrefsKey.userId)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            onTap: () => Navigator.of(context).pushNamed(
+                NetworkImagePreviewFullScreen.route,
+                arguments: chat.url ?? ''),
+            child: CachedNetworkImage(
+              imageUrl: chat.url ?? '',
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => Center(
+                child: Text('Error ${error.toString()}'),
+              ),
+              fit: BoxFit.fill,
+              height: 250,
+            ),
+          ),
+        ),
+        verticalGap(5),
+        Text(
+          getChatTimesAgo(chat.timestamp ?? 0),
+          style: TextStyle(
+              color: chat.senderId == prefs.getString(PrefsKey.userId)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  void showSendImagePopup(File? image, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          bool isUploading = false;
+          return AlertDialog(
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  setState(() {
+                    isUploading = true;
+                  });
+                  // upload and send
+                  await StorageService.uploadImage(
+                    image!,
+                    'message/${widget.chatWindowDetails.chatWindowId}/images/${widget.chatWindowDetails.currentUser?.id}-${p.basename(image.path)}',
+                  ).then((value) async {
+                    ChatModel chat = ChatModel(
+                        assetId: '',
+                        message: '',
+                        msgType: MessageType.IMAGE.name,
+                        senderId: prefs.getString(PrefsKey.userId),
+                        url: value,
+                        videoThumbnaiil: '');
+                    await FirebaseDbService.sendChat(
+                            widget.chatWindowDetails.chatWindowId ?? '', chat)
+                        .then(
+                      (value) {
+                        setState(() {
+                          isUploading = false;
+                        });
+                        textCtrl.text = '';
+                        _scrollToBottom();
+                      },
+                    );
+                    Navigator.pop(context);
+                  });
+                },
+                child: const Text('Send'),
+              )
+            ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.file(
+                    _image!,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                Visibility(
+                  visible: isUploading,
+                  child: Container(
+                    color: Colors.white.withOpacity(0.1),
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+      },
     );
   }
 }
