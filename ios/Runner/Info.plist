@@ -92,5 +92,7 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pick image for user profile and post</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app is requires Mic permission.</string>
 </dict>
 </plist>

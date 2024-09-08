@@ -9,6 +9,8 @@ environment:
   sdk: ">=3.4.4 <4.0.0"
 
 dependencies:
+  audio_waveforms: ^1.0.5
+  audioplayers: ^6.1.0
   cached_network_image: ^3.3.1
   chewie: ^1.8.3
   country_code_picker: ^3.0.0
@@ -47,8 +49,6 @@ dependencies:
   permission_handler: ^11.3.1
   polar_tab_bar: ^0.0.2
   provider: ^6.1.2
-  record: ^5.1.2
-  shared_preferences: ^2.2.3
   social_login_buttons: ^1.0.7
   svgaplayer_flutter_rhr: ^2.2.1
   timeago: ^3.7.0

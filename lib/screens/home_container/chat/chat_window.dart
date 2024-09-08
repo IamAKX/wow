@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,11 @@ import 'package:worldsocialintegrationapp/models/chat_window_model.dart';
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+import 'package:worldsocialintegrationapp/widgets/audio_player_chat.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:path/path.dart' as p;
+import 'dart:ui' as ui show Gradient;
 
 import '../../../services/storage_service.dart';
 import '../../../widgets/enum.dart';
@@ -37,11 +40,20 @@ class _ChatWindowState extends State<ChatWindow> {
   final ScrollController _scrollController = ScrollController();
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  late final RecorderController recorderController;
+  PlayerController controller = PlayerController();
 
   @override
   void initState() {
     super.initState();
+    recorderController = RecorderController();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  @override
+  void dispose() {
+    recorderController.dispose();
+    super.dispose();
   }
 
   void _scrollToBottom() {
@@ -136,85 +148,126 @@ class _ChatWindowState extends State<ChatWindow> {
           Row(
             children: [
               horizontalGap(10),
-              IconButton(
-                icon: SvgPicture.asset(
-                  'assets/svg/microphone_white.svg',
-                  width: 20,
-                  color: const Color(0xFFFF0095),
-                ),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: SvgPicture.asset(
-                  'assets/svg/gallery.svg',
-                  width: 20,
-                  color: const Color(0xFFFF0095),
-                ),
-                onPressed: () async {
-                  final pickedFile =
-                      await _picker.pickImage(source: ImageSource.gallery);
-                  setState(() {
-                    if (pickedFile != null) {
-                      _image = File(pickedFile.path);
-                      showSendImagePopup(_image, context);
-                    } else {
-                      log('No image selected.');
-                    }
-                  });
+              GestureDetector(
+                onLongPress: () async {
+                  log('recording start');
+                  await recorderController.record();
+                  setState(() {});
                 },
-              ),
-              Expanded(
-                child: TextField(
-                  controller: textCtrl,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.send,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.all(0),
-                    hintText: 'Type message...',
-                    border: InputBorder.none,
-                    filled: true,
-                    fillColor: Colors.transparent,
-                    counterText: '',
+                onLongPressUp: () async {
+                  log('recording end');
+                  final path = await recorderController.stop();
+                  setState(() {});
+                  log('Recording file : $path');
+                  if (path != null && path.isNotEmpty) {
+                    showSendAudioPopup(path, context);
+                  }
+                },
+                child: IconButton(
+                  icon: SvgPicture.asset(
+                    'assets/svg/microphone_white.svg',
+                    width: 20,
+                    color: const Color(0xFFFF0095),
                   ),
+                  onPressed: null,
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  if (textCtrl.text.isEmpty) return;
-                  ChatModel chat = ChatModel(
-                      assetId: '',
-                      message: textCtrl.text,
-                      msgType: MessageType.TEXT.name,
-                      senderId: prefs.getString(PrefsKey.userId),
-                      url: '',
-                      videoThumbnaiil: '');
-                  FirebaseDbService.sendChat(
-                          widget.chatWindowDetails.chatWindowId ?? '', chat)
-                      .then(
-                    (value) {
-                      textCtrl.text = '';
-                      _scrollToBottom();
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50),
-                    gradient: const LinearGradient(
-                      colors: [
-                        Colors.blue,
-                        Color(0xFFFF0095),
+              if (recorderController.isRecording)
+                AudioWaveforms(
+                  enableGesture: true,
+                  size: Size(MediaQuery.of(context).size.width - 130, 40),
+                  recorderController: recorderController,
+                  waveStyle: WaveStyle(
+                    waveThickness: 2,
+                    spacing: 5,
+                    scaleFactor: 80,
+                    gradient: ui.Gradient.linear(
+                      const Offset(70, 50),
+                      Offset(MediaQuery.of(context).size.width / 2, 0),
+                      [
+                        Colors.red,
+                        Colors.green,
                       ],
                     ),
+                    extendWaveform: true,
+                    showMiddleLine: false,
                   ),
-                  child: SvgPicture.asset(
-                    'assets/svg/ic_sent_mail__1_.svg',
+                  padding: const EdgeInsets.only(left: 18),
+                ),
+              if (!recorderController.isRecording)
+                IconButton(
+                  icon: SvgPicture.asset(
+                    'assets/svg/gallery.svg',
                     width: 20,
-                    color: Colors.white,
+                    color: const Color(0xFFFF0095),
+                  ),
+                  onPressed: () async {
+                    final pickedFile =
+                        await _picker.pickImage(source: ImageSource.gallery);
+                    setState(() {
+                      if (pickedFile != null) {
+                        _image = File(pickedFile.path);
+                        showSendImagePopup(_image, context);
+                      } else {
+                        log('No image selected.');
+                      }
+                    });
+                  },
+                ),
+              if (!recorderController.isRecording)
+                Expanded(
+                  child: TextField(
+                    controller: textCtrl,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.send,
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.all(0),
+                      hintText: 'Type message...',
+                      border: InputBorder.none,
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      counterText: '',
+                    ),
                   ),
                 ),
-              ),
+              if (!recorderController.isRecording)
+                InkWell(
+                  onTap: () {
+                    if (textCtrl.text.isEmpty) return;
+                    ChatModel chat = ChatModel(
+                        assetId: '',
+                        message: textCtrl.text,
+                        msgType: MessageType.TEXT.name,
+                        senderId: prefs.getString(PrefsKey.userId),
+                        url: '',
+                        videoThumbnaiil: '');
+                    FirebaseDbService.sendChat(
+                            widget.chatWindowDetails.chatWindowId ?? '', chat)
+                        .then(
+                      (value) {
+                        textCtrl.text = '';
+                        _scrollToBottom();
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Colors.blue,
+                          Color(0xFFFF0095),
+                        ],
+                      ),
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/svg/ic_sent_mail__1_.svg',
+                      width: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               horizontalGap(10),
             ],
           )
@@ -257,6 +310,9 @@ class _ChatWindowState extends State<ChatWindow> {
 
       case 'IMAGE':
         return getImageTypeChat(chat);
+
+      case 'AUDIO':
+        return getAudioTypeChat(chat);
 
       default:
         return const SizedBox.shrink();
@@ -328,13 +384,50 @@ class _ChatWindowState extends State<ChatWindow> {
     );
   }
 
+  Widget getAudioTypeChat(ChatModel chat) {
+    return Column(
+      crossAxisAlignment: chat.senderId == prefs.getString(PrefsKey.userId)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularImage(
+                      imagePath: chat.senderId ==
+                              prefs.getString(PrefsKey.userId)
+                          ? widget.chatWindowDetails.currentUser?.image ?? ''
+                          : widget.chatWindowDetails.friendUser?.image ?? '',
+                      diameter: 50),
+                  horizontalGap(5),
+                  ChatAudioPlayer(url: chat.url ?? ''),
+                ],
+              ),
+            )),
+        verticalGap(5),
+        Text(
+          getChatTimesAgo(chat.timestamp ?? 0),
+          style: TextStyle(
+              color: chat.senderId == prefs.getString(PrefsKey.userId)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12),
+        ),
+      ],
+    );
+  }
+
   void showSendImagePopup(File? image, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        bool isUploading = false;
+
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          bool isUploading = false;
           return AlertDialog(
             actions: [
               TextButton(
@@ -349,7 +442,7 @@ class _ChatWindowState extends State<ChatWindow> {
                     isUploading = true;
                   });
                   // upload and send
-                  await StorageService.uploadImage(
+                  await StorageService.uploadFile(
                     image!,
                     'message/${widget.chatWindowDetails.chatWindowId}/images/${widget.chatWindowDetails.currentUser?.id}-${p.basename(image.path)}',
                   ).then((value) async {
@@ -385,6 +478,116 @@ class _ChatWindowState extends State<ChatWindow> {
                   child: Image.file(
                     _image!,
                     fit: BoxFit.fitWidth,
+                  ),
+                ),
+                Visibility(
+                  visible: isUploading,
+                  child: Container(
+                    color: Colors.white.withOpacity(0.1),
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  void showSendAudioPopup(String audioPath, BuildContext context) async {
+    await controller.preparePlayer(
+      path: audioPath,
+      shouldExtractWaveform: true,
+      noOfSamples: 100,
+      volume: 1.0,
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        bool isPlaying = false;
+        bool isUploading = false;
+
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (!isPlaying) {
+                    setState(() {
+                      isPlaying = true;
+                    });
+
+                    controller.startPlayer(forceRefresh: true);
+                  } else {
+                    setState(() {
+                      isPlaying = false;
+                    });
+                    controller.pausePlayer();
+                  }
+                },
+                child: isPlaying ? Text('Pause') : Text('Play'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  setState(() {
+                    isUploading = true;
+                  });
+                  // upload and send
+                  File file = File(audioPath);
+                  await StorageService.uploadFile(
+                    file,
+                    'message/${widget.chatWindowDetails.chatWindowId}/audio/${widget.chatWindowDetails.currentUser?.id}-${p.basename(file.path)}',
+                  ).then((value) async {
+                    ChatModel chat = ChatModel(
+                        assetId: '',
+                        message: '',
+                        msgType: MessageType.AUDIO.name,
+                        senderId: prefs.getString(PrefsKey.userId),
+                        url: value,
+                        videoThumbnaiil: '');
+                    await FirebaseDbService.sendChat(
+                            widget.chatWindowDetails.chatWindowId ?? '', chat)
+                        .then(
+                      (value) {
+                        setState(() {
+                          isUploading = false;
+                        });
+                        textCtrl.text = '';
+                        _scrollToBottom();
+                      },
+                    );
+                    Navigator.pop(context);
+                  });
+                },
+                child: const Text('Send'),
+              )
+            ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Tap Play to listen your recording'),
+                verticalGap(20),
+                AudioFileWaveforms(
+                  size: Size(MediaQuery.of(context).size.width, 100.0),
+                  playerController: controller,
+                  enableSeekGesture: true,
+                  waveformType: WaveformType.long,
+                  waveformData: [],
+                  playerWaveStyle: const PlayerWaveStyle(
+                    fixedWaveColor: Colors.white54,
+                    liveWaveColor: Colors.blueAccent,
+                    spacing: 6,
                   ),
                 ),
                 Visibility(
