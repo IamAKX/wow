@@ -25,6 +25,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_carousel_widget: ^2.3.0
+  flutter_chat_bubble: ^2.0.2
   flutter_facebook_auth: ^7.0.1
   flutter_localization: ^0.2.1
   flutter_localizations:

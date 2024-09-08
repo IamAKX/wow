@@ -345,4 +345,6 @@ class VisitorModel {
     data['reciveEnd'] = reciveEnd;
     return data;
   }
+
+  static fromMap(map) {}
 }

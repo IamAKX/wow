@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/chat_window_model.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/create_event.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/lucky_model.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_window.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/chat/friend_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/create_event_two.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
@@ -265,6 +268,13 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const GiftWall());
       case ChangePhoneScreen.route:
         return MaterialPageRoute(builder: (_) => const ChangePhoneScreen());
+      case FriendRequest.route:
+        return MaterialPageRoute(builder: (_) => const FriendRequest());
+      case ChatWindow.route:
+        return MaterialPageRoute(
+            builder: (_) => ChatWindow(
+                  chatWindowDetails: settings.arguments as ChatWindowModel,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

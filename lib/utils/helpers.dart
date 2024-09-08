@@ -105,3 +105,21 @@ Future<File> getFileFromAssets(String path) async {
 
   return file;
 }
+
+String getChatRoomId(String userID1, String userID2) {
+  // Convert userID1 and userID2 to integers
+  int id1 = int.parse(userID1);
+  int id2 = int.parse(userID2);
+
+  // Sort the user IDs and join them with a colon
+  if (id1 < id2) {
+    return '$id1:$id2';
+  } else {
+    return '$id2:$id1';
+  }
+}
+
+String getChatTimesAgo(int epochTime) {
+  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epochTime);
+  return timeago.format(dateTime, locale: 'en');
+}

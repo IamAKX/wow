@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
+import 'package:worldsocialintegrationapp/models/firebase_user.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_category.dart';
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
@@ -19,6 +20,7 @@ import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/colors.dart';
+import '../../../utils/generic_api_calls.dart';
 import '../../../utils/helpers.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/feed_video_player.dart';
@@ -36,11 +38,12 @@ class OtherUserDeatilScreen extends StatefulWidget {
 class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
+  UserProfileDetail? user;
   UserProfileDetail? otherUser;
   late ApiCallProvider apiCallProvider;
   List<FeedModel> momentsList = [];
   bool isFriend = false;
+  bool isRequested = false;
 
   @override
   void initState() {
@@ -54,10 +57,21 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadSelfUserData();
       loadUserData();
       loadMoments();
       setVistor();
     });
+  }
+
+  void loadSelfUserData() async {
+    await getCurrentUser().then(
+      (value) {
+        setState(() {
+          user = value;
+        });
+      },
+    );
   }
 
   void setVistor() async {
@@ -65,7 +79,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
       'userId': prefs.getString(PrefsKey.userId),
       'otherUserId': widget.otherUserId
     };
-    apiCallProvider.postRequest(API.setVisitor, reqBody).then(
+    await apiCallProvider.postRequest(API.setVisitor, reqBody).then(
           (value) {},
         );
   }
@@ -76,7 +90,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
       'followingUserId': widget.otherUserId,
       'type': type
     };
-    apiCallProvider.postRequest(API.followUnfollow, reqBody).then(
+    await apiCallProvider.postRequest(API.followUnfollow, reqBody).then(
       (value) {
         if (value['message'] != null) {
           showToastMessage(value['message']);
@@ -128,6 +142,8 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
   loadUserData() async {
     isFriend = await FirebaseDbService.isMyFriend(
         prefs.getString(PrefsKey.userId) ?? '', widget.otherUserId);
+    isRequested = await FirebaseDbService.isFriendRequested(
+        prefs.getString(PrefsKey.userId) ?? '', widget.otherUserId);
 
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId) ?? '0',
@@ -160,24 +176,50 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
           horizontalGap(10),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () async {
-                String type = isFriend ? 'removeFriend' : 'friendRequest';
-                followUnfollow(type).then(
-                  (value) async {
-                    await FirebaseDbService.addRemoveFriend(
-                        prefs.getString(PrefsKey.userId) ?? '',
-                        otherUser?.id ?? '');
-                    loadUserData();
-                  },
-                );
-              },
-              label: isFriend ? Text('Remove') : Text('Add'),
+              onPressed: isRequested
+                  ? null
+                  : isFriend
+                      ? () async {
+                          // Call chat
+                        }
+                      : () async {
+                          // Call Friend request
+
+                          FirebaseUserModel friendReqestModel =
+                              FirebaseUserModel(
+                                  image: user?.image,
+                                  name: user?.name,
+                                  userId: user?.id,
+                                  userName: user?.name);
+
+                          await FirebaseDbService.addFriendRequest(
+                              friendReqestModel, otherUser?.id ?? '');
+                          loadUserData();
+                          String type = 'friendRequest';
+                          await followUnfollow(type).then(
+                            (value) async {},
+                          );
+                        },
+              label: isRequested
+                  ? Text('Requested')
+                  : isFriend
+                      ? Text('Chat')
+                      : Text('Add'),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                backgroundColor: Color(0xFFFBC100),
+                disabledBackgroundColor: Color(
+                  0xFFFBC100,
+                ),
+                backgroundColor: Color(
+                  0xFFFBC100,
+                ),
               ),
               icon: Icon(
-                isFriend ? Icons.person_remove_alt_1 : Icons.person_add_alt_1,
+                isRequested
+                    ? Icons.person_add_alt_1_sharp
+                    : isFriend
+                        ? Icons.chat_outlined
+                        : Icons.person_add_alt,
                 color: Colors.white,
               ),
             ),
@@ -342,7 +384,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                           blockUnblock();
                           break;
                         case 'Unfriend':
-                          String type = 'follow ';
+                          String type = 'removeFriend ';
                           followUnfollow(type);
                           break;
                       }
