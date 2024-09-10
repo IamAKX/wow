@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/popular.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/related.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/search_member.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/live_room_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 
 import '../../../main.dart';
@@ -148,7 +149,9 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(LiveRoomScreen.route);
+            },
             icon: SvgPicture.asset(
               'assets/svg/go_live.svg',
               color: Colors.white,

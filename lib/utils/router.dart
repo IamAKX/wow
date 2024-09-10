@@ -51,6 +51,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/user_detail_scr
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/how_to_level_up.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level_cars.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/live_room_screen.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/login.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/models/phone_number.dart';
 import 'package:worldsocialintegrationapp/screens/onboarding/phone.dart';
@@ -275,6 +276,8 @@ class NavRoute {
             builder: (_) => ChatWindow(
                   chatWindowDetails: settings.arguments as ChatWindowModel,
                 ));
+      case LiveRoomScreen.route:
+        return MaterialPageRoute(builder: (_) => const LiveRoomScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

@@ -95,6 +95,14 @@ String getTimesAgo(String date) {
   }
 }
 
+String getTodaysDate() {
+  try {
+    return DateFormat('dd-MMM-yyyy').format(DateTime.now());
+  } catch (e) {
+    return '';
+  }
+}
+
 Future<File> getFileFromAssets(String path) async {
   final byteData = await rootBundle.load(path);
 
