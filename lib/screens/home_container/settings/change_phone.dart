@@ -251,12 +251,12 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
           if (res == true) {
             Map<String, dynamic> reqBody = {
               'userId': prefs.getString(PrefsKey.userId),
-              'phone':
+              'phoneNumber':
                   '${phoneNumberModel.countryCode?.dialCode}${phoneNumberModel.phoneNumber}'
                       .replaceAll('+', '')
             };
             await apiCallProvider
-                .postRequest(API.updateUserProfile, reqBody)
+                .postRequest(API.updatePhoneNumber, reqBody)
                 .then(
               (value) {
                 showToastMessage(value['message']);
@@ -275,3 +275,4 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
     );
   }
 }
+

@@ -13,6 +13,7 @@ class API {
   static const String mobileLogin = '$baseUrl/mobileLogin';
   static const String getUserDataById = '$baseUrl/getUserDetails';
   static const String updateUserProfile = '$baseUrl/updateUserProfile';
+  static const String updatePhoneNumber = '$baseUrl/updatePhoneNumber';
   static const String userPostAndVideo = '$baseUrl/userPostAndVideo';
   static const String feedDetails = '$baseUrl/feedDetails';
   static const String likeDislike = '$baseUrl/likeDislike';
@@ -55,6 +56,7 @@ class API {
   static const String blockUnblock = '$baseUrl/blockUnblock';
   static const String followUnfollow = '$baseUrl/followUnfollow';
   static const String getSetVisitor = '$baseUrl/getSetVisitor';
+  static const String acceptFriendRequest = '$baseUrl/acceptFriendRequest';
   static const String getFollowingDetails = '$baseUrl/getFollowingDetails';
   static const String getFollowersDetails = '$baseUrl/getFollowersDetails';
   static const String userReport = '$baseUrl/userReport';

@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 
 import '../../../main.dart';
 import '../../../models/firebase_user.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
 import '../../../widgets/circular_image.dart';
 import '../../../widgets/gaps.dart';
@@ -101,7 +103,9 @@ class _FriendRequestState extends State<FriendRequest> {
                           FirebaseDbService.acceptFriendRequest(
                                   firebaseUserModel, list.elementAt(index))
                               .then(
-                            (value) {
+                            (value) async {
+                              await acceptFriendRequestAPI(
+                                  list.elementAt(index).userId ?? '');
                               loadRequests();
                             },
                           );
@@ -164,5 +168,19 @@ class _FriendRequestState extends State<FriendRequest> {
                   color: hintColor,
                 ),
             itemCount: list.length);
+  }
+
+  acceptFriendRequestAPI(String friendId) async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'friendUserID': friendId
+    };
+    await apiCallProvider
+        .postRequest(API.acceptFriendRequest, reqBody)
+        .then((value) {
+      if (value['message'] != null) {
+        showToastMessage(value['message']);
+      }
+    });
   }
 }
