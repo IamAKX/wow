@@ -353,4 +353,6 @@ class _SplashScreenState extends State<SplashScreen> {
     log('continent : ${countryContinent?.continent}');
     log('LatLong : ${countryContinent?.position?.latitude},${countryContinent?.position?.longitude}');
   }
+
+  
 }

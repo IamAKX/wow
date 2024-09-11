@@ -82,4 +82,6 @@ class API {
       '$baseUrl/getSenderReceiverGifting';
   static const String hideUnHideCountry = '$baseUrl/hideUnHideCountry';
   static const String getBlockUsers = '$baseUrl/getBlockUsers';
+  static const String agoraToken = '$baseUrl/agoraToken';
+  
 }

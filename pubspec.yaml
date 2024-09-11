@@ -9,6 +9,7 @@ environment:
   sdk: ">=3.4.4 <4.0.0"
 
 dependencies:
+  agora_rtc_engine: ^6.3.2
   audio_waveforms: ^1.0.5
   audioplayers: ^6.1.0
   cached_network_image: ^3.3.1

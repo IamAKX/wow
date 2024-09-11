@@ -1,15 +1,33 @@
+import 'dart:developer';
+
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:worldsocialintegrationapp/utils/colors.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/agora_live_model.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/lock_room.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/music_bottomsheet.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/scoreboard_bottomsheet.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/theme_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../models/country_continent.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../services/location_service.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import 'cover_info_bottomsheet.dart';
+import 'edit_announcement.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   const LiveRoomScreen({super.key});
@@ -22,12 +40,77 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   bool _isClicked = false;
+  AgoraToken? agoraToken;
+  late RtcEngine agoraEngine;
+  final String appId = '86f31e0182524c3ebc7af02c9a35e0ca';
+  String token = 'your-temporary-token';
+  String channelName = 'testChannel';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
+      getAgoraToken();
+      initializeAgora();
+    });
+  }
+
+  void initializeAgora() async {
+    agoraEngine = createAgoraRtcEngine();
+    await agoraEngine.initialize(RtcEngineContext(appId: appId));
+
+    // Enable audio
+    await agoraEngine.enableAudio();
+
+    // Set event handlers
+    agoraEngine.registerEventHandler(
+      RtcEngineEventHandler(
+        onJoinChannelSuccess: (connection, elapsed) {
+          log('Local user ${connection.localUid} joined the channel');
+        },
+        onUserJoined: (connection, remoteUid, elapsed) {
+          log('Remote user $remoteUid joined the channel');
+        },
+        onUserOffline: (connection, remoteUid, reason) {
+          log('Remote user $remoteUid left the channel');
+        },
+      ),
+    );
+
+    // Join channel
+    await agoraEngine.joinChannel(
+      token: token,
+      channelId: channelName,
+      uid: int.parse(user?.id ?? '0'),
+      options: const ChannelMediaOptions(),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    agoraEngine.leaveChannel();
+    agoraEngine.release();
+  }
+
+  void getAgoraToken() async {
+    CountryContinent? countryContinent =
+        await LocationService().getCurrentLocation();
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'channelName': prefs.getString(PrefsKey.userId),
+      'longitude': countryContinent?.position?.longitude,
+      'latitude': countryContinent?.position?.latitude,
+      'hostType': '3',
+    };
+    await apiCallProvider.postRequest(API.agoraToken, reqBody).then((value) {
+      if (value['details'] != null) {
+        agoraToken = AgoraToken.fromJson(value['details']);
+        channelName = agoraToken?.channelName ?? '';
+        token = agoraToken?.toke ?? '';
+        setState(() {});
+      }
     });
   }
 
@@ -42,105 +125,108 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
-      body: Stack(
-        children: [
-          getBody(context),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 500),
-            top: _isClicked
-                ? MediaQuery.of(context).size.height / 2 - 150
-                : -100, // Animate from top to center
-            left: MediaQuery.of(context).size.width / 2 -
-                35, // Center horizontally
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _isClicked = !_isClicked;
-                });
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFC00E8),
-                          Color(0xFF881FF4),
-                        ],
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            getBody(context),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 500),
+              top: _isClicked
+                  ? MediaQuery.of(context).size.height / 2 - 150
+                  : -100, // Animate from top to center
+              left: MediaQuery.of(context).size.width / 2 -
+                  35, // Center horizontally
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _isClicked = !_isClicked;
+                  });
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFFC00E8),
+                            Color(0xFF881FF4),
+                          ],
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        'assets/image/minimiz.png',
+                        color: Colors.white,
+                        width: 40,
                       ),
                     ),
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      'assets/image/minimiz.png',
-                      color: Colors.white,
-                      width: 40,
-                    ),
-                  ),
-                  verticalGap(10),
-                  Text(
-                    'Minimize',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
+                    verticalGap(10),
+                    const Text(
+                      'Minimize',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 500),
-            bottom: _isClicked
-                ? MediaQuery.of(context).size.height / 2 - 150
-                : -100, // Animate from bottom to center
-            left: MediaQuery.of(context).size.width / 2 -
-                35, // Center horizontally
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _isClicked = !_isClicked;
-                });
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFC00E8),
-                          Color(0xFF881FF4),
-                        ],
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 500),
+              bottom: _isClicked
+                  ? MediaQuery.of(context).size.height / 2 - 150
+                  : -100, // Animate from bottom to center
+              left: MediaQuery.of(context).size.width / 2 -
+                  35, // Center horizontally
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _isClicked = !_isClicked;
+                  });
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFFC00E8),
+                            Color(0xFF881FF4),
+                          ],
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        'assets/image/exit.png',
+                        color: Colors.white,
+                        width: 40,
                       ),
                     ),
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      'assets/image/exit.png',
-                      color: Colors.white,
-                      width: 40,
-                    ),
-                  ),
-                  verticalGap(10),
-                  Text(
-                    'Exit',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
+                    verticalGap(10),
+                    const Text(
+                      'Exit',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -264,7 +350,41 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          content: const TextField(
+                            decoration: InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.symmetric(horizontal: 10),
+                              hintText: 'Send message',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          actions: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.red),
+                                borderRadius: BorderRadius.circular(50),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Colors.green,
+                                    Colors.yellow,
+                                    Colors.deepOrange
+                                  ],
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
@@ -560,30 +680,140 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           insetPadding: EdgeInsets.zero,
           contentPadding: EdgeInsets.zero,
           content: Container(
-            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
-                    getMenuItem(
-                        'assets/image/cover_info_img.png', 'Cover Info'),
-                    getMenuItem('assets/image/bulletin_call.png', 'Bulletin'),
-                    getMenuItem('assets/image/admin_icon.png', 'Admin'),
-                    getMenuItem('assets/image/lock_icon65.png', 'Lock'),
-                    getMenuItem('assets/image/brush.png', 'Clean Chat'),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => const CoverInfoBottomsheet(),
+                          );
+                        },
+                        child: getMenuItem(
+                            'assets/image/cover_info_img.png', 'Cover Info'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) => const EditAnnouncement(),
+                          );
+                        },
+                        child: getMenuItem(
+                            'assets/image/bulletin_call.png', 'Bulletin'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => const AdminBottomsheet(),
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/admin_icon.png', 'Admin'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) => const LockRoom(),
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/lock_icon65.png', 'Lock'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) => const CleanChatRoom(),
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/brush.png', 'Clean Chat'),
+                      ),
+                    ),
                   ],
                 ),
                 verticalGap(50),
                 Row(
                   children: [
-                    getMenuItem('assets/image/color_theme.png', 'Theme'),
-                    getMenuItem('assets/image/eye_h.png', 'Hidden'),
-                    getMenuItem(
-                        'assets/image/increasing_bar.png', 'Scoreboard'),
-                    getMenuItem('assets/image/music_icon.png', 'Music'),
-                    Expanded(child: SizedBox.shrink()),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => const ThemeBottomsheet(),
+                          );
+                        },
+                        child: getMenuItem(
+                            'assets/image/color_theme.png', 'Theme'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) => const HideLiveRoom(),
+                          );
+                        },
+                        child: getMenuItem('assets/image/eye_h.png', 'Hidden'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => const ScoreboardBottomsheet(),
+                          );
+                        },
+                        child: getMenuItem(
+                            'assets/image/increasing_bar.png', 'Scoreboard'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => const MusicBottomsheet(),
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/music_icon.png', 'Music'),
+                      ),
+                    ),
+                    const Expanded(child: SizedBox.shrink()),
                   ],
                 ),
               ],
@@ -595,22 +825,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   }
 
   getMenuItem(String image, String label) {
-    return Expanded(
-      child: Column(
-        children: [
-          Image.asset(
-            image,
-            width: 30,
+    return Column(
+      children: [
+        Image.asset(
+          image,
+          width: 30,
+        ),
+        verticalGap(10),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
           ),
-          verticalGap(10),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
