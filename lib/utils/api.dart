@@ -83,5 +83,7 @@ class API {
   static const String hideUnHideCountry = '$baseUrl/hideUnHideCountry';
   static const String getBlockUsers = '$baseUrl/getBlockUsers';
   static const String agoraToken = '$baseUrl/agoraToken';
+  static const String getPopularUserLive = '$baseUrl/getPopularUserLive';
+  static const String setLiveImage = '$baseUrl/setLiveImage';
   
 }

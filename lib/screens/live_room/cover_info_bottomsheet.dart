@@ -1,13 +1,25 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/agora_live_model.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
-class CoverInfoBottomsheet extends StatefulWidget {
-  const CoverInfoBottomsheet({super.key});
+import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
+import '../../utils/helpers.dart';
 
+class CoverInfoBottomsheet extends StatefulWidget {
+  const CoverInfoBottomsheet(
+      {super.key, required this.userId, required this.agoraToken});
+  final String userId;
+  final AgoraToken agoraToken;
   @override
   State<CoverInfoBottomsheet> createState() => _CoverInfoBottomsheetState();
 }
@@ -15,6 +27,8 @@ class CoverInfoBottomsheet extends StatefulWidget {
 class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  final TextEditingController _titleCtrl = TextEditingController();
+  late ApiCallProvider apiCallProvider;
 
   final List<String> _chipLabels = [
     'Any',
@@ -33,7 +47,18 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
   int _selectedIndex = -1;
 
   @override
+  void initState() {
+    super.initState();
+    _titleCtrl.addListener(
+      () {
+        setState(() {});
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return FractionallySizedBox(
       heightFactor: 0.7, // Set height to 60% of screen height
       child: ClipRRect(
@@ -67,7 +92,7 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: CachedNetworkImage(
-                                  imageUrl: '',
+                                  imageUrl: widget.agoraToken.image ?? '',
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(),
                                   ),
@@ -83,15 +108,28 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                                 ),
                               ),
                       ),
-                      const Positioned(
+                      Positioned(
                         bottom: 1,
                         right: 1,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.red,
-                          radius: 12,
-                          child: Icon(
-                            Icons.add,
-                            size: 20,
+                        child: InkWell(
+                          onTap: () async {
+                            final pickedFile = await _picker.pickImage(
+                                source: ImageSource.gallery);
+                            setState(() {
+                              if (pickedFile != null) {
+                                _image = File(pickedFile.path);
+                              } else {
+                                log('No image selected.');
+                              }
+                            });
+                          },
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.red,
+                            radius: 12,
+                            child: Icon(
+                              Icons.add,
+                              size: 20,
+                            ),
                           ),
                         ),
                       )
@@ -106,12 +144,16 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                 ],
               ),
               verticalGap(20),
-              const Text(
-                'Your Live\'s Title',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              TextField(
+                controller: _titleCtrl,
+                decoration: const InputDecoration(
+                  hintText: 'Your Live\'s Title',
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  border: InputBorder.none,
                 ),
               ),
               verticalGap(20),
@@ -151,6 +193,49 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                   });
                 }),
               ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _image == null ||
+                          _selectedIndex == -1 ||
+                          _titleCtrl.text.isEmpty ||
+                          apiCallProvider.status == ApiStatus.loading
+                      ? null
+                      : () async {
+                          Map<String, dynamic> reqBody = {
+                            'userId': widget.userId,
+                            'liveId': widget.agoraToken.mainId,
+                            'imageText': _chipLabels[_selectedIndex],
+                            'imageTitle': _titleCtrl.text,
+                          };
+                          if (_image != null) {
+                            MultipartFile profileImage =
+                                await MultipartFile.fromFile(_image!.path,
+                                    filename: basename(_image!.path));
+                            reqBody['Liveimage'] = profileImage;
+                          }
+                          apiCallProvider
+                              .postRequest(API.setLiveImage, reqBody)
+                              .then((value) {
+                            if (apiCallProvider.status == ApiStatus.success) {
+                              showToastMessageWithLogo(
+                                  '${value['message']}', context);
+                            } else {
+                              showToastMessageWithLogo(
+                                  'Request failed', context);
+                            }
+                            Navigator.pop(context);
+                          });
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  child: apiCallProvider.status == ApiStatus.loading
+                      ? const ButtonLoader()
+                      : const Text('Confirm'),
+                ),
+              )
             ],
           ),
         ),

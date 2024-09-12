@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/agora_live_model.dart';
 import 'package:worldsocialintegrationapp/models/chat_window_model.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/create_event.dart';
@@ -67,6 +68,7 @@ import 'package:worldsocialintegrationapp/widgets/network_image_preview_fullscre
 
 import '../models/event_subscriber.dart';
 import '../models/family_details.dart';
+import '../models/live_room_detail_model.dart';
 import '../models/send_friend_model.dart';
 import '../models/whats_on_model.dart';
 import '../screens/home_container/event/create_event_one.dart';
@@ -277,7 +279,10 @@ class NavRoute {
                   chatWindowDetails: settings.arguments as ChatWindowModel,
                 ));
       case LiveRoomScreen.route:
-        return MaterialPageRoute(builder: (_) => const LiveRoomScreen());
+        return MaterialPageRoute(
+            builder: (_) => LiveRoomScreen(
+                  agoraToken: settings.arguments as LiveRoomDetailModel,
+                ));
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

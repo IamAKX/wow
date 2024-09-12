@@ -21,6 +21,7 @@ import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/country_continent.dart';
+import '../../models/live_room_detail_model.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
 import '../../services/location_service.dart';
@@ -30,8 +31,9 @@ import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
 
 class LiveRoomScreen extends StatefulWidget {
-  const LiveRoomScreen({super.key});
+  const LiveRoomScreen({super.key, required this.agoraToken});
   static const String route = '/liveRoomScreen';
+  final LiveRoomDetailModel agoraToken;
   @override
   State<LiveRoomScreen> createState() => _LiveRoomScreenState();
 }
@@ -40,7 +42,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   bool _isClicked = false;
-  AgoraToken? agoraToken;
+
   late RtcEngine agoraEngine;
   final String appId = '86f31e0182524c3ebc7af02c9a35e0ca';
   String token = 'your-temporary-token';
@@ -51,26 +53,36 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
-      getAgoraToken();
-      initializeAgora();
+
+      // initializeAgora();
     });
   }
 
   void initializeAgora() async {
+    channelName = widget.agoraToken.channelName ?? '';
+    token = widget.agoraToken.token ?? '';
+
     agoraEngine = createAgoraRtcEngine();
     await agoraEngine.initialize(RtcEngineContext(appId: appId));
 
     // Enable audio
     await agoraEngine.enableAudio();
+    await agoraEngine.setDefaultAudioRouteToSpeakerphone(true);
+    await agoraEngine.enableAudio();
+    await agoraEngine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+    await agoraEngine.setAudioProfile(
+      profile: AudioProfileType.audioProfileDefault,
+      scenario: AudioScenarioType.audioScenarioGameStreaming,
+    );
 
     // Set event handlers
     agoraEngine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (connection, elapsed) {
-          log('Local user ${connection.localUid} joined the channel');
+          log('Local user ${connection.localUid} joined the channel $elapsed');
         },
         onUserJoined: (connection, remoteUid, elapsed) {
-          log('Remote user $remoteUid joined the channel');
+          log('Remote user $remoteUid joined the channel $elapsed');
         },
         onUserOffline: (connection, remoteUid, reason) {
           log('Remote user $remoteUid left the channel');
@@ -78,12 +90,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       ),
     );
 
+    log('token : ${token}');
+    log('channelName : ${channelName}');
     // Join channel
     await agoraEngine.joinChannel(
       token: token,
       channelId: channelName,
       uid: int.parse(user?.id ?? '0'),
-      options: const ChannelMediaOptions(),
+      options: const ChannelMediaOptions(
+        channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+        clientRoleType: ClientRoleType.clientRoleBroadcaster,
+      ),
     );
   }
 
@@ -92,26 +109,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     super.dispose();
     agoraEngine.leaveChannel();
     agoraEngine.release();
-  }
-
-  void getAgoraToken() async {
-    CountryContinent? countryContinent =
-        await LocationService().getCurrentLocation();
-    Map<String, dynamic> reqBody = {
-      'userId': prefs.getString(PrefsKey.userId),
-      'channelName': prefs.getString(PrefsKey.userId),
-      'longitude': countryContinent?.position?.longitude,
-      'latitude': countryContinent?.position?.latitude,
-      'hostType': '3',
-    };
-    await apiCallProvider.postRequest(API.agoraToken, reqBody).then((value) {
-      if (value['details'] != null) {
-        agoraToken = AgoraToken.fromJson(value['details']);
-        channelName = agoraToken?.channelName ?? '';
-        token = agoraToken?.toke ?? '';
-        setState(() {});
-      }
-    });
   }
 
   void loadUserData() async {
@@ -694,7 +691,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
-                            builder: (context) => const CoverInfoBottomsheet(),
+                            builder: (context) => CoverInfoBottomsheet(
+                              agoraToken: AgoraToken(),
+                              userId: prefs.getString(PrefsKey.userId) ?? '',
+                            ),
                           );
                         },
                         child: getMenuItem(
