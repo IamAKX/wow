@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-import 'package:worldsocialintegrationapp/models/agora_live_model.dart';
+import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
 import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -17,9 +18,9 @@ import '../../utils/helpers.dart';
 
 class CoverInfoBottomsheet extends StatefulWidget {
   const CoverInfoBottomsheet(
-      {super.key, required this.userId, required this.agoraToken});
+      {super.key, required this.userId, required this.roomDetail});
   final String userId;
-  final AgoraToken agoraToken;
+  final JoinableLiveRoomModel roomDetail;
   @override
   State<CoverInfoBottomsheet> createState() => _CoverInfoBottomsheetState();
 }
@@ -49,6 +50,9 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
   @override
   void initState() {
     super.initState();
+    _selectedIndex = _chipLabels.indexOf(widget.roomDetail.imageText ?? '');
+    _titleCtrl.text = widget.roomDetail.imageTitle ?? '';
+    setState(() {});
     _titleCtrl.addListener(
       () {
         setState(() {});
@@ -92,7 +96,7 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: CachedNetworkImage(
-                                  imageUrl: widget.agoraToken.image ?? '',
+                                  imageUrl: widget.roomDetail.liveimage ?? '',
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(),
                                   ),
@@ -197,7 +201,8 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _image == null ||
+                  onPressed: (_image == null &&
+                              (widget.roomDetail.liveimage?.isEmpty ?? true)) ||
                           _selectedIndex == -1 ||
                           _titleCtrl.text.isEmpty ||
                           apiCallProvider.status == ApiStatus.loading
@@ -205,7 +210,7 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                       : () async {
                           Map<String, dynamic> reqBody = {
                             'userId': widget.userId,
-                            'liveId': widget.agoraToken.mainId,
+                            'liveId': widget.roomDetail.id,
                             'imageText': _chipLabels[_selectedIndex],
                             'imageTitle': _titleCtrl.text,
                           };
@@ -217,10 +222,15 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                           }
                           apiCallProvider
                               .postRequest(API.setLiveImage, reqBody)
-                              .then((value) {
+                              .then((value) async {
                             if (apiCallProvider.status == ApiStatus.success) {
                               showToastMessageWithLogo(
                                   '${value['message']}', context);
+                              JoinableLiveRoomModel joinableLiveRoomModel =
+                                  JoinableLiveRoomModel.fromJson(
+                                      value['details']);
+                              await LiveRoomFirebase.updateLiveRoomInfo(
+                                  joinableLiveRoomModel);
                             } else {
                               showToastMessageWithLogo(
                                   'Request failed', context);

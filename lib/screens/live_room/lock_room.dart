@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:otp_pin_field/otp_pin_field.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
+
+import '../../main.dart';
+import '../../models/joinable_live_room_model.dart';
+import '../../providers/api_call_provider.dart';
+import '../../services/live_room_firebase.dart';
+import '../../utils/api.dart';
+import '../../utils/prefs_key.dart';
 
 class LockRoom extends StatefulWidget {
-  const LockRoom({super.key});
-
+  const LockRoom({super.key, required this.roomDetail, required this.userId});
+  final JoinableLiveRoomModel roomDetail;
+  final String userId;
   @override
   State<LockRoom> createState() => _LockRoomState();
 }
@@ -11,9 +21,12 @@ class LockRoom extends StatefulWidget {
 class _LockRoomState extends State<LockRoom> {
   String otpInput = '';
   final _otpPinFieldKey = GlobalKey<OtpPinFieldState>();
+  late ApiCallProvider apiCallProvider;
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return AlertDialog(
       title: const Text(
         'Set Room Password',
@@ -99,10 +112,14 @@ class _LockRoomState extends State<LockRoom> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // Handle confirm action
-
-                Navigator.of(context).pop();
+                if (otpInput.length == 6) {
+                  lockRoom();
+                  Navigator.of(context).pop();
+                } else {
+                  showToastMessage('Enter 6 digits code');
+                }
               },
               child: const Text('Confirm'),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -111,5 +128,22 @@ class _LockRoomState extends State<LockRoom> {
         ),
       ],
     );
+  }
+
+  Future<void> lockRoom() async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'liveId': widget.roomDetail.id,
+      'password': otpInput
+    };
+    await apiCallProvider
+        .postRequest(API.lockUserLive, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        showToastMessage(value['message']);
+        widget.roomDetail.password = otpInput;
+        await LiveRoomFirebase.updateLiveRoomInfo(widget.roomDetail);
+      }
+    });
   }
 }

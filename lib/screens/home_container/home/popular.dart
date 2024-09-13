@@ -14,6 +14,7 @@ import '../../../models/joinable_live_room_model.dart';
 import '../../../models/live_room_detail_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
+import '../../../utils/helpers.dart';
 import '../../../utils/prefs_key.dart';
 import '../../live_room/live_room_screen.dart';
 
@@ -42,7 +43,9 @@ class _PopularScreenState extends State<PopularScreen> {
       'userId': prefs.getString(PrefsKey.userId),
       'otherId': prefs.getString(PrefsKey.userId),
     };
-    apiCallProvider.postRequest(API.getPopularUserLive, reqBody).then((value) {
+    await apiCallProvider
+        .postRequest(API.getPopularUserLive, reqBody)
+        .then((value) {
       roomList.clear();
       if (value['details'] != null) {
         for (var item in value['details']) {
@@ -98,7 +101,16 @@ class _PopularScreenState extends State<PopularScreen> {
                     itemCount: roomList.length,
                     itemBuilder: (context, index) {
                       return InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          if (roomList.elementAt(index).password?.isNotEmpty ??
+                              false) {
+                            String? isPasswordVerified =
+                                await showPasswordDialog(context,
+                                    roomList.elementAt(index).password!);
+                            if (isPasswordVerified != 'true') {
+                              return;
+                            }
+                          }
                           LiveRoomDetailModel liveRoomDetailModel =
                               LiveRoomDetailModel(
                             channelName: roomList.elementAt(index).channelName,
@@ -314,6 +326,56 @@ class _PopularScreenState extends State<PopularScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<String?> showPasswordDialog(
+      BuildContext context, String roomPassword) async {
+    TextEditingController passwordController = TextEditingController();
+
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Room Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Room is locked, enter password to enter'),
+              const SizedBox(height: 16),
+              TextField(
+                keyboardType: TextInputType.number,
+                controller: passwordController,
+                obscureText: true, // To hide the text for password input
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Close dialog without returning a value
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (roomPassword == passwordController.text) {
+                  Navigator.pop(context, 'true');
+                } else {
+                  showToastMessage('Incorrect password');
+                  Navigator.pop(context, 'false');
+                } // Return the password
+              },
+              child: const Text('Enter'),
+            ),
+          ],
+        );
+      },
     );
   }
 

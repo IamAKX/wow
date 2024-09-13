@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
 
 class CleanChatRoom extends StatefulWidget {
-  const CleanChatRoom({super.key});
+  const CleanChatRoom(
+      {super.key, required this.chatRoomId, required this.chat});
+  final String chatRoomId;
+  final LiveroomChat chat;
 
   @override
   State<CleanChatRoom> createState() => _CleanChatRoomState();
@@ -36,7 +41,7 @@ class _CleanChatRoomState extends State<CleanChatRoom> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle confirm action
+                LiveRoomFirebase.clearChat(widget.chatRoomId, widget.chat);
 
                 Navigator.of(context).pop();
               },

@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
-import 'package:worldsocialintegrationapp/models/agora_live_model.dart';
+import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.dart';
@@ -14,6 +16,7 @@ import 'package:worldsocialintegrationapp/screens/live_room/music_bottomsheet.da
 import 'package:worldsocialintegrationapp/screens/live_room/scoreboard_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/theme_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/firebase_db_node.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
@@ -24,6 +27,7 @@ import '../../models/country_continent.dart';
 import '../../models/live_room_detail_model.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../services/live_room_firebase.dart';
 import '../../services/location_service.dart';
 import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
@@ -42,19 +46,79 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   bool _isClicked = false;
+  JoinableLiveRoomModel? roomDetail;
+  static FirebaseDatabase database = FirebaseDatabase.instance;
+  int participantCount = -1;
+  String announcementMessage = '';
 
   late RtcEngine agoraEngine;
   final String appId = '86f31e0182524c3ebc7af02c9a35e0ca';
   String token = 'your-temporary-token';
   String channelName = 'testChannel';
 
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
+      firebaseDetailListners();
 
       // initializeAgora();
+    });
+  }
+
+  void firebaseDetailListners() async {
+    LiveRoomFirebase.toggleUserInRoomArray(
+        widget.agoraToken.mainId ?? '', prefs.getString(PrefsKey.userId) ?? '');
+    database
+        .ref('${FirebaseDbNode.liveRoom}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        setState(() {
+          roomDetail =
+              JoinableLiveRoomModel.fromJson(dataSnapshot.value as Map);
+        });
+      }
+    });
+    database
+        .ref(
+            '${FirebaseDbNode.liveRoomParticipants}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      if (event.snapshot.exists) {
+        List<dynamic> userList = List.from(event.snapshot.value as List);
+        log('userList : $userList');
+        setState(() {
+          participantCount = userList.length;
+        });
+      } else {
+        setState(() {
+          participantCount = 0;
+        });
+      }
+    });
+
+    database
+        .ref(
+            '${FirebaseDbNode.liveRoomAnnouncement}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        setState(() {
+          announcementMessage = dataSnapshot.value as String;
+        });
+      }
     });
   }
 
@@ -106,16 +170,46 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     agoraEngine.leaveChannel();
     agoraEngine.release();
+    cleanFirebaseListener();
+    super.dispose();
+  }
+
+  void cleanFirebaseListener() async {
+    await database
+        .ref('${FirebaseDbNode.liveRoom}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref(
+            '${FirebaseDbNode.liveRoomParticipants}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref(
+            '${FirebaseDbNode.liveRoomAnnouncement}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
   }
 
   void loadUserData() async {
     await getCurrentUser().then(
       (value) async {
         user = value;
-        setState(() {});
+        LiveroomChat liveroomChat = LiveroomChat(
+            message: 'joined Stream',
+            timeStamp: DateTime.now().millisecondsSinceEpoch,
+            userId: user?.id,
+            userImage: user?.image,
+            userName: user?.name);
+        LiveRoomFirebase.sendChat(widget.agoraToken.mainId ?? '', liveroomChat)
+            .then(
+          (value) {},
+        );
+        setState(() {
+          _scrollToBottom();
+        });
       },
     );
   }
@@ -132,7 +226,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               duration: const Duration(milliseconds: 500),
               top: _isClicked
                   ? MediaQuery.of(context).size.height / 2 - 150
-                  : -100, // Animate from top to center
+                  : -150, // Animate from top to center
               left: MediaQuery.of(context).size.width / 2 -
                   35, // Center horizontally
               child: InkWell(
@@ -179,14 +273,32 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               duration: const Duration(milliseconds: 500),
               bottom: _isClicked
                   ? MediaQuery.of(context).size.height / 2 - 150
-                  : -100, // Animate from bottom to center
+                  : -150, // Animate from bottom to center
               left: MediaQuery.of(context).size.width / 2 -
                   35, // Center horizontally
               child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _isClicked = !_isClicked;
-                  });
+                onTap: () async {
+                  _isClicked = !_isClicked;
+                  await LiveRoomFirebase.toggleUserInRoomArray(
+                          widget.agoraToken.mainId ?? '',
+                          prefs.getString(PrefsKey.userId) ?? '')
+                      .then(
+                    (value) {},
+                  );
+
+                  LiveroomChat liveroomChat = LiveroomChat(
+                      message: 'left Stream',
+                      timeStamp: DateTime.now().millisecondsSinceEpoch,
+                      userId: user?.id,
+                      userImage: user?.image,
+                      userName: user?.name);
+                  LiveRoomFirebase.sendChat(
+                          widget.agoraToken.mainId ?? '', liveroomChat)
+                      .then(
+                    (value) {
+                      _scrollToBottom();
+                    },
+                  );
                 },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -248,139 +360,28 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               verticalGap(10),
               getProfileRow(context),
               verticalGap(20),
-              GridView.builder(
-                primary: true,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    childAspectRatio: 0.7),
-                itemCount: 8,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () async {
-                      showPositionPopup();
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(60),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                        ),
-                        verticalGap(20),
-                        Text(
-                          '${index + 1}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              ),
-              Expanded(
-                child: Align(
+              getSeatLayout(),
+              if (announcementMessage.isNotEmpty)
+                Align(
                   alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width - 30),
-                        margin: const EdgeInsets.all(5),
-                        padding: const EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            BorderedCircularImage(
-                              imagePath: user?.image ?? '',
-                              diameter: 20,
-                              borderColor: Colors.white,
-                              borderThickness: 1,
-                            ),
-                            horizontalGap(5),
-                            Text(
-                              user?.name ?? '',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            horizontalGap(5),
-                            const Flexible(
-                              child: Text(
-                                ': Welcome to WOW\s Live Stream',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Colors.green,
-                                Colors.yellow,
-                                Colors.deepOrange
-                              ],
-                            ),
-                            border: Border.all(color: Colors.red),
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      'Room announcement: $announcementMessage',
+                      style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14),
+                    ),
                   ),
                 ),
-              ),
+              getLiveChatList(context),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   InkWell(
                     onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          content: const TextField(
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 10),
-                              hintText: 'Send message',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          actions: [
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.red),
-                                borderRadius: BorderRadius.circular(50),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Colors.green,
-                                    Colors.yellow,
-                                    Colors.deepOrange
-                                  ],
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ),
-                      );
+                      sendLiveRoomMessage(context);
                     },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
@@ -456,6 +457,218 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
+  Expanded getLiveChatList(BuildContext context) {
+    return Expanded(
+      child: StreamBuilder(
+        stream: FirebaseDatabase.instance
+            .ref('${FirebaseDbNode.liveRoomChat}/${widget.agoraToken.mainId}')
+            .onValue,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.data!.snapshot.value == null) {
+            return const SizedBox.shrink();
+          }
+          Map<dynamic, dynamic>? chatData =
+              snapshot.data!.snapshot.value as Map;
+
+          List<LiveroomChat> messageList = [];
+
+          chatData.values
+              .forEach((value) => messageList.add(LiveroomChat.fromMap(value)));
+
+          messageList.sort(
+            (a, b) {
+              return (a.timeStamp ?? 0).compareTo(b.timeStamp ?? 0);
+            },
+          );
+          _scrollToBottom();
+          return ListView.builder(
+            controller: _scrollController,
+            itemCount: messageList.length,
+            itemBuilder: (context, index) {
+              return getChatItem(context, messageList.elementAt(index));
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Container getChatItem(BuildContext context, LiveroomChat chatContent) {
+    return Container(
+      width: MediaQuery.of(context).size.width - 30,
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Colors.green, Colors.yellow, Colors.deepOrange],
+          ),
+          border: Border.all(color: Colors.red),
+          borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          BorderedCircularImage(
+            imagePath: chatContent.userImage ?? '',
+            diameter: 20,
+            borderColor: Colors.white,
+            borderThickness: 1,
+          ),
+          horizontalGap(5),
+          Text(
+            chatContent.userName ?? '',
+            style: const TextStyle(color: Colors.white),
+          ),
+          const Text(
+            ': ',
+            style: TextStyle(color: Colors.white),
+          ),
+          Flexible(
+            child: Text(
+              chatContent.message ?? '',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  GridView getSeatLayout() {
+    return GridView.builder(
+      primary: true,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 5,
+          mainAxisSpacing: 5,
+          childAspectRatio: 0.7),
+      itemCount: 8,
+      itemBuilder: (context, index) {
+        return InkWell(
+          onTap: () async {
+            showPositionPopup();
+          },
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(60),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+              ),
+              verticalGap(20),
+              Text(
+                '${index + 1}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> sendLiveRoomMessage(BuildContext context) {
+    final TextEditingController messageCtrl = TextEditingController();
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => Stack(
+        children: [
+          Positioned(
+            bottom: 1, // Ensures dialog stays on top of keyboard
+            left: 0,
+            right: 0,
+            child: Dialog(
+              insetPadding: EdgeInsets.zero,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: messageCtrl,
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          hintText: 'Send message',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    horizontalGap(10),
+                    InkWell(
+                      onTap: () async {
+                        if (messageCtrl.text.isNotEmpty) {
+                          LiveroomChat liveroomChat = LiveroomChat(
+                              message: messageCtrl.text,
+                              timeStamp: DateTime.now().millisecondsSinceEpoch,
+                              userId: user?.id,
+                              userImage: user?.image,
+                              userName: user?.name);
+                          LiveRoomFirebase.sendChat(
+                                  widget.agoraToken.mainId ?? '', liveroomChat)
+                              .then(
+                            (value) {
+                              Navigator.of(context).pop();
+                              _scrollToBottom();
+                            },
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red),
+                          borderRadius: BorderRadius.circular(50),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Colors.green,
+                              Colors.yellow,
+                              Colors.deepOrange
+                            ],
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Row getProfileRow(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,19 +740,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 data: Theme.of(context).copyWith(
                   canvasColor: Colors.black.withOpacity(0.2),
                 ),
-                child: const Chip(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                child: Chip(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   backgroundColor: Colors.transparent,
                   label: Text(
-                    '1',
-                    style: TextStyle(
+                    '$participantCount',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                     ),
                   ),
-                  labelPadding: EdgeInsets.only(right: 5),
+                  labelPadding: const EdgeInsets.only(right: 5),
                   visualDensity: VisualDensity.compact,
-                  avatar: Icon(
+                  avatar: const Icon(
                     Icons.person,
                     color: Colors.white,
                     size: 15,
@@ -592,15 +805,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
           child: Row(
             children: [
-              const CircularImage(imagePath: '', diameter: 40),
+              CircularImage(
+                  imagePath: roomDetail?.liveimage ?? '', diameter: 40),
               horizontalGap(10),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'My Games',
-                    style: TextStyle(
+                  Text(
+                    roomDetail?.imageTitle ?? '',
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   Text(
@@ -692,7 +906,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             context: context,
                             isScrollControlled: true, // To enable custom height
                             builder: (context) => CoverInfoBottomsheet(
-                              agoraToken: AgoraToken(),
+                              roomDetail: roomDetail ??
+                                  JoinableLiveRoomModel(
+                                    id: widget.agoraToken.mainId,
+                                  ),
                               userId: prefs.getString(PrefsKey.userId) ?? '',
                             ),
                           );
@@ -707,7 +924,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           Navigator.of(context).pop();
                           showDialog(
                             context: context,
-                            builder: (context) => const EditAnnouncement(),
+                            builder: (context) => EditAnnouncement(
+                              roomDetail: roomDetail ??
+                                  JoinableLiveRoomModel(
+                                      id: widget.agoraToken.mainId),
+                            ),
                           );
                         },
                         child: getMenuItem(
@@ -732,13 +953,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       child: InkWell(
                         onTap: () {
                           Navigator.of(context).pop();
-                          showDialog(
-                            context: context,
-                            builder: (context) => const LockRoom(),
-                          );
+                          if ((roomDetail?.password?.isEmpty ?? true)) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => LockRoom(
+                                userId: user?.id ?? '',
+                                roomDetail: roomDetail ??
+                                    JoinableLiveRoomModel(
+                                        id: widget.agoraToken.mainId),
+                              ),
+                            );
+                          } else {
+                            unlockRoom();
+                          }
                         },
-                        child:
-                            getMenuItem('assets/image/lock_icon65.png', 'Lock'),
+                        child: getMenuItem(
+                            'assets/image/lock_icon65.png',
+                            (roomDetail?.password?.isEmpty ?? true)
+                                ? 'Lock'
+                                : 'Unlock'),
                       ),
                     ),
                     Expanded(
@@ -747,7 +980,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           Navigator.of(context).pop();
                           showDialog(
                             context: context,
-                            builder: (context) => const CleanChatRoom(),
+                            builder: (context) => CleanChatRoom(
+                              chatRoomId: widget.agoraToken.mainId ?? '',
+                              chat: LiveroomChat(
+                                  message: 'Chat cleaned',
+                                  timeStamp:
+                                      DateTime.now().millisecondsSinceEpoch,
+                                  userId: user?.id,
+                                  userImage: user?.image,
+                                  userName: user?.name),
+                            ),
                           );
                         },
                         child:
@@ -840,5 +1082,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         ),
       ],
     );
+  }
+
+  void unlockRoom() {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'liveId': widget.agoraToken.mainId,
+      'password': ''
+    };
+    apiCallProvider.postRequest(API.lockUserLive, reqBody).then((value) async {
+      if (value['success'] == '1') {
+        roomDetail?.password = '';
+        await LiveRoomFirebase.updateLiveRoomInfo(roomDetail!);
+        showToastMessage('Live room unlocked');
+        setState(() {});
+      }
+    });
   }
 }

@@ -64,7 +64,7 @@ class JoinableLiveRoomModel {
       this.userGender,
       this.userDob});
 
-  JoinableLiveRoomModel.fromJson(Map<String, dynamic> json) {
+  JoinableLiveRoomModel.fromJson(Map json) {
     id = json['id'];
     hostType = json['hostType'];
     userId = json['userId'];
@@ -99,7 +99,7 @@ class JoinableLiveRoomModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = id;
     data['hostType'] = hostType;
     data['userId'] = userId;

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
+
+import '../../models/joinable_live_room_model.dart';
 
 class EditAnnouncement extends StatefulWidget {
-  const EditAnnouncement({super.key});
+  const EditAnnouncement({super.key, required this.roomDetail});
+  final JoinableLiveRoomModel roomDetail;
 
   @override
   State<EditAnnouncement> createState() => _EditAnnouncementState();
@@ -12,7 +16,7 @@ class _EditAnnouncementState extends State<EditAnnouncement> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
+      title: const Text(
         'Edit the announcement',
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
@@ -24,7 +28,7 @@ class _EditAnnouncementState extends State<EditAnnouncement> {
             decoration: InputDecoration(
               fillColor: Colors.grey.shade300,
               filled: true,
-              labelText: 'Type your announcement',
+              hintText: 'Type your announcement',
               border: InputBorder.none,
             ),
           ),
@@ -39,12 +43,12 @@ class _EditAnnouncementState extends State<EditAnnouncement> {
                 // Handle cancel action
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle confirm action
-                print('Entered text: ${_textController.text}');
+                LiveRoomFirebase.updateLiveRoomAnnoucement(
+                    widget.roomDetail.id ?? '', _textController.text);
                 Navigator.of(context).pop();
               },
               child: Text('Confirm'),

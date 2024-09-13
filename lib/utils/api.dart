@@ -85,5 +85,6 @@ class API {
   static const String agoraToken = '$baseUrl/agoraToken';
   static const String getPopularUserLive = '$baseUrl/getPopularUserLive';
   static const String setLiveImage = '$baseUrl/setLiveImage';
+  static const String lockUserLive = '$baseUrl/lockUserLive';
   
 }
