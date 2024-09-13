@@ -9,6 +9,7 @@ import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_window.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/friend_request.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/daily_spin/daily_spin_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/create_event_two.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
@@ -283,6 +284,8 @@ class NavRoute {
             builder: (_) => LiveRoomScreen(
                   agoraToken: settings.arguments as LiveRoomDetailModel,
                 ));
+      case DailySpinScreen.route:
+        return MaterialPageRoute(builder: (_) => const DailySpinScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

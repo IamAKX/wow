@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/daily_spin/daily_spin_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
@@ -61,7 +62,7 @@ class _PopularScreenState extends State<PopularScreen> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       floatingActionButton: InkWell(
-        onTap: () => {},
+        onTap: () => Navigator.of(context).pushNamed(DailySpinScreen.route),
         child: Image.asset(
           'assets/image/spinnwheell.png',
           width: 60,

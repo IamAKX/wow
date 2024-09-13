@@ -36,8 +36,11 @@ class BorderedCircularImage extends StatelessWidget {
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
-                errorWidget: (context, url, error) =>
-                    Image.asset('assets/dummy/demo_user_profile.png'),
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/dummy/demo_user_profile.png',
+                  width: diameter,
+                  height: diameter,
+                ),
                 imageBuilder: (context, imageProvider) => CircleAvatar(
                   backgroundImage: imageProvider,
                   radius: diameter / 2,

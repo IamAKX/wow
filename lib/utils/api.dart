@@ -86,5 +86,7 @@ class API {
   static const String getPopularUserLive = '$baseUrl/getPopularUserLive';
   static const String setLiveImage = '$baseUrl/setLiveImage';
   static const String lockUserLive = '$baseUrl/lockUserLive';
-  
+  static const String getSpinWheelDetails = '$baseUrl/getSpinWheelDetails';
+  static const String hitSpinWheel = '$baseUrl/hitSpinWheel';
+  static const String checkSpinWheel = '$baseUrl/checkSpinWheel';
 }

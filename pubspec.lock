@@ -510,6 +510,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  flutter_confetti:
+    dependency: "direct main"
+    description:
+      name: flutter_confetti
+      sha256: "7a0f586a0295b1dad6be364a82c59b8579e1cc8af99b0cba0461b6fabd60ff78"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   flutter_facebook_auth:
     dependency: "direct main"
     description:
@@ -933,6 +941,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  kbspinningwheel:
+    dependency: "direct main"
+    description:
+      name: kbspinningwheel
+      sha256: "2d962bcc1b762721d222e230175dfb7b03987e9c072c307819111646f2acdd3c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   leak_tracker:
     dependency: transitive
     description:
