@@ -97,32 +97,36 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text((user?.facebookUserName?.isNotEmpty ?? false)
-                  ? user!.facebookUserName!
+                  ? 'UNBOUND'
                   : 'ADD'),
               Icon(Icons.chevron_right),
             ],
           ),
           tileColor: Colors.white,
-          onTap: () async {
-            Map<String, dynamic> facebookUserData =
-                await ConnectSocialAccount().loginWithFacebook();
-            if (facebookUserData['id'] != null) {
-              Map<String, dynamic> reqBody = {
-                'isAddGoogleId': 'No',
-                'googleSocialId': '',
-                'googleEmailId': '',
-                'facebookId': facebookUserData['id'],
-                'facebookUserName': facebookUserData['name'],
-                'userId': user?.id
-              };
-              apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
-                (value) {
-                  showToastMessage(value['message']);
-                  loadUserData();
+          onTap: (user?.email?.isNotEmpty ?? false)
+              ? () async {
+                  await ConnectSocialAccount().logoutWithFacebook();
+                }
+              : () async {
+                  Map<String, dynamic> facebookUserData =
+                      await ConnectSocialAccount().loginWithFacebook();
+                  if (facebookUserData['id'] != null) {
+                    Map<String, dynamic> reqBody = {
+                      'isAddGoogleId': 'No',
+                      'googleSocialId': '',
+                      'googleEmailId': '',
+                      'facebookId': facebookUserData['id'],
+                      'facebookUserName': facebookUserData['name'],
+                      'userId': user?.id
+                    };
+                    apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
+                      (value) {
+                        showToastMessage(value['message']);
+                        loadUserData();
+                      },
+                    );
+                  }
                 },
-              );
-            }
-          },
         ),
         const Divider(
           height: 1,
@@ -137,33 +141,37 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text((user?.email?.isNotEmpty ?? false)
-                    ? user?.email ?? 'ADD'
-                    : 'ADD'),
+                Text((user?.email?.isNotEmpty ?? false) ? 'UNBOUND' : 'ADD'),
                 Icon(Icons.chevron_right),
               ],
             ),
             tileColor: Colors.white,
-            onTap: () async {
-              GoogleSignInAccount? googleSignInAccount =
-                  await ConnectSocialAccount().loginWithGoogle();
-              if (googleSignInAccount != null) {
-                Map<String, dynamic> reqBody = {
-                  'isAddGoogleId': 'Yes',
-                  'googleSocialId': googleSignInAccount.id,
-                  'googleEmailId': googleSignInAccount.email,
-                  'facebookId': '',
-                  'facebookUserName': '',
-                  'userId': user?.id
-                };
-                apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
-                  (value) {
-                    showToastMessage(value['message']);
-                    loadUserData();
-                  },
-                );
-              }
-            }),
+            onTap: (user?.email?.isNotEmpty ?? false)
+                ? () async {
+                    await ConnectSocialAccount().logoutWithGoogle();
+                  }
+                : () async {
+                    GoogleSignInAccount? googleSignInAccount =
+                        await ConnectSocialAccount().loginWithGoogle();
+                    if (googleSignInAccount != null) {
+                      Map<String, dynamic> reqBody = {
+                        'isAddGoogleId': 'Yes',
+                        'googleSocialId': googleSignInAccount.id,
+                        'googleEmailId': googleSignInAccount.email,
+                        'facebookId': '',
+                        'facebookUserName': '',
+                        'userId': user?.id
+                      };
+                      apiCallProvider
+                          .postRequest(API.addSocialIds, reqBody)
+                          .then(
+                        (value) {
+                          showToastMessage(value['message']);
+                          loadUserData();
+                        },
+                      );
+                    }
+                  }),
         const Divider(
           height: 1,
           color: Color(0xFFE5E5E5),

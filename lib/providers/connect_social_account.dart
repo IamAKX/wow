@@ -85,7 +85,7 @@ class ConnectSocialAccount {
 
     if (result.status != LoginStatus.success) {
       showToastMessage('Failed to log in with Facebook.');
-      
+
       return userData;
     }
     userData = await FacebookAuth.instance.getUserData();
@@ -109,7 +109,6 @@ class ConnectSocialAccount {
         .catchError((onError) {
       log('$onError');
       showToastMessage('Error: $onError');
-     
     });
     User? user = userCredential.user;
     log('Firebase account info');
@@ -119,11 +118,23 @@ class ConnectSocialAccount {
     log('uid : ${user?.uid}');
     if (user != null) {
       log('Facebook user logged in: ${user?.uid}');
-      
     } else {
       log('Failed to log in with Facebook.');
       showToastMessage('Failed to log in with Facebook.');
     }
     return userData;
+  }
+
+  Future<void> logoutWithGoogle() async {
+    await GoogleSignIn(
+            clientId: (DefaultFirebaseOptions.currentPlatform ==
+                    DefaultFirebaseOptions.ios)
+                ? DefaultFirebaseOptions.currentPlatform.iosClientId
+                : DefaultFirebaseOptions.currentPlatform.androidClientId)
+        .signOut();
+  }
+
+  Future<void> logoutWithFacebook() async {
+    await FacebookAuth.instance.logOut();
   }
 }

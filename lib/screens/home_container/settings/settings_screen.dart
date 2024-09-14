@@ -92,17 +92,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Navigator.of(context).pushNamed(AboutUsScreen.route);
           },
         ),
-        const Divider(
-          height: 1,
-          color: Color(0xFFF9F9F9),
-        ),
-        ListTile(
-          tileColor: Colors.white,
-          title: const Text('Clean Cache'),
-          onTap: () {
-            showCleanCacheDialog(context);
-          },
-        ),
+        // const Divider(
+        //   height: 1,
+        //   color: Color(0xFFF9F9F9),
+        // ),
+        // ListTile(
+        //   tileColor: Colors.white,
+        //   title: const Text('Clean Cache'),
+        //   onTap: () {
+        //     showCleanCacheDialog(context);
+        //   },
+        // ),
         const Divider(
           height: 10,
           color: Color(0xFFF9F9F9),

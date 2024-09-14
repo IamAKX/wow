@@ -26,11 +26,32 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
 
   late ApiCallProvider apiCallProvider;
   List<List<SingleFamilyDetailModel>> list = [];
+  PageController _carouselController = PageController();
+  int _currentCarouselPage = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    _carouselController.addListener(() {
+      int nextPage = _carouselController.page?.round() ?? _currentCarouselPage;
+
+      if (nextPage != _currentCarouselPage) {
+        // Left swipe (next tab)
+        if (nextPage > _currentCarouselPage) {
+          if (_tabController!.index < _tabController!.length - 1) {
+            _tabController!.animateTo(_tabController!.index + 1);
+          }
+        }
+        // Right swipe (previous tab)
+        else if (nextPage < _currentCarouselPage) {
+          if (_tabController!.index > 0) {
+            _tabController!.animateTo(_tabController!.index - 1);
+          }
+        }
+        _currentCarouselPage = nextPage;
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
@@ -63,6 +84,7 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _carouselController.dispose();
     super.dispose();
   }
 
@@ -139,7 +161,7 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
         Container(
           padding: EdgeInsets.only(bottom: 40),
           height: 200,
-          child: getMedalCarousel(list.elementAt(position)),
+          child: getMedalCarousel(list.elementAt(position), position),
         ),
         Expanded(
           child: Container(
@@ -293,15 +315,27 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
     );
   }
 
-  getMedalCarousel(List<SingleFamilyDetailModel> medalList) {
+  getMedalCarousel(List<SingleFamilyDetailModel> medalList, int position) {
     return FlutterCarousel(
       options: CarouselOptions(
+        
         height: 180.0,
         showIndicator: false,
         autoPlay: false,
         pageSnapping: true,
         floatingIndicator: false,
         viewportFraction: 1,
+        onPageChanged: (index, reason) {
+          log('index = $index');
+          log('index = $reason');
+          if (position >= 1 && position <= list.length - 2) {
+            if (index == 0) {
+              _tabController.animateTo(position - 1);
+            } else if (index == medalList.length - 1) {
+              _tabController.animateTo(position + 1);
+            }
+          }
+        },
         slideIndicator: const CircularSlideIndicator(
           slideIndicatorOptions: SlideIndicatorOptions(
               currentIndicatorColor: Color(0xffFA03E6),
@@ -314,19 +348,39 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
             return Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Expanded(
-                  child: CachedNetworkImage(
-                    imageUrl: i.mainImage ?? '',
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Text('Error ${error.toString()}'),
-                    ),
-                    width: 90,
-                    height: 90,
-                  ),
-                ),
+                position == 0
+                    ? Expanded(child: SizedBox.shrink())
+                    : medalList.indexOf(i) == 0
+                        ? Expanded(
+                            child: CachedNetworkImage(
+                              imageUrl: list
+                                      .elementAt(position - 1)
+                                      .first
+                                      .mainImage ??
+                                  '',
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Text('Error ${error.toString()}'),
+                              ),
+                              width: 90,
+                              height: 90,
+                            ),
+                          )
+                        : Expanded(
+                            child: CachedNetworkImage(
+                              imageUrl: i.mainImage ?? '',
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Text('Error ${error.toString()}'),
+                              ),
+                              width: 90,
+                              height: 90,
+                            ),
+                          ),
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -354,19 +408,40 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
                     ],
                   ),
                 ),
-                Expanded(
-                  child: CachedNetworkImage(
-                    imageUrl: i.mainImage ?? '',
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Text('Error ${error.toString()}'),
-                    ),
-                    width: 90,
-                    height: 90,
-                  ),
-                )
+                (position == list.length - 1 &&
+                        medalList.indexOf(i) == medalList.length - 1)
+                    ? Expanded(child: SizedBox.shrink())
+                    : medalList.indexOf(i) == medalList.length - 1
+                        ? Expanded(
+                            child: CachedNetworkImage(
+                              imageUrl: list
+                                      .elementAt(position + 1)
+                                      .first
+                                      .mainImage ??
+                                  '',
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Text('Error ${error.toString()}'),
+                              ),
+                              width: 90,
+                              height: 90,
+                            ),
+                          )
+                        : Expanded(
+                            child: CachedNetworkImage(
+                              imageUrl: i.mainImage ?? '',
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Text('Error ${error.toString()}'),
+                              ),
+                              width: 90,
+                              height: 90,
+                            ),
+                          )
               ],
             );
           },
