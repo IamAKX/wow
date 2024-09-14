@@ -24,6 +24,8 @@ import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/generic_api_calls.dart';
+import '../friends/friend_fans_following.dart';
+import '../friends/friend_navigator_model.dart';
 
 class ProfileDeatilScreen extends StatefulWidget {
   const ProfileDeatilScreen({super.key});
@@ -108,8 +110,35 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  getProfileMetric('Fans', '1'),
-                  getProfileMetric('Following', '1'),
+                  InkWell(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(
+                              FriendFansFollowing.route,
+                              arguments: FriendNavigatorModel(
+                                  index: 2, userId: user?.id ?? ''),
+                            )
+                            .then(
+                              (value) => loadUserData(),
+                            );
+                      },
+                      child:
+                          getProfileMetric('Fans', '${user?.followersCount}')),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context)
+                          .pushNamed(
+                            FriendFansFollowing.route,
+                            arguments: FriendNavigatorModel(
+                                index: 1, userId: user?.id ?? ''),
+                          )
+                          .then(
+                            (value) => loadUserData(),
+                          );
+                    },
+                    child: getProfileMetric(
+                        'Following', '${user?.followingCount ?? 0}'),
+                  ),
                 ],
               ),
               Divider(
@@ -270,7 +299,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                     arguments: CommentData(
                         feedId: moment.mediaId,
                         senderId: prefs.getString(PrefsKey.userId),
-                        senderImage: user?.image),
+                        senderImage: user?.image,
+                        feedSenderId: moment.userId),
                   )
                       .then(
                     (value) {
@@ -320,7 +350,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 arguments: CommentData(
                     feedId: moment.mediaId,
                     senderId: prefs.getString(PrefsKey.userId),
-                    senderImage: user?.image),
+                    senderImage: user?.image,
+                    feedSenderId: moment.userId),
               )
                   .then(
                 (value) {

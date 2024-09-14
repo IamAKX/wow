@@ -7,6 +7,7 @@ import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_navigator_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/mall/mall.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/my_look/my_look_screen.dart';
@@ -92,7 +93,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context)
-                            .pushNamed(FriendFansFollowing.route, arguments: 0)
+                            .pushNamed(
+                              FriendFansFollowing.route,
+                              arguments: FriendNavigatorModel(
+                                  index: 0, userId: user?.id ?? ''),
+                            )
                             .then(
                               (value) => loadUserData(),
                             );
@@ -105,8 +110,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: InkWell(
                         onTap: () {
                           Navigator.of(context)
-                              .pushNamed(FriendFansFollowing.route,
-                                  arguments: 1)
+                              .pushNamed(
+                                FriendFansFollowing.route,
+                                arguments: FriendNavigatorModel(
+                                    index: 1, userId: user?.id ?? ''),
+                              )
                               .then(
                                 (value) => loadUserData(),
                               );
@@ -118,7 +126,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: InkWell(
                       onTap: () {
                         Navigator.of(context)
-                            .pushNamed(FriendFansFollowing.route, arguments: 2)
+                            .pushNamed(
+                              FriendFansFollowing.route,
+                              arguments: FriendNavigatorModel(
+                                  index: 2, userId: user?.id ?? ''),
+                            )
                             .then(
                               (value) => loadUserData(),
                             );
@@ -142,8 +154,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      '1262',
+                    Text(
+                      '${user?.myCoin ?? '0'}',
                       style: TextStyle(fontSize: 12),
                     ),
                     horizontalGap(5),
@@ -168,8 +180,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      '0',
+                    Text(
+                      '${user?.myDiamond ?? ''}',
                       style: TextStyle(fontSize: 12),
                     ),
                     horizontalGap(5),

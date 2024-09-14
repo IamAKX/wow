@@ -69,6 +69,9 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Search Friend'),
+      ),
       body: getBody(context),
     );
   }
@@ -76,9 +79,8 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
   getBody(BuildContext context) {
     return Column(
       children: [
-        verticalGap(40),
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: TextField(
             controller: searchCtrl,
             decoration: InputDecoration(

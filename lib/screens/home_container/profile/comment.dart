@@ -133,7 +133,9 @@ class _CommentScreenState extends State<CommentScreen> {
                   ),
                 ),
                 onTap: commentList.elementAt(index).userId ==
-                        widget.commentData.senderId
+                            prefs.getString(PrefsKey.userId) ||
+                        prefs.getString(PrefsKey.userId) ==
+                            widget.commentData.feedSenderId
                     ? () {
                         showDeleteCommentPopup(
                             commentList.elementAt(index).id ?? '');

@@ -1,5 +1,6 @@
-String getContinent(String country) {
-  Map<String, String> countryToContinent = {
+import 'package:worldsocialintegrationapp/models/more_country_model.dart';
+
+Map<String, String> countryToContinent = {
     'Afghanistan': 'Asia',
     'Albania': 'Europe',
     'Algeria': 'Africa',
@@ -197,5 +198,24 @@ String getContinent(String country) {
     'Zambia': 'Africa',
     'Zimbabwe': 'Africa',
   };
+String getContinent(String country) {
+  
   return countryToContinent[country] ?? 'Unknown';
+}
+
+Map<String, MoreCountryModel> getMoreCountryList() {
+  return {
+    'India': MoreCountryModel(
+        country: 'India', flagPath: 'assets/svg/country/in.svg'),
+    'Pakistan': MoreCountryModel(
+        country: 'Pakistan', flagPath: 'assets/svg/country/pk.svg'),
+    'Bangladesh': MoreCountryModel(
+        country: 'Bangladesh', flagPath: 'assets/svg/country/bd.svg'),
+    'UAE':
+        MoreCountryModel(country: 'UAE', flagPath: 'assets/svg/country/ae.svg'),
+    'USA':
+        MoreCountryModel(country: 'USA', flagPath: 'assets/svg/country/us.svg'),
+    'Canada': MoreCountryModel(
+        country: 'Canada', flagPath: 'assets/svg/country/ca.svg'),
+  };
 }

@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/popular_banner_model.dart';
+import 'package:worldsocialintegrationapp/screens/anchor_request/anchor_request_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/daily_spin/daily_spin_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/event_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
@@ -30,12 +32,26 @@ class _PopularScreenState extends State<PopularScreen> {
   late ApiCallProvider apiCallProvider;
 
   List<JoinableLiveRoomModel> roomList = [];
+  List<PopularBannerModel> bannerList = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadLiveRoom();
+      loadBanner();
+    });
+  }
+
+  loadBanner() async {
+    await apiCallProvider.getRequest(API.getGamesBanner).then((value) {
+      bannerList.clear();
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          bannerList.add(PopularBannerModel.fromMap(item));
+        }
+        setState(() {});
+      }
     });
   }
 
@@ -62,7 +78,18 @@ class _PopularScreenState extends State<PopularScreen> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       floatingActionButton: InkWell(
-        onTap: () => Navigator.of(context).pushNamed(DailySpinScreen.route),
+        onTap: () async {
+          Map<String, dynamic> reqBody = {
+            'userId': prefs.getString(PrefsKey.userId),
+          };
+          await apiCallProvider.postRequest(API.getHost, reqBody).then((value) {
+            if (value['success'] == '0') {
+              Navigator.of(context).pushNamed(DailySpinScreen.route);
+            } else {
+              showToastMessage(value['message']);
+            }
+          });
+        },
         child: Image.asset(
           'assets/image/spinnwheell.png',
           width: 60,
@@ -71,7 +98,9 @@ class _PopularScreenState extends State<PopularScreen> {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          getCarousel(),
+          if (bannerList.isNotEmpty) ...{
+            getCarousel(),
+          },
           getFamilyEventButton(),
           roomList.isEmpty
               ? Container(
@@ -87,140 +116,135 @@ class _PopularScreenState extends State<PopularScreen> {
                     ),
                   ),
                 )
-              : Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(10),
-                    primary: true,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1),
-                    itemCount: roomList.length,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () async {
-                          if (roomList.elementAt(index).password?.isNotEmpty ??
-                              false) {
-                            String? isPasswordVerified =
-                                await showPasswordDialog(context,
-                                    roomList.elementAt(index).password!);
-                            if (isPasswordVerified != 'true') {
-                              return;
-                            }
+              : GridView.builder(
+                  padding: const EdgeInsets.all(10),
+                  primary: true,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 1),
+                  itemCount: roomList.length,
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () async {
+                        if (roomList.elementAt(index).password?.isNotEmpty ??
+                            false) {
+                          String? isPasswordVerified = await showPasswordDialog(
+                              context, roomList.elementAt(index).password!);
+                          if (isPasswordVerified != 'true') {
+                            return;
                           }
-                          LiveRoomDetailModel liveRoomDetailModel =
-                              LiveRoomDetailModel(
-                            channelName: roomList.elementAt(index).channelName,
-                            mainId: roomList.elementAt(index).id,
-                            token: roomList.elementAt(index).rtmToken,
-                          );
-                          Navigator.of(context)
-                              .pushNamed(LiveRoomScreen.route,
-                                  arguments: liveRoomDetailModel)
-                              .then(
-                            (value) {
-                              loadLiveRoom();
-                            },
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: CachedNetworkImage(
-                                imageUrl: roomList.elementAt(index).liveimage ??
-                                    'https://images.pexels.com/photos/129733/pexels-photo-129733.jpeg',
-                                placeholder: (context, url) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    Image.asset(
-                                  'assets/image/wooden_bg.jpeg',
-                                  fit: BoxFit.cover,
-                                ),
+                        }
+                        LiveRoomDetailModel liveRoomDetailModel =
+                            LiveRoomDetailModel(
+                          channelName: roomList.elementAt(index).channelName,
+                          mainId: roomList.elementAt(index).id,
+                          token: roomList.elementAt(index).rtmToken,
+                        );
+                        Navigator.of(context)
+                            .pushNamed(LiveRoomScreen.route,
+                                arguments: liveRoomDetailModel)
+                            .then(
+                          (value) {
+                            loadLiveRoom();
+                          },
+                        );
+                      },
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: CachedNetworkImage(
+                              imageUrl: roomList.elementAt(index).liveimage ??
+                                  'https://images.pexels.com/photos/129733/pexels-photo-129733.jpeg',
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                'assets/image/wooden_bg.jpeg',
                                 fit: BoxFit.cover,
-                                height: double.infinity,
-                                width: double.infinity,
                               ),
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
                             ),
-                            Positioned(
-                              top: 5,
-                              left: 5,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: LinearGradient(
-                                    colors: const [
-                                      Color(0xFFEC0DDC),
-                                      Color(0xFF8E18FE),
-                                    ],
-                                  ),
-                                ),
-                                child: Text(
-                                  roomList.elementAt(index).imageTitle ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
+                          ),
+                          Positioned(
+                            top: 5,
+                            left: 5,
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  colors: const [
+                                    Color(0xFFEC0DDC),
+                                    Color(0xFF8E18FE),
+                                  ],
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              bottom: 5,
-                              left: 5,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  gradient: LinearGradient(
-                                    colors: const [
-                                      Color(0xFFEB5716),
-                                      Color(0xFFECBC1E),
-                                    ],
-                                  ),
-                                ),
-                                child: Text(
-                                  roomList.elementAt(index).imageText ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
+                              child: Text(
+                                roomList.elementAt(index).imageTitle ?? '',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
-                            Positioned(
-                              top: 5,
-                              right: 5,
-                              child: Container(
-                                padding: EdgeInsets.all(5),
-                                child: Text(
-                                  roomList.elementAt(index).totaltimePerLive ??
-                                      '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
+                          ),
+                          Positioned(
+                            bottom: 5,
+                            left: 5,
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                gradient: LinearGradient(
+                                  colors: const [
+                                    Color(0xFFEB5716),
+                                    Color(0xFFECBC1E),
+                                  ],
+                                ),
+                              ),
+                              child: Text(
+                                roomList.elementAt(index).imageText ?? '',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
-                            Positioned(
-                              bottom: 5,
-                              right: 5,
-                              child: Image.asset(
-                                'assets/image/audio-8777_128.gif',
-                                width: 20,
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              child: Text(
+                                roomList.elementAt(index).totaltimePerLive ??
+                                    '',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          ),
+                          Positioned(
+                            bottom: 5,
+                            right: 5,
+                            child: Image.asset(
+                              'assets/image/audio-8777_128.gif',
+                              width: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
         ],
       ),
@@ -395,20 +419,24 @@ class _PopularScreenState extends State<PopularScreen> {
               indicatorBackgroundColor: Colors.white),
         ),
       ),
-      items: [
-        'assets/dummy/banner1.jpeg',
-        'assets/dummy/banner2.jpeg',
-        'assets/dummy/banner3.jpeg',
-        'assets/dummy/banner4.jpeg',
-        'assets/dummy/banner5.jpeg'
-      ].map((i) {
+      items: bannerList.map((i) {
         return Builder(
           builder: (BuildContext context) {
-            return Image.asset(
-              i,
-              fit: BoxFit.cover,
-              height: double.infinity,
-              width: double.infinity,
+            return InkWell(
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AnchorRequestScreen.route),
+              child: CachedNetworkImage(
+                imageUrl: i.image ?? '',
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text('Error ${error.toString()}'),
+                ),
+                fit: BoxFit.cover,
+                height: double.infinity,
+                width: double.infinity,
+              ),
             );
           },
         );

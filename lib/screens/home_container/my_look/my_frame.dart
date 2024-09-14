@@ -49,101 +49,105 @@ class _MyFrameState extends State<MyFrame> {
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(10),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        childAspectRatio: 0.8,
-      ),
-      itemCount: list.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {
-                        showTestDrivePopup(
-                            '${list.elementAt(index).frameIMage}');
-                      },
-                      child: const Text(
-                        'Test Wear',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFF73400),
+    return list.isEmpty
+        ? Center(
+            child: Text('No item found'),
+          )
+        : GridView.builder(
+            padding: const EdgeInsets.all(10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {
+                              showTestDrivePopup(
+                                  '${list.elementAt(index).frameIMage}');
+                            },
+                            child: const Text(
+                              'Test Wear',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFF73400),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: SVGASimpleImage(
+                          resUrl: '${list.elementAt(index).frameIMage}',
                         ),
                       ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: SVGASimpleImage(
-                    resUrl: '${list.elementAt(index).frameIMage}',
-                  ),
-                ),
-                verticalGap(15),
-                Text(
-                  'deadline:\n${list.elementAt(index).dateTo} / ${list.elementAt(index).expTime}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  onTap: () async {
-                    Map<String, dynamic> reqBody = {
-                      'userId': prefs.getString(PrefsKey.userId),
-                      'frameId': list.elementAt(index).frameId,
-                    };
-
-                    await apiCallProvider
-                        .postRequest(API.applyFrame, reqBody)
-                        .then((value) {
-                      if (value['message'] != null) {
-                        showToastMessage(value['message']);
-
-                        getLuck();
-                      }
-                    });
-                  },
-                  child: Container(
-                    width: 70,
-                    height: 30,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xffFE3400),
-                          Color(0xffFBC108),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      verticalGap(15),
+                      Text(
+                        'deadline:\n${list.elementAt(index).dateTo} / ${list.elementAt(index).expTime}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 12,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    child: Text(
-                      list.elementAt(index).isApplied ?? false
-                          ? 'Remove'
-                          : 'Apply',
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () async {
+                          Map<String, dynamic> reqBody = {
+                            'userId': prefs.getString(PrefsKey.userId),
+                            'frameId': list.elementAt(index).frameId,
+                          };
+
+                          await apiCallProvider
+                              .postRequest(API.applyFrame, reqBody)
+                              .then((value) {
+                            if (value['message'] != null) {
+                              showToastMessage(value['message']);
+
+                              getLuck();
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: 70,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xffFE3400),
+                                Color(0xffFBC108),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Text(
+                            list.elementAt(index).isApplied ?? false
+                                ? 'Remove'
+                                : 'Apply',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
+                ),
+              );
+            },
+          );
   }
 
   void showTestDrivePopup(String link) {

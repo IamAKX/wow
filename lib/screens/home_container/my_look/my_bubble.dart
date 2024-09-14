@@ -52,101 +52,106 @@ class _MyBubbleState extends State<MyBubble> {
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(10),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        childAspectRatio: 0.8,
-      ),
-      itemCount: list.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {
-                        showPreviewPopup('${list.elementAt(index).vipImage}');
-                      },
-                      child: const Text(
-                        'Preview',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFF73400),
+    return list.isEmpty
+        ? Center(
+            child: Text('No item found'),
+          )
+        : GridView.builder(
+            padding: const EdgeInsets.all(10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Spacer(),
+                          InkWell(
+                            onTap: () {
+                              showPreviewPopup(
+                                  '${list.elementAt(index).vipImage}');
+                            },
+                            child: const Text(
+                              'Preview',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFF73400),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const Spacer(),
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: CachedNetworkImage(
+                          imageUrl: list.elementAt(index).vipImage ?? '',
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          errorWidget: (context, url, error) => Center(
+                            child: Text('Error ${error.toString()}'),
+                          ),
+                          width: 100,
+                          height: 100,
                         ),
                       ),
-                    )
-                  ],
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: CachedNetworkImage(
-                    imageUrl: list.elementAt(index).vipImage ?? '',
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Text('Error ${error.toString()}'),
-                    ),
-                    width: 100,
-                    height: 100,
+                      const Spacer(),
+                      InkWell(
+                        onTap: () async {
+                          Map<String, dynamic> reqBody = {
+                            'userId': prefs.getString(PrefsKey.userId),
+                            'vipId': list.elementAt(index).id,
+                          };
+
+                          await apiCallProvider
+                              .postRequest(API.applyVip, reqBody)
+                              .then((value) {
+                            if (value['message'] != null) {
+                              showToastMessage(value['message']);
+
+                              getLuck();
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: 70,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xffFE3400),
+                                Color(0xffFBC108),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Text(
+                            list.elementAt(index).isApplied ?? false
+                                ? 'Remove'
+                                : 'Apply',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                const Spacer(),
-                InkWell(
-                  onTap: () async {
-                    Map<String, dynamic> reqBody = {
-                      'userId': prefs.getString(PrefsKey.userId),
-                      'vipId': list.elementAt(index).id,
-                    };
-
-                    await apiCallProvider
-                        .postRequest(API.applyVip, reqBody)
-                        .then((value) {
-                      if (value['message'] != null) {
-                        showToastMessage(value['message']);
-
-                        getLuck();
-                      }
-                    });
-                  },
-                  child: Container(
-                    width: 70,
-                    height: 30,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xffFE3400),
-                          Color(0xffFBC108),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    child: Text(
-                      list.elementAt(index).isApplied ?? false
-                          ? 'Remove'
-                          : 'Apply',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          );
   }
 
   void showPreviewPopup(String link) {

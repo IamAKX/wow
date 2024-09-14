@@ -7,6 +7,7 @@ import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/lucky_model.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/screens/anchor_request/anchor_request_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_window.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/friend_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/daily_spin/daily_spin_screen.dart';
@@ -28,6 +29,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/invite_f
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/prompt_create_family_failed.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_fans_following.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_navigator_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/visitor_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/search_member.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
@@ -73,6 +75,7 @@ import '../models/live_room_detail_model.dart';
 import '../models/send_friend_model.dart';
 import '../models/whats_on_model.dart';
 import '../screens/home_container/event/create_event_one.dart';
+import '../screens/home_container/explore/wow_leaderboard.dart';
 import '../screens/home_container/profile/comment.dart';
 
 class NavRoute {
@@ -123,7 +126,8 @@ class NavRoute {
       case FriendFansFollowing.route:
         return MaterialPageRoute(
             builder: (_) => FriendFansFollowing(
-                  index: settings.arguments as int,
+                  friendNavigatorModel:
+                      settings.arguments as FriendNavigatorModel,
                 ));
       case VisitorScreen.route:
         return MaterialPageRoute(builder: (_) => const VisitorScreen());
@@ -286,6 +290,10 @@ class NavRoute {
                 ));
       case DailySpinScreen.route:
         return MaterialPageRoute(builder: (_) => const DailySpinScreen());
+      case WowLeaderboard.route:
+        return MaterialPageRoute(builder: (_) => const WowLeaderboard());
+      case AnchorRequestScreen.route:
+        return MaterialPageRoute(builder: (_) => const AnchorRequestScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

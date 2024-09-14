@@ -172,7 +172,8 @@ class _FriendFeedScreenState extends State<FriendFeedScreen> {
                     arguments: CommentData(
                         feedId: moment.id,
                         senderId: user?.id,
-                        senderImage: user?.image),
+                        senderImage: user?.image,
+                        feedSenderId: moment.userId),
                   )
                       .then(
                     (value) {
@@ -220,7 +221,8 @@ class _FriendFeedScreenState extends State<FriendFeedScreen> {
                 arguments: CommentData(
                     feedId: moment.id,
                     senderId: user?.id,
-                    senderImage: user?.image),
+                    senderImage: user?.image,
+                    feedSenderId: moment.userId),
               )
                   .then(
                 (value) {

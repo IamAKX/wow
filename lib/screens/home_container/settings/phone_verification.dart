@@ -86,7 +86,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           onTap: isLoading
               ? null
               : () {
-                  sendOtp(context);
+                  sendOtp(context, false);
                 },
         ),
         const Divider(
@@ -101,12 +101,17 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           title: const Text('Change Password'),
           trailing: const Icon(Icons.chevron_right),
           tileColor: Colors.white,
-          onTap: () {
-            PhoneNumberModel phoneNumberModel =
-                PhoneNumberModel(phoneNumber: user?.phone);
-            Navigator.of(context).pushNamed(ChangePasswordScreen.route,
-                arguments: phoneNumberModel);
-          },
+          onTap: isLoading
+              ? null
+              : () {
+                  sendOtp(context, true);
+                },
+          // onTap: () {
+          //   PhoneNumberModel phoneNumberModel =
+          //       PhoneNumberModel(phoneNumber: user?.phone);
+          //   Navigator.of(context).pushNamed(ChangePasswordScreen.route,
+          //       arguments: phoneNumberModel);
+          // },
         ),
         Expanded(
           child: Container(
@@ -140,7 +145,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     );
   }
 
-  Future<void> sendOtp(BuildContext context) {
+  Future<void> sendOtp(BuildContext context, bool isPasswordChange) {
     setState(() {
       isLoading = true;
     });
@@ -166,11 +171,18 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
             .pushNamed(VerifyOtpScreen.route, arguments: phoneNumberModel)
             .then((res) {
           if (res == true) {
-            Navigator.of(context).pushNamed(ChangePhoneScreen.route).then(
-              (value) {
-                loadUserData();
-              },
-            );
+            if (isPasswordChange) {
+              PhoneNumberModel phoneNumberModel =
+                  PhoneNumberModel(phoneNumber: user?.phone);
+              Navigator.of(context).pushNamed(ChangePasswordScreen.route,
+                  arguments: phoneNumberModel);
+            } else {
+              Navigator.of(context).pushNamed(ChangePhoneScreen.route).then(
+                (value) {
+                  loadUserData();
+                },
+              );
+            }
           }
         });
       },

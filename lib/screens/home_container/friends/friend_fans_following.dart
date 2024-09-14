@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/follower_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/following_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/friends/friend_navigator_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/friends/friends_screen.dart';
 import 'package:worldsocialintegrationapp/widgets/user_tile.dart';
 
 class FriendFansFollowing extends StatefulWidget {
-  const FriendFansFollowing({super.key, required this.index});
-  final int index;
+  const FriendFansFollowing({super.key, required this.friendNavigatorModel});
+  final FriendNavigatorModel friendNavigatorModel;
   static const String route = '/friendFansFollowing';
 
   @override
@@ -21,7 +22,7 @@ class _FriendFansFollowingState extends State<FriendFansFollowing>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _tabController.index = widget.index;
+    _tabController.index = widget.friendNavigatorModel.index;
   }
 
   @override
@@ -81,10 +82,10 @@ class _FriendFansFollowingState extends State<FriendFansFollowing>
     return Expanded(
       child: TabBarView(
         controller: _tabController,
-        children: const [
-          FriendScreen(),
-          FollowingScreen(),
-          FollowerScreen()
+        children: [
+          FriendScreen(userId: widget.friendNavigatorModel.userId),
+          FollowingScreen(userId: widget.friendNavigatorModel.userId),
+          FollowerScreen(userId: widget.friendNavigatorModel.userId)
         ],
       ),
     );

@@ -422,7 +422,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Family Members ${familyDetails?.family?.members}/300',
+              'Family Members ${familyDetails?.members}/300',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

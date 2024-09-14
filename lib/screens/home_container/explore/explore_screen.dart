@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/game.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/meet.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/more.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/explore/wow_leaderboard.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../utils/dimensions.dart';
@@ -124,7 +125,9 @@ class _ExploreScreenState extends State<ExploreScreen>
           ),
           horizontalGap(120),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(WowLeaderboard.route);
+            },
             icon: SvgPicture.asset('assets/svg/trophy.svg'),
           ),
         ],

@@ -740,7 +740,8 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                     arguments: CommentData(
                         feedId: moment.mediaId,
                         senderId: otherUser?.id,
-                        senderImage: otherUser?.image),
+                        senderImage: otherUser?.image,
+                        feedSenderId: moment.userId),
                   )
                       .then(
                     (value) {
@@ -790,7 +791,8 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                 arguments: CommentData(
                     feedId: moment.mediaId,
                     senderId: otherUser?.id,
-                    senderImage: otherUser?.image),
+                    senderImage: otherUser?.image,
+                    feedSenderId: moment.userId),
               )
                   .then(
                 (value) {

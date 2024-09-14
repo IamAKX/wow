@@ -10,7 +10,8 @@ import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/user_tile.dart';
 
 class FriendScreen extends StatefulWidget {
-  const FriendScreen({super.key});
+  const FriendScreen({super.key, required this.userId});
+  final String userId;
 
   @override
   State<FriendScreen> createState() => _FriendScreenState();

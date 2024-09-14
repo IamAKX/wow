@@ -10,7 +10,8 @@ import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/user_tile.dart';
 
 class FollowerScreen extends StatefulWidget {
-  const FollowerScreen({super.key});
+  const FollowerScreen({super.key, required this.userId});
+  final String userId;
 
   @override
   State<FollowerScreen> createState() => _FollowerScreenState();

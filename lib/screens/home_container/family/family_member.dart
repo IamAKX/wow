@@ -70,7 +70,8 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
 
   getBody(BuildContext context) {
     List<String> joinerId = familyDetails?.joiner
-            ?.map(
+            ?.where((item) => item.isAdmin == '1')
+            .map(
               (item) => item.userId ?? '',
             )
             .toList() ??

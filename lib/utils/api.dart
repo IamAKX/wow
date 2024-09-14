@@ -89,4 +89,10 @@ class API {
   static const String getSpinWheelDetails = '$baseUrl/getSpinWheelDetails';
   static const String hitSpinWheel = '$baseUrl/hitSpinWheel';
   static const String checkSpinWheel = '$baseUrl/checkSpinWheel';
+  static const String getNewLiveUsers = '$baseUrl/getNewLiveUsers';
+  static const String getGamesBanner = '$baseUrl/getGamesBanner';
+  static const String getLeaderBoard = '$baseUrl/getLeaderBoard';
+  static const String get_agencies = '$baseUrl/get_agencies';
+  static const String hostApi = '$baseUrl/hostApi';
+  static const String getHost = '$baseUrl/getHost';
 }
