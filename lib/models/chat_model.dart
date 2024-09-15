@@ -8,6 +8,10 @@ class ChatModel {
   String? videoThumbnaiil;
   int? timestamp;
   String? assetId;
+  String? assetTypeName;
+  String? assetTypeId;
+  bool? isClaimed;
+  String? id;
   ChatModel({
     this.senderId,
     this.message,
@@ -16,6 +20,10 @@ class ChatModel {
     this.videoThumbnaiil,
     this.timestamp,
     this.assetId,
+    this.assetTypeName,
+    this.assetTypeId,
+    this.isClaimed,
+    this.id,
   });
 
   ChatModel copyWith({
@@ -26,6 +34,10 @@ class ChatModel {
     String? videoThumbnaiil,
     int? timestamp,
     String? assetId,
+    String? assetTypeName,
+    String? assetTypeId,
+    bool? isClaimed,
+    String? id,
   }) {
     return ChatModel(
       senderId: senderId ?? this.senderId,
@@ -35,6 +47,10 @@ class ChatModel {
       videoThumbnaiil: videoThumbnaiil ?? this.videoThumbnaiil,
       timestamp: timestamp ?? this.timestamp,
       assetId: assetId ?? this.assetId,
+      assetTypeName: assetTypeName ?? this.assetTypeName,
+      assetTypeId: assetTypeId ?? this.assetTypeId,
+      isClaimed: isClaimed ?? this.isClaimed,
+      id: id ?? this.id,
     );
   }
 
@@ -62,11 +78,23 @@ class ChatModel {
     if (assetId != null) {
       result.addAll({'assetId': assetId});
     }
+    if (assetTypeName != null) {
+      result.addAll({'assetTypeName': assetTypeName});
+    }
+    if (assetTypeId != null) {
+      result.addAll({'assetTypeId': assetTypeId});
+    }
+    if (isClaimed != null) {
+      result.addAll({'isClaimed': isClaimed});
+    }
+    if (id != null) {
+      result.addAll({'id': id});
+    }
 
     return result;
   }
 
-  factory ChatModel.fromMap(Map<dynamic, dynamic> map) {
+  factory ChatModel.fromMap(Map map) {
     return ChatModel(
       senderId: map['senderId'],
       message: map['message'],
@@ -75,6 +103,10 @@ class ChatModel {
       videoThumbnaiil: map['videoThumbnaiil'],
       timestamp: map['timestamp']?.toInt(),
       assetId: map['assetId'],
+      assetTypeName: map['assetTypeName'],
+      assetTypeId: map['assetTypeId'],
+      isClaimed: map['isClaimed'],
+      id: map['id'],
     );
   }
 
@@ -85,7 +117,7 @@ class ChatModel {
 
   @override
   String toString() {
-    return 'ChatModel(senderId: $senderId, message: $message, msgType: $msgType, url: $url, videoThumbnaiil: $videoThumbnaiil, timestamp: $timestamp, assetId: $assetId)';
+    return 'ChatModel(senderId: $senderId, message: $message, msgType: $msgType, url: $url, videoThumbnaiil: $videoThumbnaiil, timestamp: $timestamp, assetId: $assetId, assetTypeName: $assetTypeName, assetTypeId: $assetTypeId, isClaimed: $isClaimed, id: $id)';
   }
 
   @override
@@ -99,7 +131,11 @@ class ChatModel {
         other.url == url &&
         other.videoThumbnaiil == videoThumbnaiil &&
         other.timestamp == timestamp &&
-        other.assetId == assetId;
+        other.assetId == assetId &&
+        other.assetTypeName == assetTypeName &&
+        other.assetTypeId == assetTypeId &&
+        other.isClaimed == isClaimed &&
+        other.id == id;
   }
 
   @override
@@ -110,6 +146,10 @@ class ChatModel {
         url.hashCode ^
         videoThumbnaiil.hashCode ^
         timestamp.hashCode ^
-        assetId.hashCode;
+        assetId.hashCode ^
+        assetTypeName.hashCode ^
+        assetTypeId.hashCode ^
+        isClaimed.hashCode ^
+        id.hashCode;
   }
 }

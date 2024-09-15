@@ -44,9 +44,9 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
   void loadUserData() async {
     await getCurrentUser().then(
       (value) {
-        setState(() {
-          user = value;
-        });
+        user = value;
+        log('sid = ${user?.socialId}');
+        setState(() {});
       },
     );
   }
@@ -106,6 +106,19 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           onTap: (user?.email?.isNotEmpty ?? false)
               ? () async {
                   await ConnectSocialAccount().logoutWithFacebook();
+
+                  Map<String, dynamic> reqBody = {
+                    'socialIdType': 'facebookId',
+                    'userId': user?.id
+                  };
+                  apiCallProvider
+                      .postRequest(API.removeSocialIds, reqBody)
+                      .then(
+                    (value) {
+                      showToastMessage(value['message']);
+                      loadUserData();
+                    },
+                  );
                 }
               : () async {
                   Map<String, dynamic> facebookUserData =
@@ -120,7 +133,10 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
                       'userId': user?.id
                     };
                     apiCallProvider.postRequest(API.addSocialIds, reqBody).then(
-                      (value) {
+                      (value) async {
+                        if (value['success'] == '0') {
+                          await ConnectSocialAccount().logoutWithFacebook();
+                        }
                         showToastMessage(value['message']);
                         loadUserData();
                       },
@@ -141,14 +157,26 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text((user?.email?.isNotEmpty ?? false) ? 'UNBOUND' : 'ADD'),
+                Text((user?.socialId?.isNotEmpty ?? false) ? 'UNBOUND' : 'ADD'),
                 Icon(Icons.chevron_right),
               ],
             ),
             tileColor: Colors.white,
-            onTap: (user?.email?.isNotEmpty ?? false)
+            onTap: (user?.socialId?.isNotEmpty ?? false)
                 ? () async {
                     await ConnectSocialAccount().logoutWithGoogle();
+                    Map<String, dynamic> reqBody = {
+                      'socialIdType': 'gmailId',
+                      'userId': user?.id
+                    };
+                    apiCallProvider
+                        .postRequest(API.removeSocialIds, reqBody)
+                        .then(
+                      (value) {
+                        showToastMessage(value['message']);
+                        loadUserData();
+                      },
+                    );
                   }
                 : () async {
                     GoogleSignInAccount? googleSignInAccount =
@@ -165,7 +193,10 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
                       apiCallProvider
                           .postRequest(API.addSocialIds, reqBody)
                           .then(
-                        (value) {
+                        (value) async {
+                          if (value['success'] == '0') {
+                            await ConnectSocialAccount().logoutWithGoogle();
+                          }
                           showToastMessage(value['message']);
                           loadUserData();
                         },

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:svgaplayer_flutter_rhr/player.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/chat_model.dart';
@@ -22,7 +23,9 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:path/path.dart' as p;
 import 'dart:ui' as ui show Gradient;
 
+import '../../../providers/api_call_provider.dart';
 import '../../../services/storage_service.dart';
+import '../../../utils/api.dart';
 import '../../../widgets/enum.dart';
 import '../../../widgets/network_image_preview_fullscreen.dart';
 
@@ -43,6 +46,7 @@ class _ChatWindowState extends State<ChatWindow> {
   final ImagePicker _picker = ImagePicker();
   late final RecorderController recorderController;
   PlayerController controller = PlayerController();
+  late ApiCallProvider apiCallProvider;
 
   @override
   void initState() {
@@ -65,6 +69,8 @@ class _ChatWindowState extends State<ChatWindow> {
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         systemOverlayStyle: const SystemUiOverlayStyle(
@@ -282,7 +288,7 @@ class _ChatWindowState extends State<ChatWindow> {
         ? ChatBubble(
             clipper: ChatBubbleClipper2(type: BubbleType.sendBubble),
             alignment: Alignment.topRight,
-            margin: EdgeInsets.only(top: 20),
+            margin: const EdgeInsets.only(top: 20),
             backGroundColor: Colors.blue,
             child: Container(
               constraints: BoxConstraints(
@@ -293,8 +299,8 @@ class _ChatWindowState extends State<ChatWindow> {
           )
         : ChatBubble(
             clipper: ChatBubbleClipper2(type: BubbleType.receiverBubble),
-            backGroundColor: Color(0xffE7E7ED),
-            margin: EdgeInsets.only(top: 20),
+            backGroundColor: const Color(0xffE7E7ED),
+            margin: const EdgeInsets.only(top: 20),
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -346,6 +352,55 @@ class _ChatWindowState extends State<ChatWindow> {
                   : Colors.black,
               fontSize: 12),
         ),
+        Visibility(
+            visible: chat.senderId != prefs.getString(PrefsKey.userId),
+            child: InkWell(
+              onTap: (chat.isClaimed ?? true)
+                  ? null
+                  : () async {
+                      Map<String, dynamic> reqBody = {
+                        'garageId': chat.assetId,
+                        'type': chat.assetTypeId,
+                        'image': chat.url,
+                        'userId': prefs.getString(PrefsKey.userId)
+                      };
+                      chat.isClaimed = true;
+                      await apiCallProvider
+                          .postRequest(API.claim_garage, reqBody)
+                          .then(
+                        (value) {
+                          showToastMessage(value['message']);
+                          if (value['success'] == '1') {
+                            FirebaseDbService.updateChat(
+                                    widget.chatWindowDetails.chatWindowId ?? '',
+                                    chat)
+                                .then(
+                              (value) {
+                                textCtrl.text = '';
+                                _scrollToBottom();
+                              },
+                            );
+                          }
+                        },
+                      );
+                    },
+              child: Container(
+                margin: const EdgeInsets.only(top: 5),
+                width: 150,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(5),
+                child: Text(
+                  (chat.isClaimed ?? true) ? 'Claimed' : 'Claim',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: const LinearGradient(
+                    colors: [Colors.deepOrange, Colors.yellow],
+                  ),
+                ),
+              ),
+            ))
       ],
     );
   }
@@ -493,7 +548,6 @@ class _ChatWindowState extends State<ChatWindow> {
                         });
                         textCtrl.text = '';
                         _scrollToBottom();
-                        
                       },
                     );
                     Navigator.pop(context);
@@ -568,7 +622,7 @@ class _ChatWindowState extends State<ChatWindow> {
                     controller.pausePlayer();
                   }
                 },
-                child: isPlaying ? Text('Pause') : Text('Play'),
+                child: isPlaying ? const Text('Pause') : const Text('Play'),
               ),
               TextButton(
                 onPressed: () async {
@@ -608,7 +662,7 @@ class _ChatWindowState extends State<ChatWindow> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Tap Play to listen your recording'),
+                const Text('Tap Play to listen your recording'),
                 verticalGap(20),
                 AudioFileWaveforms(
                   size: Size(MediaQuery.of(context).size.width, 100.0),

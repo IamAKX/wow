@@ -300,7 +300,12 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
             reqBody)
         .then((value) async {
       ChatModel chat = ChatModel(
-          assetId: '',
+          assetId: widget.sendFriendModel.id,
+          assetTypeName: widget.sendFriendModel.isCar!
+              ? MessageType.CAR.name
+              : MessageType.FRAME.name,
+          assetTypeId: widget.sendFriendModel.isCar! ? '1' : '2',
+          isClaimed: false,
           message: '',
           msgType: widget.sendFriendModel.isCar!
               ? MessageType.CAR.name

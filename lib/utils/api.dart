@@ -8,6 +8,7 @@ class API {
   static const String generateToken = '$baseUrl/generateToken';
   static const String socialLogin = '$baseUrl/socialLogin';
   static const String addSocialIds = '$baseUrl/addSocialIds';
+  static const String removeSocialIds = '$baseUrl/removeSocialIds';
   static const String checkNumber = '$baseUrl/checkNumber';
   static const String registration = '$baseUrl/registration';
   static const String mobileLogin = '$baseUrl/mobileLogin';
@@ -95,4 +96,5 @@ class API {
   static const String get_agencies = '$baseUrl/get_agencies';
   static const String hostApi = '$baseUrl/hostApi';
   static const String getHost = '$baseUrl/getHost';
+  static const String claim_garage = '$baseUrl/claim_garage';
 }

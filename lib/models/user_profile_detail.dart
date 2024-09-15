@@ -390,290 +390,290 @@ class UserProfileDetail {
 
   Map<String, dynamic> toMap() {
     final result = <String, dynamic>{};
-  
-    if(id != null){
+
+    if (id != null) {
       result.addAll({'id': id});
     }
-    if(name != null){
+    if (name != null) {
       result.addAll({'name': name});
     }
-    if(username != null){
+    if (username != null) {
       result.addAll({'username': username});
     }
-    if(familyId != null){
+    if (familyId != null) {
       result.addAll({'familyId': familyId});
     }
-    if(phone != null){
+    if (phone != null) {
       result.addAll({'phone': phone});
     }
-    if(facebookUserName != null){
+    if (facebookUserName != null) {
       result.addAll({'facebookUserName': facebookUserName});
     }
-    if(email != null){
+    if (email != null) {
       result.addAll({'email': email});
     }
-    if(hostStatus != null){
+    if (hostStatus != null) {
       result.addAll({'hostStatus': hostStatus});
     }
-    if(socialId != null){
-      result.addAll({'socialId': socialId});
+    if (socialId != null) {
+      result.addAll({'social_id': socialId});
     }
-    if(fbSocialId != null){
+    if (fbSocialId != null) {
       result.addAll({'fbSocialId': fbSocialId});
     }
-    if(snapSocialId != null){
+    if (snapSocialId != null) {
       result.addAll({'snapSocialId': snapSocialId});
     }
-    if(myExp != null){
+    if (myExp != null) {
       result.addAll({'myExp': myExp});
     }
-    if(myRecieveExperience != null){
+    if (myRecieveExperience != null) {
       result.addAll({'myRecieveExperience': myRecieveExperience});
     }
-    if(vipLevel != null){
+    if (vipLevel != null) {
       result.addAll({'vipLevel': vipLevel});
     }
-    if(vipFrom != null){
+    if (vipFrom != null) {
       result.addAll({'vipFrom': vipFrom});
     }
-    if(vipTo != null){
+    if (vipTo != null) {
       result.addAll({'vipTo': vipTo});
     }
-    if(myLevel != null){
+    if (myLevel != null) {
       result.addAll({'myLevel': myLevel});
     }
-    if(receivingLevel != null){
+    if (receivingLevel != null) {
       result.addAll({'receivingLevel': receivingLevel});
     }
-    if(myCoin != null){
+    if (myCoin != null) {
       result.addAll({'myCoin': myCoin});
     }
-    if(myDiamond != null){
+    if (myDiamond != null) {
       result.addAll({'myDiamond': myDiamond});
     }
-    if(totalSendDiamond != null){
+    if (totalSendDiamond != null) {
       result.addAll({'totalSendDiamond': totalSendDiamond});
     }
-    if(myRecievedDiamond != null){
+    if (myRecievedDiamond != null) {
       result.addAll({'myRecievedDiamond': myRecievedDiamond});
     }
-    if(dob != null){
+    if (dob != null) {
       result.addAll({'dob': dob});
     }
-    if(bio != null){
+    if (bio != null) {
       result.addAll({'bio': bio});
     }
-    if(country != null){
+    if (country != null) {
       result.addAll({'country': country});
     }
-    if(continent != null){
+    if (continent != null) {
       result.addAll({'continent': continent});
     }
-    if(countryShowUnshow != null){
+    if (countryShowUnshow != null) {
       result.addAll({'countryShowUnshow': countryShowUnshow});
     }
-    if(myFrame != null){
+    if (myFrame != null) {
       result.addAll({'myFrame': myFrame});
     }
-    if(myGallery != null){
+    if (myGallery != null) {
       result.addAll({'myGallery': myGallery});
     }
-    if(myLuckyId != null){
+    if (myLuckyId != null) {
       result.addAll({'myLuckyId': myLuckyId});
     }
-    if(myTheme != null){
+    if (myTheme != null) {
       result.addAll({'myTheme': myTheme});
     }
-    if(myThemeType != null){
+    if (myThemeType != null) {
       result.addAll({'myThemeType': myThemeType});
     }
-    if(emailVerifiedAt != null){
+    if (emailVerifiedAt != null) {
       result.addAll({'emailVerifiedAt': emailVerifiedAt});
     }
-    if(password != null){
+    if (password != null) {
       result.addAll({'password': password});
     }
-    if(salt != null){
+    if (salt != null) {
       result.addAll({'salt': salt});
     }
-    if(isAdmin != null){
+    if (isAdmin != null) {
       result.addAll({'isAdmin': isAdmin});
     }
-    if(image != null){
+    if (image != null) {
       result.addAll({'image': image});
     }
-    if(langId != null){
+    if (langId != null) {
       result.addAll({'langId': langId});
     }
-    if(age != null){
+    if (age != null) {
       result.addAll({'age': age});
     }
-    if(gender != null){
+    if (gender != null) {
       result.addAll({'gender': gender});
     }
-    if(devId != null){
+    if (devId != null) {
       result.addAll({'devId': devId});
     }
-    if(regId != null){
+    if (regId != null) {
       result.addAll({'regId': regId});
     }
-    if(latitude != null){
+    if (latitude != null) {
       result.addAll({'latitude': latitude});
     }
-    if(longitude != null){
+    if (longitude != null) {
       result.addAll({'longitude': longitude});
     }
-    if(devType != null){
+    if (devType != null) {
       result.addAll({'devType': devType});
     }
-    if(rememberToken != null){
+    if (rememberToken != null) {
       result.addAll({'rememberToken': rememberToken});
     }
-    if(loginOtp != null){
+    if (loginOtp != null) {
       result.addAll({'loginOtp': loginOtp});
     }
-    if(loginType != null){
+    if (loginType != null) {
       result.addAll({'loginType': loginType});
     }
-    if(registerType != null){
+    if (registerType != null) {
       result.addAll({'registerType': registerType});
     }
-    if(createdAt != null){
+    if (createdAt != null) {
       result.addAll({'createdAt': createdAt});
     }
-    if(updatedAt != null){
+    if (updatedAt != null) {
       result.addAll({'updatedAt': updatedAt});
     }
-    if(phoneUpOtp != null){
+    if (phoneUpOtp != null) {
       result.addAll({'phoneUpOtp': phoneUpOtp});
     }
-    if(eventId != null){
+    if (eventId != null) {
       result.addAll({'eventId': eventId});
     }
-    if(isEventCreater != null){
+    if (isEventCreater != null) {
       result.addAll({'isEventCreater': isEventCreater});
     }
-    if(isEventSubscriber != null){
+    if (isEventSubscriber != null) {
       result.addAll({'isEventSubscriber': isEventSubscriber});
     }
-    if(isFamilyLeader != null){
+    if (isFamilyLeader != null) {
       result.addAll({'isFamilyLeader': isFamilyLeader});
     }
-    if(isFamilyMember != null){
+    if (isFamilyMember != null) {
       result.addAll({'isFamilyMember': isFamilyMember});
     }
-    if(monthlyCoins != null){
+    if (monthlyCoins != null) {
       result.addAll({'monthlyCoins': monthlyCoins});
     }
-    if(hoursLive != null){
+    if (hoursLive != null) {
       result.addAll({'hoursLive': hoursLive});
     }
-    if(talentLevel != null){
+    if (talentLevel != null) {
       result.addAll({'talentLevel': talentLevel});
     }
-    if(basicSalary != null){
+    if (basicSalary != null) {
       result.addAll({'basicSalary': basicSalary});
     }
-    if(userBanStatus != null){
+    if (userBanStatus != null) {
       result.addAll({'userBanStatus': userBanStatus});
     }
-    if(idBannedFrom != null){
+    if (idBannedFrom != null) {
       result.addAll({'idBannedFrom': idBannedFrom});
     }
-    if(idBannedTo != null){
+    if (idBannedTo != null) {
       result.addAll({'idBannedTo': idBannedTo});
     }
-    if(liveStatus != null){
+    if (liveStatus != null) {
       result.addAll({'liveStatus': liveStatus});
     }
-    if(liveimage != null){
+    if (liveimage != null) {
       result.addAll({'liveimage': liveimage});
     }
-    if(imageText != null){
+    if (imageText != null) {
       result.addAll({'imageText': imageText});
     }
-    if(imageTitle != null){
+    if (imageTitle != null) {
       result.addAll({'imageTitle': imageTitle});
     }
-    if(fixedValidDay != null){
+    if (fixedValidDay != null) {
       result.addAll({'fixedValidDay': fixedValidDay});
     }
-    if(fixedMinutes != null){
+    if (fixedMinutes != null) {
       result.addAll({'fixedMinutes': fixedMinutes});
     }
-    if(fixedCoins != null){
+    if (fixedCoins != null) {
       result.addAll({'fixedCoins': fixedCoins});
     }
-    if(familyName != null){
+    if (familyName != null) {
       result.addAll({'familyName': familyName});
     }
-    if(familyImage != null){
+    if (familyImage != null) {
       result.addAll({'familyImage': familyImage});
     }
-    if(followersCount != null){
+    if (followersCount != null) {
       result.addAll({'followersCount': followersCount});
     }
-    if(followingCount != null){
+    if (followingCount != null) {
       result.addAll({'followingCount': followingCount});
     }
-    if(agencyCreater != null){
+    if (agencyCreater != null) {
       result.addAll({'agencyCreater': agencyCreater});
     }
-    if(coinAgencyCreater != null){
+    if (coinAgencyCreater != null) {
       result.addAll({'coinAgencyCreater': coinAgencyCreater});
     }
-    if(visitorsCount != null){
+    if (visitorsCount != null) {
       result.addAll({'visitorsCount': visitorsCount});
     }
-    if(friendsCount != null){
+    if (friendsCount != null) {
       result.addAll({'friendsCount': friendsCount});
     }
-    if(followStatus != null){
+    if (followStatus != null) {
       result.addAll({'followStatus': followStatus});
     }
-    if(blockStatus != null){
+    if (blockStatus != null) {
       result.addAll({'blockStatus': blockStatus});
     }
-    if(vipStatus != null){
+    if (vipStatus != null) {
       result.addAll({'vipStatus': vipStatus});
     }
-    if(hideStatus != null){
+    if (hideStatus != null) {
       result.addAll({'hideStatus': hideStatus});
     }
-    if(kickOutStatus != null){
+    if (kickOutStatus != null) {
       result.addAll({'kickOutStatus': kickOutStatus});
     }
-    if(profileImage != null){
+    if (profileImage != null) {
       result.addAll({'profileImage': profileImage});
     }
-    if(idBannedStatus != null){
+    if (idBannedStatus != null) {
       result.addAll({'idBannedStatus': idBannedStatus});
     }
-    if(familyJoinStatus != null){
+    if (familyJoinStatus != null) {
       result.addAll({'familyJoinStatus': familyJoinStatus});
     }
-    if(familyJoinId != null){
+    if (familyJoinId != null) {
       result.addAll({'familyJoinId': familyJoinId});
     }
-    if(familyJoinName != null){
+    if (familyJoinName != null) {
       result.addAll({'familyJoinName': familyJoinName});
     }
-    if(agencyStatus != null){
+    if (agencyStatus != null) {
       result.addAll({'agencyStatus': agencyStatus});
     }
-    if(hostRequest != null){
+    if (hostRequest != null) {
       result.addAll({'hostRequest': hostRequest});
     }
-    if(friendCount != null){
+    if (friendCount != null) {
       result.addAll({'friendCount': friendCount});
     }
-    if(archivedTime != null){
+    if (archivedTime != null) {
       result.addAll({'archivedTime': archivedTime});
     }
-    if(lavelInfomation != null){
+    if (lavelInfomation != null) {
       result.addAll({'lavelInfomation': lavelInfomation!.toMap()});
     }
-  
+
     return result;
   }
 
@@ -687,7 +687,7 @@ class UserProfileDetail {
       facebookUserName: map['facebookUserName'],
       email: map['email'],
       hostStatus: map['hostStatus'],
-      socialId: map['socialId'],
+      socialId: map['social_id'],
       fbSocialId: map['fbSocialId'],
       snapSocialId: map['snapSocialId'],
       myExp: map['myExp'],
@@ -772,215 +772,218 @@ class UserProfileDetail {
       hostRequest: map['hostRequest'],
       friendCount: map['friendCount']?.toInt(),
       archivedTime: map['archivedTime'],
-      lavelInfomation: map['lavelInfomation'] != null ? LavelInfomation.fromMap(map['lavelInfomation']) : null,
+      lavelInfomation: map['lavelInfomation'] != null
+          ? LavelInfomation.fromMap(map['lavelInfomation'])
+          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory UserProfileDetail.fromJson(String source) => UserProfileDetail.fromMap(json.decode(source));
+  factory UserProfileDetail.fromJson(String source) =>
+      UserProfileDetail.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'UserProfileDetail(id: $id, name: $name, username: $username, familyId: $familyId, phone: $phone, facebookUserName: $facebookUserName, email: $email, hostStatus: $hostStatus, socialId: $socialId, fbSocialId: $fbSocialId, snapSocialId: $snapSocialId, myExp: $myExp, myRecieveExperience: $myRecieveExperience, vipLevel: $vipLevel, vipFrom: $vipFrom, vipTo: $vipTo, myLevel: $myLevel, receivingLevel: $receivingLevel, myCoin: $myCoin, myDiamond: $myDiamond, totalSendDiamond: $totalSendDiamond, myRecievedDiamond: $myRecievedDiamond, dob: $dob, bio: $bio, country: $country, continent: $continent, countryShowUnshow: $countryShowUnshow, myFrame: $myFrame, myGallery: $myGallery, myLuckyId: $myLuckyId, myTheme: $myTheme, myThemeType: $myThemeType, emailVerifiedAt: $emailVerifiedAt, password: $password, salt: $salt, isAdmin: $isAdmin, image: $image, langId: $langId, age: $age, gender: $gender, devId: $devId, regId: $regId, latitude: $latitude, longitude: $longitude, devType: $devType, rememberToken: $rememberToken, loginOtp: $loginOtp, loginType: $loginType, registerType: $registerType, createdAt: $createdAt, updatedAt: $updatedAt, phoneUpOtp: $phoneUpOtp, eventId: $eventId, isEventCreater: $isEventCreater, isEventSubscriber: $isEventSubscriber, isFamilyLeader: $isFamilyLeader, isFamilyMember: $isFamilyMember, monthlyCoins: $monthlyCoins, hoursLive: $hoursLive, talentLevel: $talentLevel, basicSalary: $basicSalary, userBanStatus: $userBanStatus, idBannedFrom: $idBannedFrom, idBannedTo: $idBannedTo, liveStatus: $liveStatus, liveimage: $liveimage, imageText: $imageText, imageTitle: $imageTitle, fixedValidDay: $fixedValidDay, fixedMinutes: $fixedMinutes, fixedCoins: $fixedCoins, familyName: $familyName, familyImage: $familyImage, followersCount: $followersCount, followingCount: $followingCount, agencyCreater: $agencyCreater, coinAgencyCreater: $coinAgencyCreater, visitorsCount: $visitorsCount, friendsCount: $friendsCount, followStatus: $followStatus, blockStatus: $blockStatus, vipStatus: $vipStatus, hideStatus: $hideStatus, kickOutStatus: $kickOutStatus, profileImage: $profileImage, idBannedStatus: $idBannedStatus, familyJoinStatus: $familyJoinStatus, familyJoinId: $familyJoinId, familyJoinName: $familyJoinName, agencyStatus: $agencyStatus, hostRequest: $hostRequest, friendCount: $friendCount, archivedTime: $archivedTime, lavelInfomation: $lavelInfomation)';
+    return 'UserProfileDetail(id: $id, name: $name, username: $username, familyId: $familyId, phone: $phone, facebookUserName: $facebookUserName, email: $email, hostStatus: $hostStatus, social_id: $socialId, fbSocialId: $fbSocialId, snapSocialId: $snapSocialId, myExp: $myExp, myRecieveExperience: $myRecieveExperience, vipLevel: $vipLevel, vipFrom: $vipFrom, vipTo: $vipTo, myLevel: $myLevel, receivingLevel: $receivingLevel, myCoin: $myCoin, myDiamond: $myDiamond, totalSendDiamond: $totalSendDiamond, myRecievedDiamond: $myRecievedDiamond, dob: $dob, bio: $bio, country: $country, continent: $continent, countryShowUnshow: $countryShowUnshow, myFrame: $myFrame, myGallery: $myGallery, myLuckyId: $myLuckyId, myTheme: $myTheme, myThemeType: $myThemeType, emailVerifiedAt: $emailVerifiedAt, password: $password, salt: $salt, isAdmin: $isAdmin, image: $image, langId: $langId, age: $age, gender: $gender, devId: $devId, regId: $regId, latitude: $latitude, longitude: $longitude, devType: $devType, rememberToken: $rememberToken, loginOtp: $loginOtp, loginType: $loginType, registerType: $registerType, createdAt: $createdAt, updatedAt: $updatedAt, phoneUpOtp: $phoneUpOtp, eventId: $eventId, isEventCreater: $isEventCreater, isEventSubscriber: $isEventSubscriber, isFamilyLeader: $isFamilyLeader, isFamilyMember: $isFamilyMember, monthlyCoins: $monthlyCoins, hoursLive: $hoursLive, talentLevel: $talentLevel, basicSalary: $basicSalary, userBanStatus: $userBanStatus, idBannedFrom: $idBannedFrom, idBannedTo: $idBannedTo, liveStatus: $liveStatus, liveimage: $liveimage, imageText: $imageText, imageTitle: $imageTitle, fixedValidDay: $fixedValidDay, fixedMinutes: $fixedMinutes, fixedCoins: $fixedCoins, familyName: $familyName, familyImage: $familyImage, followersCount: $followersCount, followingCount: $followingCount, agencyCreater: $agencyCreater, coinAgencyCreater: $coinAgencyCreater, visitorsCount: $visitorsCount, friendsCount: $friendsCount, followStatus: $followStatus, blockStatus: $blockStatus, vipStatus: $vipStatus, hideStatus: $hideStatus, kickOutStatus: $kickOutStatus, profileImage: $profileImage, idBannedStatus: $idBannedStatus, familyJoinStatus: $familyJoinStatus, familyJoinId: $familyJoinId, familyJoinName: $familyJoinName, agencyStatus: $agencyStatus, hostRequest: $hostRequest, friendCount: $friendCount, archivedTime: $archivedTime, lavelInfomation: $lavelInfomation)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is UserProfileDetail &&
-      other.id == id &&
-      other.name == name &&
-      other.username == username &&
-      other.familyId == familyId &&
-      other.phone == phone &&
-      other.facebookUserName == facebookUserName &&
-      other.email == email &&
-      other.hostStatus == hostStatus &&
-      other.socialId == socialId &&
-      other.fbSocialId == fbSocialId &&
-      other.snapSocialId == snapSocialId &&
-      other.myExp == myExp &&
-      other.myRecieveExperience == myRecieveExperience &&
-      other.vipLevel == vipLevel &&
-      other.vipFrom == vipFrom &&
-      other.vipTo == vipTo &&
-      other.myLevel == myLevel &&
-      other.receivingLevel == receivingLevel &&
-      other.myCoin == myCoin &&
-      other.myDiamond == myDiamond &&
-      other.totalSendDiamond == totalSendDiamond &&
-      other.myRecievedDiamond == myRecievedDiamond &&
-      other.dob == dob &&
-      other.bio == bio &&
-      other.country == country &&
-      other.continent == continent &&
-      other.countryShowUnshow == countryShowUnshow &&
-      other.myFrame == myFrame &&
-      other.myGallery == myGallery &&
-      other.myLuckyId == myLuckyId &&
-      other.myTheme == myTheme &&
-      other.myThemeType == myThemeType &&
-      other.emailVerifiedAt == emailVerifiedAt &&
-      other.password == password &&
-      other.salt == salt &&
-      other.isAdmin == isAdmin &&
-      other.image == image &&
-      other.langId == langId &&
-      other.age == age &&
-      other.gender == gender &&
-      other.devId == devId &&
-      other.regId == regId &&
-      other.latitude == latitude &&
-      other.longitude == longitude &&
-      other.devType == devType &&
-      other.rememberToken == rememberToken &&
-      other.loginOtp == loginOtp &&
-      other.loginType == loginType &&
-      other.registerType == registerType &&
-      other.createdAt == createdAt &&
-      other.updatedAt == updatedAt &&
-      other.phoneUpOtp == phoneUpOtp &&
-      other.eventId == eventId &&
-      other.isEventCreater == isEventCreater &&
-      other.isEventSubscriber == isEventSubscriber &&
-      other.isFamilyLeader == isFamilyLeader &&
-      other.isFamilyMember == isFamilyMember &&
-      other.monthlyCoins == monthlyCoins &&
-      other.hoursLive == hoursLive &&
-      other.talentLevel == talentLevel &&
-      other.basicSalary == basicSalary &&
-      other.userBanStatus == userBanStatus &&
-      other.idBannedFrom == idBannedFrom &&
-      other.idBannedTo == idBannedTo &&
-      other.liveStatus == liveStatus &&
-      other.liveimage == liveimage &&
-      other.imageText == imageText &&
-      other.imageTitle == imageTitle &&
-      other.fixedValidDay == fixedValidDay &&
-      other.fixedMinutes == fixedMinutes &&
-      other.fixedCoins == fixedCoins &&
-      other.familyName == familyName &&
-      other.familyImage == familyImage &&
-      other.followersCount == followersCount &&
-      other.followingCount == followingCount &&
-      other.agencyCreater == agencyCreater &&
-      other.coinAgencyCreater == coinAgencyCreater &&
-      other.visitorsCount == visitorsCount &&
-      other.friendsCount == friendsCount &&
-      other.followStatus == followStatus &&
-      other.blockStatus == blockStatus &&
-      other.vipStatus == vipStatus &&
-      other.hideStatus == hideStatus &&
-      other.kickOutStatus == kickOutStatus &&
-      other.profileImage == profileImage &&
-      other.idBannedStatus == idBannedStatus &&
-      other.familyJoinStatus == familyJoinStatus &&
-      other.familyJoinId == familyJoinId &&
-      other.familyJoinName == familyJoinName &&
-      other.agencyStatus == agencyStatus &&
-      other.hostRequest == hostRequest &&
-      other.friendCount == friendCount &&
-      other.archivedTime == archivedTime &&
-      other.lavelInfomation == lavelInfomation;
+        other.id == id &&
+        other.name == name &&
+        other.username == username &&
+        other.familyId == familyId &&
+        other.phone == phone &&
+        other.facebookUserName == facebookUserName &&
+        other.email == email &&
+        other.hostStatus == hostStatus &&
+        other.socialId == socialId &&
+        other.fbSocialId == fbSocialId &&
+        other.snapSocialId == snapSocialId &&
+        other.myExp == myExp &&
+        other.myRecieveExperience == myRecieveExperience &&
+        other.vipLevel == vipLevel &&
+        other.vipFrom == vipFrom &&
+        other.vipTo == vipTo &&
+        other.myLevel == myLevel &&
+        other.receivingLevel == receivingLevel &&
+        other.myCoin == myCoin &&
+        other.myDiamond == myDiamond &&
+        other.totalSendDiamond == totalSendDiamond &&
+        other.myRecievedDiamond == myRecievedDiamond &&
+        other.dob == dob &&
+        other.bio == bio &&
+        other.country == country &&
+        other.continent == continent &&
+        other.countryShowUnshow == countryShowUnshow &&
+        other.myFrame == myFrame &&
+        other.myGallery == myGallery &&
+        other.myLuckyId == myLuckyId &&
+        other.myTheme == myTheme &&
+        other.myThemeType == myThemeType &&
+        other.emailVerifiedAt == emailVerifiedAt &&
+        other.password == password &&
+        other.salt == salt &&
+        other.isAdmin == isAdmin &&
+        other.image == image &&
+        other.langId == langId &&
+        other.age == age &&
+        other.gender == gender &&
+        other.devId == devId &&
+        other.regId == regId &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.devType == devType &&
+        other.rememberToken == rememberToken &&
+        other.loginOtp == loginOtp &&
+        other.loginType == loginType &&
+        other.registerType == registerType &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt &&
+        other.phoneUpOtp == phoneUpOtp &&
+        other.eventId == eventId &&
+        other.isEventCreater == isEventCreater &&
+        other.isEventSubscriber == isEventSubscriber &&
+        other.isFamilyLeader == isFamilyLeader &&
+        other.isFamilyMember == isFamilyMember &&
+        other.monthlyCoins == monthlyCoins &&
+        other.hoursLive == hoursLive &&
+        other.talentLevel == talentLevel &&
+        other.basicSalary == basicSalary &&
+        other.userBanStatus == userBanStatus &&
+        other.idBannedFrom == idBannedFrom &&
+        other.idBannedTo == idBannedTo &&
+        other.liveStatus == liveStatus &&
+        other.liveimage == liveimage &&
+        other.imageText == imageText &&
+        other.imageTitle == imageTitle &&
+        other.fixedValidDay == fixedValidDay &&
+        other.fixedMinutes == fixedMinutes &&
+        other.fixedCoins == fixedCoins &&
+        other.familyName == familyName &&
+        other.familyImage == familyImage &&
+        other.followersCount == followersCount &&
+        other.followingCount == followingCount &&
+        other.agencyCreater == agencyCreater &&
+        other.coinAgencyCreater == coinAgencyCreater &&
+        other.visitorsCount == visitorsCount &&
+        other.friendsCount == friendsCount &&
+        other.followStatus == followStatus &&
+        other.blockStatus == blockStatus &&
+        other.vipStatus == vipStatus &&
+        other.hideStatus == hideStatus &&
+        other.kickOutStatus == kickOutStatus &&
+        other.profileImage == profileImage &&
+        other.idBannedStatus == idBannedStatus &&
+        other.familyJoinStatus == familyJoinStatus &&
+        other.familyJoinId == familyJoinId &&
+        other.familyJoinName == familyJoinName &&
+        other.agencyStatus == agencyStatus &&
+        other.hostRequest == hostRequest &&
+        other.friendCount == friendCount &&
+        other.archivedTime == archivedTime &&
+        other.lavelInfomation == lavelInfomation;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      username.hashCode ^
-      familyId.hashCode ^
-      phone.hashCode ^
-      facebookUserName.hashCode ^
-      email.hashCode ^
-      hostStatus.hashCode ^
-      socialId.hashCode ^
-      fbSocialId.hashCode ^
-      snapSocialId.hashCode ^
-      myExp.hashCode ^
-      myRecieveExperience.hashCode ^
-      vipLevel.hashCode ^
-      vipFrom.hashCode ^
-      vipTo.hashCode ^
-      myLevel.hashCode ^
-      receivingLevel.hashCode ^
-      myCoin.hashCode ^
-      myDiamond.hashCode ^
-      totalSendDiamond.hashCode ^
-      myRecievedDiamond.hashCode ^
-      dob.hashCode ^
-      bio.hashCode ^
-      country.hashCode ^
-      continent.hashCode ^
-      countryShowUnshow.hashCode ^
-      myFrame.hashCode ^
-      myGallery.hashCode ^
-      myLuckyId.hashCode ^
-      myTheme.hashCode ^
-      myThemeType.hashCode ^
-      emailVerifiedAt.hashCode ^
-      password.hashCode ^
-      salt.hashCode ^
-      isAdmin.hashCode ^
-      image.hashCode ^
-      langId.hashCode ^
-      age.hashCode ^
-      gender.hashCode ^
-      devId.hashCode ^
-      regId.hashCode ^
-      latitude.hashCode ^
-      longitude.hashCode ^
-      devType.hashCode ^
-      rememberToken.hashCode ^
-      loginOtp.hashCode ^
-      loginType.hashCode ^
-      registerType.hashCode ^
-      createdAt.hashCode ^
-      updatedAt.hashCode ^
-      phoneUpOtp.hashCode ^
-      eventId.hashCode ^
-      isEventCreater.hashCode ^
-      isEventSubscriber.hashCode ^
-      isFamilyLeader.hashCode ^
-      isFamilyMember.hashCode ^
-      monthlyCoins.hashCode ^
-      hoursLive.hashCode ^
-      talentLevel.hashCode ^
-      basicSalary.hashCode ^
-      userBanStatus.hashCode ^
-      idBannedFrom.hashCode ^
-      idBannedTo.hashCode ^
-      liveStatus.hashCode ^
-      liveimage.hashCode ^
-      imageText.hashCode ^
-      imageTitle.hashCode ^
-      fixedValidDay.hashCode ^
-      fixedMinutes.hashCode ^
-      fixedCoins.hashCode ^
-      familyName.hashCode ^
-      familyImage.hashCode ^
-      followersCount.hashCode ^
-      followingCount.hashCode ^
-      agencyCreater.hashCode ^
-      coinAgencyCreater.hashCode ^
-      visitorsCount.hashCode ^
-      friendsCount.hashCode ^
-      followStatus.hashCode ^
-      blockStatus.hashCode ^
-      vipStatus.hashCode ^
-      hideStatus.hashCode ^
-      kickOutStatus.hashCode ^
-      profileImage.hashCode ^
-      idBannedStatus.hashCode ^
-      familyJoinStatus.hashCode ^
-      familyJoinId.hashCode ^
-      familyJoinName.hashCode ^
-      agencyStatus.hashCode ^
-      hostRequest.hashCode ^
-      friendCount.hashCode ^
-      archivedTime.hashCode ^
-      lavelInfomation.hashCode;
+        name.hashCode ^
+        username.hashCode ^
+        familyId.hashCode ^
+        phone.hashCode ^
+        facebookUserName.hashCode ^
+        email.hashCode ^
+        hostStatus.hashCode ^
+        socialId.hashCode ^
+        fbSocialId.hashCode ^
+        snapSocialId.hashCode ^
+        myExp.hashCode ^
+        myRecieveExperience.hashCode ^
+        vipLevel.hashCode ^
+        vipFrom.hashCode ^
+        vipTo.hashCode ^
+        myLevel.hashCode ^
+        receivingLevel.hashCode ^
+        myCoin.hashCode ^
+        myDiamond.hashCode ^
+        totalSendDiamond.hashCode ^
+        myRecievedDiamond.hashCode ^
+        dob.hashCode ^
+        bio.hashCode ^
+        country.hashCode ^
+        continent.hashCode ^
+        countryShowUnshow.hashCode ^
+        myFrame.hashCode ^
+        myGallery.hashCode ^
+        myLuckyId.hashCode ^
+        myTheme.hashCode ^
+        myThemeType.hashCode ^
+        emailVerifiedAt.hashCode ^
+        password.hashCode ^
+        salt.hashCode ^
+        isAdmin.hashCode ^
+        image.hashCode ^
+        langId.hashCode ^
+        age.hashCode ^
+        gender.hashCode ^
+        devId.hashCode ^
+        regId.hashCode ^
+        latitude.hashCode ^
+        longitude.hashCode ^
+        devType.hashCode ^
+        rememberToken.hashCode ^
+        loginOtp.hashCode ^
+        loginType.hashCode ^
+        registerType.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode ^
+        phoneUpOtp.hashCode ^
+        eventId.hashCode ^
+        isEventCreater.hashCode ^
+        isEventSubscriber.hashCode ^
+        isFamilyLeader.hashCode ^
+        isFamilyMember.hashCode ^
+        monthlyCoins.hashCode ^
+        hoursLive.hashCode ^
+        talentLevel.hashCode ^
+        basicSalary.hashCode ^
+        userBanStatus.hashCode ^
+        idBannedFrom.hashCode ^
+        idBannedTo.hashCode ^
+        liveStatus.hashCode ^
+        liveimage.hashCode ^
+        imageText.hashCode ^
+        imageTitle.hashCode ^
+        fixedValidDay.hashCode ^
+        fixedMinutes.hashCode ^
+        fixedCoins.hashCode ^
+        familyName.hashCode ^
+        familyImage.hashCode ^
+        followersCount.hashCode ^
+        followingCount.hashCode ^
+        agencyCreater.hashCode ^
+        coinAgencyCreater.hashCode ^
+        visitorsCount.hashCode ^
+        friendsCount.hashCode ^
+        followStatus.hashCode ^
+        blockStatus.hashCode ^
+        vipStatus.hashCode ^
+        hideStatus.hashCode ^
+        kickOutStatus.hashCode ^
+        profileImage.hashCode ^
+        idBannedStatus.hashCode ^
+        familyJoinStatus.hashCode ^
+        familyJoinId.hashCode ^
+        familyJoinName.hashCode ^
+        agencyStatus.hashCode ^
+        hostRequest.hashCode ^
+        friendCount.hashCode ^
+        archivedTime.hashCode ^
+        lavelInfomation.hashCode;
   }
 }

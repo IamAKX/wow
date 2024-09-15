@@ -119,6 +119,14 @@ class FirebaseDbService {
     DatabaseReference messageRef =
         database.ref('${FirebaseDbNode.message}/$chatWindowId');
     DatabaseReference newMessageRef = messageRef.push();
+    chat.id = newMessageRef.key;
     return await newMessageRef.set(chat.toMap());
+  }
+
+  static Future<void> updateChat(String chatWindowId, ChatModel chat) async {
+    chat.timestamp = DateTime.now().millisecondsSinceEpoch;
+    DatabaseReference messageRef =
+        database.ref('${FirebaseDbNode.message}/$chatWindowId/${chat.id}');
+    return await messageRef.update(chat.toMap());
   }
 }
