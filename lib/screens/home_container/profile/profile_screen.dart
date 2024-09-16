@@ -19,6 +19,8 @@ import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../widgets/custom_webview.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -347,7 +349,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () {},
+                onTap: () => Navigator.of(context).pushNamed(
+                    CustomWebview.route,
+                    arguments:
+                        'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}'),
               ),
               ListTile(
                 leading: Image.asset(
