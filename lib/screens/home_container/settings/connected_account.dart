@@ -97,7 +97,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text((user?.facebookUserName?.isNotEmpty ?? false)
-                  ? 'UNBOUND'
+                  ? user?.facebookUserName ?? ''
                   : 'ADD'),
               Icon(Icons.chevron_right),
             ],
@@ -157,7 +157,9 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text((user?.socialId?.isNotEmpty ?? false) ? 'UNBOUND' : 'ADD'),
+                Text((user?.socialId?.isNotEmpty ?? false)
+                    ? user?.socialId ?? ''
+                    : 'ADD'),
                 Icon(Icons.chevron_right),
               ],
             ),
@@ -276,6 +278,15 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
                 ),
                 const Text(
                   'You can set to show your social account to your profile.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w300,
+                    height: 1.25,
+                  ),
+                ),
+                verticalGap(20),
+                const Text(
+                  'If you want to unbound your social account, tap on the linked email/account number.',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w300,

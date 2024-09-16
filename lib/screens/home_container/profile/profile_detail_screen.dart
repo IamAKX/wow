@@ -505,61 +505,64 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             ),
                           ),
                           horizontalGap(10),
-                          Container(
-                            constraints: BoxConstraints(minWidth: 70),
-                            padding: const EdgeInsets.all(5),
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/image/level_1.png',
+                          if ((user?.lavelInfomation?.sendLevel ?? '0') != '0')
+                            Container(
+                              constraints: BoxConstraints(minWidth: 70),
+                              padding: const EdgeInsets.all(5),
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                      'assets/image/level_1.png',
+                                    ),
+                                    fit: BoxFit.fill),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    'assets/image/starlevel.png',
+                                    width: 12,
                                   ),
-                                  fit: BoxFit.fill),
+                                  horizontalGap(5),
+                                  Text(
+                                    '${user?.lavelInfomation?.sendLevel}',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
+                                  )
+                                ],
+                              ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/image/coins_img.png',
-                                  width: 12,
-                                ),
-                                horizontalGap(5),
-                                const Text(
-                                  '22',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                )
-                              ],
-                            ),
-                          ),
                           horizontalGap(10),
-                          Container(
-                            constraints: BoxConstraints(minWidth: 70),
-                            padding: const EdgeInsets.all(5),
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/image/level_9.png',
+                          if ((user?.lavelInfomation?.reciveLevel ?? '0') !=
+                              '0')
+                            Container(
+                              constraints: BoxConstraints(minWidth: 70),
+                              padding: const EdgeInsets.all(5),
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                      'assets/image/level_9.png',
+                                    ),
+                                    fit: BoxFit.fill),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    'assets/image/coins_img.png',
+                                    width: 12,
                                   ),
-                                  fit: BoxFit.fill),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/image/coins_img.png',
-                                  width: 12,
-                                ),
-                                horizontalGap(5),
-                                const Text(
-                                  '22',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
+                                  horizontalGap(5),
+                                  Text(
+                                    user?.lavelInfomation?.reciveLevel ?? '0',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
                         ],
                       ),
                     ),

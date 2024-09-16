@@ -6,7 +6,6 @@ import 'circular_image.dart';
 import 'gaps.dart';
 
 class UserTile extends StatelessWidget {
-  
   const UserTile({
     super.key,
     required this.visitorModel,
@@ -51,60 +50,62 @@ class UserTile extends StatelessWidget {
             ),
           ),
           horizontalGap(5),
-          Container(
-            width: 60,
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    'assets/image/level_1.png',
+          if ((visitorModel.sendLevel ?? '0') != '0')
+            Container(
+              width: 60,
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      'assets/image/level_1.png',
+                    ),
+                    fit: BoxFit.fill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/image/starlevel.png',
+                    width: 12,
                   ),
-                  fit: BoxFit.fill),
+                  horizontalGap(5),
+                  Text(
+                    '${visitorModel.sendLevel}',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  )
+                ],
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/image/coins_img.png',
-                  width: 12,
-                ),
-                horizontalGap(5),
-                const Text(
-                  '22',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                )
-              ],
-            ),
-          ),
           horizontalGap(5),
-          Container(
-            width: 60,
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    'assets/image/level_9.png',
+          if ((visitorModel.receivingLevel ?? '0') != '0')
+            Container(
+              width: 60,
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      'assets/image/level_9.png',
+                    ),
+                    fit: BoxFit.fill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/image/coins_img.png',
+                    width: 12,
                   ),
-                  fit: BoxFit.fill),
+                  horizontalGap(5),
+                  Text(
+                    '${visitorModel.receivingLevel}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+                ],
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/image/coins_img.png',
-                  width: 12,
-                ),
-                horizontalGap(5),
-                const Text(
-                  '22',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                )
-              ],
-            ),
-          ),
         ],
       ),
     );

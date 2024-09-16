@@ -148,39 +148,51 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                 ),
               ),
               horizontalGap(10),
-              Container(
-                constraints: const BoxConstraints(minWidth: 50),
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFEE9DA8),
-                      const Color(0xFFEE9DA8).withOpacity(0.5),
-                      const Color(0xFFEE9DA8).withOpacity(0.2)
+              if ((friendList.elementAt(index).lavelInformation?.reciveLevel ??
+                      '0') !=
+                  '0')
+                Container(
+                  constraints: const BoxConstraints(minWidth: 50),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFEE9DA8),
+                        const Color(0xFFEE9DA8).withOpacity(0.5),
+                        const Color(0xFFEE9DA8).withOpacity(0.2)
+                      ],
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/image/starlevel.png',
+                        width: 10,
+                      ),
+                      horizontalGap(5),
+                      Text(
+                        friendList
+                                .elementAt(index)
+                                .lavelInformation
+                                ?.reciveLevel ??
+                            '',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 10),
+                      )
                     ],
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/image/starlevel.png',
-                      width: 10,
-                    ),
-                    horizontalGap(5),
-                    const Text(
-                      '2',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
-                  ],
-                ),
-              ),
               horizontalGap(5),
-              Image.asset(
-                'assets/image/money.png',
-                width: 15,
-              ),
+              if ((friendList.elementAt(index).lavelInformation?.sendLevel ??
+                      0) !=
+                  '0')
+                Image.asset(
+                  'assets/image/money.png',
+                  width: 15,
+                ),
             ],
           ),
         );

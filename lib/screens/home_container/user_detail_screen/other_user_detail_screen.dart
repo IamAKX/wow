@@ -480,12 +480,12 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Image.asset(
-                            'assets/image/coins_img.png',
+                            'assets/image/starlevel.png',
                             width: 12,
                           ),
                           horizontalGap(5),
-                          const Text(
-                            '22',
+                          Text(
+                            user?.lavelInfomation?.sendLevel ?? '0',
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           )
                         ],
@@ -510,8 +510,8 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                             width: 12,
                           ),
                           horizontalGap(5),
-                          const Text(
-                            '22',
+                          Text(
+                            user?.lavelInfomation?.reciveLevel ?? '0',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,

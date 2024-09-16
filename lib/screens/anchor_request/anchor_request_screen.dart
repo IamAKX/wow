@@ -114,7 +114,7 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
             ),
             horizontalGap(20),
             Text(
-              '${user?.id ?? 0}',
+              '${user?.username ?? 0}',
               style: const TextStyle(color: Colors.black, fontSize: 16),
             ),
           ],
@@ -201,7 +201,7 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
               return;
             }
             Map<String, dynamic> reqBody = {
-              'userId': prefs.getString(PrefsKey.userId),
+              'userId': user?.username,
               'agencyId': selectedAgent?.agencyCode ?? '',
               'name': nameCtrl.text,
               'country': country,
