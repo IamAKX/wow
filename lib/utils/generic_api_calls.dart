@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/providers/api_call_provider.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
@@ -20,4 +22,18 @@ Future<UserProfileDetail?> getCurrentUser() async {
     }
   });
   return user;
+}
+
+Future<String> loadFrame() async {
+  Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+  String frame = '';
+  await ApiCallProvider.instance
+      .postRequest(API.getAppliedFrame, reqBody)
+      .then((value) {
+    if (value['details'] != null) {
+      frame = value['details']['frame_img'];
+    }
+  });
+
+  return frame;
 }

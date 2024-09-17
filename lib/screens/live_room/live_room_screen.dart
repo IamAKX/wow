@@ -19,6 +19,7 @@ import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/firebase_db_node.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+import 'package:worldsocialintegrationapp/widgets/animated_framed_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -50,6 +51,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   static FirebaseDatabase database = FirebaseDatabase.instance;
   int participantCount = -1;
   String announcementMessage = '';
+  String liveRoomTheme = '';
+  String frame = '';
 
   late RtcEngine agoraEngine;
   final String appId = '86f31e0182524c3ebc7af02c9a35e0ca';
@@ -117,6 +120,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       if (dataSnapshot.exists) {
         setState(() {
           announcementMessage = dataSnapshot.value as String;
+        });
+      }
+    });
+
+    database
+        .ref('${FirebaseDbNode.liveRoomTheme}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        setState(() {
+          liveRoomTheme = dataSnapshot.value as String;
         });
       }
     });
@@ -212,6 +227,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         });
       },
     );
+
+    frame = await loadFrame();
+    setState(() {});
   }
 
   @override
@@ -344,10 +362,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: CachedNetworkImageProvider(
-              'https://images.pexels.com/photos/66869/green-leaf-natural-wallpaper-royalty-free-66869.jpeg'),
+          image: CachedNetworkImageProvider(liveRoomTheme.isNotEmpty
+              ? liveRoomTheme
+              : 'https://images.pexels.com/photos/66869/green-leaf-natural-wallpaper-royalty-free-66869.jpeg'),
           fit: BoxFit.fill,
         ),
       ),
@@ -716,10 +735,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               verticalGap(20),
-              CircularImage(
-                imagePath: user?.image ?? '',
-                diameter: 80,
-              ),
+              frame.isEmpty
+                  ? CircularImage(
+                      imagePath: user?.image ?? '',
+                      diameter: 80,
+                    )
+                  : AnimatedFramedCircularImage(
+                      imagePath: user?.image ?? '',
+                      imageSize: 80,
+                      framePath: frame),
               verticalGap(10),
               Text(
                 user?.name ?? '',
@@ -1008,7 +1032,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
-                            builder: (context) => const ThemeBottomsheet(),
+                            builder: (context) => ThemeBottomsheet(
+                              roomDetail: roomDetail ??
+                                  JoinableLiveRoomModel(
+                                    id: widget.agoraToken.mainId,
+                                  ),
+                            ),
                           );
                         },
                         child: getMenuItem(

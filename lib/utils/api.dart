@@ -97,4 +97,7 @@ class API {
   static const String hostApi = '$baseUrl/hostApi';
   static const String getHost = '$baseUrl/getHost';
   static const String claim_garage = '$baseUrl/claim_garage';
+  static const String getAppliedFrame = '$baseUrl/getAppliedFrame';
+  static const String getThemes = '$baseUrl/getThemes';
+  static const String getImages = '$baseUrl/getImages';
 }

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_leaderboard.dart';
@@ -16,9 +17,13 @@ import 'package:worldsocialintegrationapp/screens/home_container/settings/settin
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
+import 'package:worldsocialintegrationapp/widgets/animated_framed_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../main.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/prefs_key.dart';
 import '../../../widgets/custom_webview.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -30,6 +35,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   UserProfileDetail? user;
+  String frame = '';
+  late ApiCallProvider apiCallProvider;
 
   @override
   void initState() {
@@ -41,6 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return Scaffold(
       body: getBody(context),
     );
@@ -411,7 +420,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           horizontalGap(pagePadding),
-          CircularImage(imagePath: user?.image ?? '', diameter: 60),
+          frame.isEmpty
+              ? CircularImage(imagePath: user?.image ?? '', diameter: 60)
+              : AnimatedFramedCircularImage(
+                  imagePath: user?.image ?? '',
+                  imageSize: 60,
+                  framePath: frame),
           horizontalGap(pagePadding),
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -477,5 +491,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       },
     );
+    frame = await loadFrame();
+    setState(() {});
+    log('frame = ${frame}');
   }
 }

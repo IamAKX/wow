@@ -1,9 +1,26 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
+
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../main.dart';
+import '../../models/joinable_live_room_model.dart';
+import '../../models/theme_free_image_model.dart';
+import '../../models/theme_paid_image_model.dart';
+import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
+import '../../utils/prefs_key.dart';
+
 class ThemeBottomsheet extends StatefulWidget {
-  const ThemeBottomsheet({super.key});
+  const ThemeBottomsheet({
+    Key? key,
+    required this.roomDetail,
+  }) : super(key: key);
+  final JoinableLiveRoomModel roomDetail;
 
   @override
   State<ThemeBottomsheet> createState() => _ThemeBottomsheetState();
@@ -12,13 +29,45 @@ class ThemeBottomsheet extends StatefulWidget {
 class _ThemeBottomsheetState extends State<ThemeBottomsheet>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late ApiCallProvider apiCallProvider;
+
+  List<ThemeFreeImageModel> freeThemeList = [];
+  List<ThemePaidImageModel> paidThemeList = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadFreeImage();
+      loadPaidImage();
+    });
+  }
+
+  loadFreeImage() async {
+    apiCallProvider.getRequest(API.getImages).then((value) {
+      freeThemeList.clear();
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          freeThemeList.add(ThemeFreeImageModel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
+  }
+
+  loadPaidImage() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    apiCallProvider.postRequest(API.getThemes, reqBody).then((value) {
+      paidThemeList.clear();
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          paidThemeList.add(ThemePaidImageModel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -29,6 +78,8 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return FractionallySizedBox(
       heightFactor: 0.6, // Set height to 60% of screen height
       child: ClipRRect(
@@ -118,15 +169,17 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 childAspectRatio: 0.9),
-            itemCount: 10,
+            itemCount: freeThemeList.length,
             itemBuilder: (context, index) {
               return InkWell(
-                onTap: () {},
+                onTap: () {
+                  showImageDialog(
+                      context, freeThemeList.elementAt(index).images ?? '');
+                },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: CachedNetworkImage(
-                    imageUrl:
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ36L_LsmTuC3V9RcegbAllAkZ-WUPfcHsEgg&s',
+                    imageUrl: freeThemeList.elementAt(index).images ?? '',
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(),
                     ),
@@ -156,7 +209,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 childAspectRatio: 0.7),
-            itemCount: 10,
+            itemCount: paidThemeList.length,
             itemBuilder: (context, index) {
               return InkWell(
                 onTap: () {},
@@ -165,8 +218,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                   child: Stack(
                     children: [
                       CachedNetworkImage(
-                        imageUrl:
-                            'https://64.media.tumblr.com/ff30f5bbc325a949470d2ee77e1ac731/tumblr_meu0bgLQhQ1r3bteso1_500.gif',
+                        imageUrl: paidThemeList.elementAt(index).theme ?? '',
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
@@ -188,9 +240,9 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                                   size: 20,
                                 ),
                                 horizontalGap(5),
-                                const Text(
-                                  '4 days',
-                                  style: TextStyle(color: Colors.white),
+                                Text(
+                                  '${paidThemeList.elementAt(index).valditity ?? '0'} days',
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                                 const Spacer(),
                                 const Icon(
@@ -202,13 +254,13 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                             ),
                           ),
                           const Spacer(),
-                          const Align(
+                          Align(
                             alignment: Alignment.centerLeft,
                             child: Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                '8000 coins',
-                                style: TextStyle(
+                                '${paidThemeList.elementAt(index).price ?? ''} coins',
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold),
@@ -264,6 +316,52 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
           ),
         ),
       ],
+    );
+  }
+
+  void showImageDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: Text('Image Preview'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text('Error ${error.toString()}'),
+                ),
+                fit: BoxFit.fitWidth,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Set'),
+              onPressed: () async {
+                await LiveRoomFirebase.updateLiveRoomTheme(
+                    widget.roomDetail.id ?? '', imageUrl);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -105,20 +105,22 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           tileColor: Colors.white,
           onTap: (user?.email?.isNotEmpty ?? false)
               ? () async {
-                  await ConnectSocialAccount().logoutWithFacebook();
+                  showUnboundPrompt(context, () async {
+                    await ConnectSocialAccount().logoutWithFacebook();
 
-                  Map<String, dynamic> reqBody = {
-                    'socialIdType': 'facebookId',
-                    'userId': user?.id
-                  };
-                  apiCallProvider
-                      .postRequest(API.removeSocialIds, reqBody)
-                      .then(
-                    (value) {
-                      showToastMessage(value['message']);
-                      loadUserData();
-                    },
-                  );
+                    Map<String, dynamic> reqBody = {
+                      'socialIdType': 'facebookId',
+                      'userId': user?.id
+                    };
+                    apiCallProvider
+                        .postRequest(API.removeSocialIds, reqBody)
+                        .then(
+                      (value) {
+                        showToastMessage(value['message']);
+                        loadUserData();
+                      },
+                    );
+                  });
                 }
               : () async {
                   Map<String, dynamic> facebookUserData =
@@ -166,19 +168,21 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             tileColor: Colors.white,
             onTap: (user?.socialId?.isNotEmpty ?? false)
                 ? () async {
-                    await ConnectSocialAccount().logoutWithGoogle();
-                    Map<String, dynamic> reqBody = {
-                      'socialIdType': 'gmailId',
-                      'userId': user?.id
-                    };
-                    apiCallProvider
-                        .postRequest(API.removeSocialIds, reqBody)
-                        .then(
-                      (value) {
-                        showToastMessage(value['message']);
-                        loadUserData();
-                      },
-                    );
+                    showUnboundPrompt(context, () async {
+                      await ConnectSocialAccount().logoutWithGoogle();
+                      Map<String, dynamic> reqBody = {
+                        'socialIdType': 'gmailId',
+                        'userId': user?.id
+                      };
+                      apiCallProvider
+                          .postRequest(API.removeSocialIds, reqBody)
+                          .then(
+                        (value) {
+                          showToastMessage(value['message']);
+                          loadUserData();
+                        },
+                      );
+                    });
                   }
                 : () async {
                     GoogleSignInAccount? googleSignInAccount =
@@ -320,6 +324,40 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           style: TextStyle(color: Colors.white),
         ),
       ),
+    );
+  }
+
+  void showUnboundPrompt(BuildContext context, Function funtion) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Unbound Account'),
+          content: const Text(
+              'Are you sure you want to unbound your social account?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                funtion();
+              },
+              child: const Text(
+                'Yes',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -72,6 +72,13 @@ class LiveRoomFirebase {
     await liveRoomRef.set(message);
   }
 
+  static Future<void> updateLiveRoomTheme(
+      String roomId, String themeUrl) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomTheme}/$roomId');
+    await liveRoomRef.set(themeUrl);
+  }
+
   static Future<void> sendChat(String chatWindowId, LiveroomChat chat) async {
     DatabaseReference messageRef =
         database.ref('${FirebaseDbNode.liveRoomChat}/$chatWindowId');
