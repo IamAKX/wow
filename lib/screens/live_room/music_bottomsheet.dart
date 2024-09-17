@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/load_music_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class MusicBottomsheet extends StatefulWidget {
@@ -25,8 +26,13 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.chevron_left,
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.chevron_left,
+                    ),
                   ),
                   horizontalGap(10),
                   Text(
@@ -36,12 +42,28 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
                     ),
                   ),
                   const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // To enable custom height
+                        builder: (context) => const LoadMusicBottomsheet(),
+                      );
+                    },
+                    child: Text('Scan'),
+                  )
                 ],
               ),
               Expanded(
                 child: Center(
                   child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, // To enable custom height
+                          builder: (context) => const LoadMusicBottomsheet(),
+                        );
+                      },
                       child: Text('Scan and add from your phone'),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,

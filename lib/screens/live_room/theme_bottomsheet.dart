@@ -1,9 +1,13 @@
-// ignore_for_file: prefer_const_constructors
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/get_friend_bottonsheet.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/purchase_gallery_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -70,6 +74,24 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
     });
   }
 
+  Future<bool> buyTheme(String themeId) async {
+    bool res = false;
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'themeId': themeId,
+    };
+    await apiCallProvider
+        .postRequest(API.purchaseThemes, reqBody)
+        .then((value) {
+      if (value['success'] != null) {
+        res = value['success'] == '1';
+        showToastMessage(value['message']);
+        setState(() {});
+      }
+    });
+    return res;
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -83,6 +105,10 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
     return FractionallySizedBox(
       heightFactor: 0.6, // Set height to 60% of screen height
       child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
         child: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: const BoxDecoration(
@@ -125,7 +151,14 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // To enable custom height
+                        builder: (context) => PurchaseGalleryBottomsheet(
+                            roomDetail: widget.roomDetail),
+                      );
+                    },
                     icon: const Icon(
                       Icons.photo_library_outlined,
                       color: Colors.black,
@@ -245,10 +278,18 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                                   style: const TextStyle(color: Colors.white),
                                 ),
                                 const Spacer(),
-                                const Icon(
-                                  Icons.preview_outlined,
-                                  color: Colors.white,
-                                  size: 20,
+                                InkWell(
+                                  onTap: () {
+                                    showPreviewImageDialog(
+                                        context,
+                                        paidThemeList.elementAt(index).theme ??
+                                            '');
+                                  },
+                                  child: const Icon(
+                                    Icons.preview_outlined,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
                                 ),
                               ],
                             ),
@@ -273,13 +314,33 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                               children: [
                                 Expanded(
                                   child: InkWell(
-                                    onTap: () {},
+                                    onTap: (paidThemeList
+                                                .elementAt(index)
+                                                .purchasedType ??
+                                            false)
+                                        ? () {
+                                            showImageDialog(
+                                                context,
+                                                paidThemeList
+                                                        .elementAt(index)
+                                                        .theme ??
+                                                    '');
+                                          }
+                                        : () {
+                                            showPaidImageDialog(context,
+                                                paidThemeList.elementAt(index));
+                                          },
                                     child: Container(
                                       padding: const EdgeInsets.all(10),
                                       alignment: Alignment.center,
-                                      child: const Text(
-                                        'Buy',
-                                        style: TextStyle(
+                                      child: Text(
+                                        (paidThemeList
+                                                    .elementAt(index)
+                                                    .purchasedType ??
+                                                false)
+                                            ? 'Set'
+                                            : 'Buy',
+                                        style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold),
@@ -289,7 +350,23 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                                 ),
                                 Expanded(
                                   child: InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled:
+                                            true, // To enable custom height
+                                        builder: (context) =>
+                                            GetFriendBottomsheet(
+                                                roomDetail: widget.roomDetail,
+                                                permissionId: '',
+                                                themeId: paidThemeList
+                                                        .elementAt(index)
+                                                        .id ??
+                                                    '',
+                                                image: File(''),
+                                                isStoreTheme: true),
+                                      );
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.all(10),
                                       alignment: Alignment.center,
@@ -327,7 +404,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          title: Text('Image Preview'),
+          title: const Text('Image Preview'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -345,18 +422,105 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Close'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Set'),
+              child: const Text('Set'),
               onPressed: () async {
                 await LiveRoomFirebase.updateLiveRoomTheme(
                     widget.roomDetail.id ?? '', imageUrl);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showPreviewImageDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: const Text('Image Preview'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text('Error ${error.toString()}'),
+                ),
+                fit: BoxFit.fitWidth,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showPaidImageDialog(
+      BuildContext context, ThemePaidImageModel pageImageModel) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: const Text('Image Preview'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CachedNetworkImage(
+                imageUrl: pageImageModel.theme ?? '',
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text('Error ${error.toString()}'),
+                ),
+                fit: BoxFit.fitWidth,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Buy'),
+              onPressed: () async {
+                bool res = await buyTheme(pageImageModel.id ?? '');
+                if (res) {
+                  await LiveRoomFirebase.updateLiveRoomTheme(
+                      widget.roomDetail.id ?? '', pageImageModel.theme ?? '');
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }
               },
             ),
           ],

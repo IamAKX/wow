@@ -361,6 +361,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.3+2"
+  files_scanner_android:
+    dependency: "direct main"
+    description:
+      name: files_scanner_android
+      sha256: "734b3b1f8c290394af3d9e816380ed7046b63c543b1c95c6170f1801fd3fe77f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -837,6 +845,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.0"
+  image_cropper:
+    dependency: "direct main"
+    description:
+      name: image_cropper
+      sha256: fe37d9a129411486e0d93089b61bd326d05b89e78ad4981de54b560725bf5bd5
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.2"
+  image_cropper_for_web:
+    dependency: transitive
+    description:
+      name: image_cropper_for_web
+      sha256: "34256c8fb7fcb233251787c876bb37271744459b593a948a2db73caa323034d0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
+  image_cropper_platform_interface:
+    dependency: transitive
+    description:
+      name: image_cropper_platform_interface
+      sha256: e8e9d2ca36360387aee39295ce49029362ae4df3071f23e8e71f2b81e40b7531
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   image_picker:
     dependency: "direct main"
     description:

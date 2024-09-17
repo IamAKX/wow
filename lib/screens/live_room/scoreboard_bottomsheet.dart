@@ -1,10 +1,9 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../providers/api_call_provider.dart';
 
 class ScoreboardBottomsheet extends StatefulWidget {
   const ScoreboardBottomsheet({super.key});
@@ -14,8 +13,19 @@ class ScoreboardBottomsheet extends StatefulWidget {
 }
 
 class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
+  late ApiCallProvider apiCallProvider;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return FractionallySizedBox(
       heightFactor: 0.7, // Set height to 60% of screen height
       child: ClipRRect(
@@ -28,15 +38,15 @@ class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: EdgeInsets.all(10),
-                color: Color(0xFFC39955),
-                child: Row(
+                padding: const EdgeInsets.all(10),
+                color: const Color(0xFFC39955),
+                child: const Row(
                   children: [
                     Icon(
                       Icons.chevron_left,
                       color: Colors.white,
                     ),
-                    const Spacer(),
+                    Spacer(),
                     Text(
                       'History',
                       style: TextStyle(
@@ -44,14 +54,14 @@ class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
                         color: Colors.white,
                       ),
                     ),
-                    const Spacer(),
+                    Spacer(),
                   ],
                 ),
               ),
               Expanded(
                 child: ListView.separated(
                   itemCount: 20,
-                  separatorBuilder: (context, index) => Divider(
+                  separatorBuilder: (context, index) => const Divider(
                     color: Colors.grey,
                   ),
                   itemBuilder: (context, index) {
@@ -60,15 +70,15 @@ class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
                           horizontal: 10, vertical: 5),
                       child: Row(
                         children: [
-                          CircularImage(imagePath: '', diameter: 40),
+                          const CircularImage(imagePath: '', diameter: 40),
                           horizontalGap(20),
-                          Text(
+                          const Text(
                             'Name',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           Image.asset('assets/image/diamond.png'),
-                          Text(
+                          const Text(
                             '700',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),

@@ -94,5 +94,7 @@
 	<string>Pick image for user profile and post</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app is requires Mic permission.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Wows requires access to media library</string>
 </dict>
 </plist>

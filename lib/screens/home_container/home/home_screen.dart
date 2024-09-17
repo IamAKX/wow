@@ -187,9 +187,11 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           IconButton(
-            onPressed: () {
-              getAgoraToken();
-            },
+            onPressed: apiCallProvider.status == ApiStatus.loading
+                ? null
+                : () {
+                    getAgoraToken();
+                  },
             icon: SvgPicture.asset(
               'assets/svg/go_live.svg',
               color: Colors.white,

@@ -100,4 +100,10 @@ class API {
   static const String getAppliedFrame = '$baseUrl/getAppliedFrame';
   static const String getThemes = '$baseUrl/getThemes';
   static const String getImages = '$baseUrl/getImages';
+  static const String purchaseThemes = '$baseUrl/purchaseThemes';
+  static const String getGallery = '$baseUrl/getGallery';
+  static const String purchaseGallery = '$baseUrl/purchaseGallery';
+  static const String sendThemes = '$baseUrl/sendThemes';
+  static const String sendGallery = '$baseUrl/sendGallery';
+  static const String hideUnHideLiveUser = '$baseUrl/hideUnHideLiveUser';
 }
