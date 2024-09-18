@@ -74,6 +74,7 @@ import '../models/family_details.dart';
 import '../models/live_room_detail_model.dart';
 import '../models/send_friend_model.dart';
 import '../models/whats_on_model.dart';
+import '../screens/home_container/chat/chat_screen.dart';
 import '../screens/home_container/event/create_event_one.dart';
 import '../screens/home_container/explore/wow_leaderboard.dart';
 import '../screens/home_container/profile/comment.dart';
@@ -294,6 +295,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const WowLeaderboard());
       case AnchorRequestScreen.route:
         return MaterialPageRoute(builder: (_) => const AnchorRequestScreen());
+      case ChatScreen.route:
+        return MaterialPageRoute(builder: (_) => const ChatScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

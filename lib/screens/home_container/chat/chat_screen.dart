@@ -18,6 +18,7 @@ import '../../../utils/prefs_key.dart';
 import '../../../widgets/default_page_loader.dart';
 
 class ChatScreen extends StatefulWidget {
+  static const String route = '/chatScreen';
   const ChatScreen({super.key});
 
   @override

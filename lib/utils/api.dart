@@ -106,4 +106,5 @@ class API {
   static const String sendThemes = '$baseUrl/sendThemes';
   static const String sendGallery = '$baseUrl/sendGallery';
   static const String hideUnHideLiveUser = '$baseUrl/hideUnHideLiveUser';
+  static const String getEmoji = '$baseUrl/getEmoji';
 }

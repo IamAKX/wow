@@ -9,8 +9,10 @@ import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/emoji_model.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.dart';
@@ -47,7 +49,7 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   bool _isClicked = false;
@@ -57,6 +59,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   String announcementMessage = '';
   String liveRoomTheme = '';
   String frame = '';
+  List<EmojiModel> emojiList = [];
+  String selectedEmoji = '';
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -72,6 +76,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   late AnimationController _musicplayerAnimationController;
   late Animation<Offset> _musicplayerOffsetAnimation;
 
+  late AnimationController _emojiAnimationController;
+  late Animation<double> _emojiAnimation;
+  bool _isImageVisible = false;
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -85,6 +93,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       loadUserData();
       firebaseDetailListners();
       initAudioPlayer();
+      initEmojiAnimation();
+      loadEmojiList();
       // initializeAgora();
     });
   }
@@ -96,9 +106,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     );
 
     _musicplayerOffsetAnimation = Tween<Offset>(
-      begin:
-          Offset(5.0, 0.0), // Start just outside the right side of the screen
-      end: Offset(0.0, 0.0), // End at the original position
+      begin: const Offset(
+          5.0, 0.0), // Start just outside the right side of the screen
+      end: const Offset(0.0, 0.0), // End at the original position
     ).animate(_musicplayerAnimationController);
 
     _audioPlayer.onDurationChanged.listen((duration) {
@@ -232,6 +242,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     agoraEngine.release();
     cleanFirebaseListener();
     _audioPlayer.dispose();
+    _emojiAnimationController.dispose();
     super.dispose();
   }
 
@@ -286,218 +297,251 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         child: Stack(
           children: [
             getBody(context),
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 500),
-              top: _isClicked
-                  ? MediaQuery.of(context).size.height / 2 - 150
-                  : -150, // Animate from top to center
-              left: MediaQuery.of(context).size.width / 2 -
-                  35, // Center horizontally
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _isClicked = !_isClicked;
-                  });
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFC00E8),
-                            Color(0xFF881FF4),
-                          ],
-                        ),
+            buildExistSwitchTop(context),
+            buildExistSwitchBottom(context),
+            musicControllerLayout(context),
+            musicPlayerButton(context),
+            if (_isImageVisible)
+              AnimatedBuilder(
+                animation: _emojiAnimation,
+                builder: (context, child) {
+                  return Positioned(
+                    top: _emojiAnimation
+                        .value, // Smoothly animate the top position
+                    left: MediaQuery.of(context).size.width / 2 - 50,
+                    child: CachedNetworkImage(
+                      imageUrl: selectedEmoji,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
                       ),
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        'assets/image/minimiz.png',
-                        color: Colors.white,
-                        width: 40,
+                      errorWidget: (context, url, error) => Center(
+                        child: Text('Error ${error.toString()}'),
                       ),
+                      fit: BoxFit.cover,
+                      height: 100,
+                      width: 100,
                     ),
-                    verticalGap(10),
-                    const Text(
-                      'Minimize',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 500),
-              bottom: _isClicked
-                  ? MediaQuery.of(context).size.height / 2 - 150
-                  : -150, // Animate from bottom to center
-              left: MediaQuery.of(context).size.width / 2 -
-                  35, // Center horizontally
-              child: InkWell(
-                onTap: () async {
-                  _isClicked = !_isClicked;
-                  await LiveRoomFirebase.toggleUserInRoomArray(
-                          widget.agoraToken.mainId ?? '',
-                          prefs.getString(PrefsKey.userId) ?? '')
-                      .then(
-                    (value) {
-                      Navigator.pop(context);
-                    },
                   );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                  LiveroomChat liveroomChat = LiveroomChat(
-                      message: 'left Stream',
-                      timeStamp: DateTime.now().millisecondsSinceEpoch,
-                      userId: user?.id,
-                      userImage: user?.image,
-                      userName: user?.name);
-                  LiveRoomFirebase.sendChat(
-                          widget.agoraToken.mainId ?? '', liveroomChat)
-                      .then(
-                    (value) {
-                      _scrollToBottom();
-                    },
-                  );
+  Visibility musicPlayerButton(BuildContext context) {
+    return Visibility(
+      visible: _isPlaying,
+      child: Positioned(
+        right: 20,
+        bottom: MediaQuery.of(context).size.height * 0.3,
+        child: InkWell(
+          onTap: () {
+            _startGlideAnimation();
+          },
+          child: Image.asset(
+            'assets/image/frkst-records.gif',
+            width: 50,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Positioned musicControllerLayout(BuildContext context) {
+    return Positioned(
+      bottom: MediaQuery.of(context).size.height * 0.27,
+      left: 20,
+      child: SlideTransition(
+        position: _musicplayerOffsetAnimation,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.7,
+          padding: const EdgeInsets.only(top: 10, bottom: 10),
+          decoration: BoxDecoration(
+              color: Colors.black, borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                  color: Colors.white,
+                  size: 30,
+                ),
+                onPressed: () {
+                  if (_isPlaying) {
+                    _pauseAudio();
+                    _startGlideAnimation();
+                  } else {
+                    _resumeAudio();
+                  }
                 },
+              ),
+              Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFC00E8),
-                            Color(0xFF881FF4),
-                          ],
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        'assets/image/exit.png',
-                        color: Colors.white,
-                        width: 40,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text(
+                        basename(prefs.getString(PrefsKey.musicPlaying) ?? ''),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
-                    verticalGap(10),
-                    const Text(
-                      'Exit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Slider(
+                      value: _currentPosition.inSeconds.toDouble(),
+                      min: 0,
+                      thumbColor: Colors.teal,
+                      activeColor: Colors.teal,
+                      inactiveColor: Colors.teal.shade100,
+                      max: _totalDuration.inSeconds.toDouble(),
+                      onChanged: (value) {
+                        final newPosition = Duration(seconds: value.toInt());
+                        _seekAudio(newPosition);
+                      },
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Text(
+                            _formatDuration(_currentPosition),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: Text(
+                            ' ${_formatDuration(_totalDuration)}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),
-              ),
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).size.height * 0.27,
-              left: 20,
-              child: SlideTransition(
-                position: _musicplayerOffsetAnimation,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  padding: const EdgeInsets.only(top: 10, bottom: 10),
-                  decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          if (_isPlaying) {
-                            _pauseAudio();
-                            _startGlideAnimation();
-                          } else {
-                            _resumeAudio();
-                          }
-                        },
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: Text(
-                                basename(
-                                    prefs.getString(PrefsKey.musicPlaying) ??
-                                        ''),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            Slider(
-                              value: _currentPosition.inSeconds.toDouble(),
-                              min: 0,
-                              thumbColor: Colors.teal,
-                              activeColor: Colors.teal,
-                              inactiveColor: Colors.teal.shade100,
-                              max: _totalDuration.inSeconds.toDouble(),
-                              onChanged: (value) {
-                                final newPosition =
-                                    Duration(seconds: value.toInt());
-                                _seekAudio(newPosition);
-                              },
-                            ),
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20),
-                                  child: Text(
-                                    _formatDuration(_currentPosition),
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 20),
-                                  child: Text(
-                                    ' ${_formatDuration(_totalDuration)}',
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  AnimatedPositioned buildExistSwitchBottom(BuildContext context) {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 500),
+      bottom: _isClicked
+          ? MediaQuery.of(context).size.height / 2 - 150
+          : -150, // Animate from bottom to center
+      left: MediaQuery.of(context).size.width / 2 - 35, // Center horizontally
+      child: InkWell(
+        onTap: () async {
+          _isClicked = !_isClicked;
+          await LiveRoomFirebase.toggleUserInRoomArray(
+                  widget.agoraToken.mainId ?? '',
+                  prefs.getString(PrefsKey.userId) ?? '')
+              .then(
+            (value) {
+              Navigator.pop(context);
+            },
+          );
+
+          LiveroomChat liveroomChat = LiveroomChat(
+              message: 'left Stream',
+              timeStamp: DateTime.now().millisecondsSinceEpoch,
+              userId: user?.id,
+              userImage: user?.image,
+              userName: user?.name);
+          LiveRoomFirebase.sendChat(
+                  widget.agoraToken.mainId ?? '', liveroomChat)
+              .then(
+            (value) {
+              _scrollToBottom();
+            },
+          );
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFC00E8),
+                    Color(0xFF881FF4),
+                  ],
                 ),
               ),
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/image/exit.png',
+                color: Colors.white,
+                width: 40,
+              ),
             ),
-            Visibility(
-              visible: _isPlaying,
-              child: Positioned(
-                right: 20,
-                bottom: MediaQuery.of(context).size.height * 0.3,
-                child: InkWell(
-                  onTap: () {
-                    _startGlideAnimation();
-                  },
-                  child: Image.asset(
-                    'assets/image/frkst-records.gif',
-                    width: 50,
-                  ),
+            verticalGap(10),
+            const Text(
+              'Exit',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  AnimatedPositioned buildExistSwitchTop(BuildContext context) {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 500),
+      top: _isClicked
+          ? MediaQuery.of(context).size.height / 2 - 150
+          : -150, // Animate from top to center
+      left: MediaQuery.of(context).size.width / 2 - 35, // Center horizontally
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _isClicked = !_isClicked;
+          });
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFC00E8),
+                    Color(0xFF881FF4),
+                  ],
                 ),
+              ),
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/image/minimiz.png',
+                color: Colors.white,
+                width: 40,
+              ),
+            ),
+            verticalGap(10),
+            const Text(
+              'Minimize',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
             )
           ],
@@ -569,7 +613,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      //  _showBottomSheet(context);
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, // To enable custom height
+                          builder: (context) => loadEmojiBottomSheet());
+                    },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
@@ -596,7 +646,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(ChatScreen.route);
+                    },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
@@ -1321,5 +1373,106 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     } else {
       _musicplayerAnimationController.forward();
     }
+  }
+
+  initEmojiAnimation() {
+    // Initialize the AnimationController
+    _emojiAnimationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    // Tween to move from bottom of the screen to 90% height
+    _emojiAnimation = Tween<double>(
+      begin: 1000,
+      end: 100,
+    ).animate(CurvedAnimation(
+      parent: _emojiAnimationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  void _onImageTap(BuildContext context) {
+    setState(() {
+      _isImageVisible = true; // Make the image visible
+    });
+
+    // Start the animation
+    _emojiAnimationController.forward(from: 0.0);
+
+    // Wait for 1 second and then hide the image
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        _isImageVisible = false;
+      });
+      _emojiAnimationController.reset(); // Reset animation for future use
+    });
+  }
+
+  loadEmojiBottomSheet() {
+    return FractionallySizedBox(
+      heightFactor: 0.6,
+      child: SizedBox(
+        height: 400,
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: const Text(
+                'Emoji',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1,
+                ),
+                itemCount: emojiList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      selectedEmoji = emojiList.elementAt(index).frameImg ?? '';
+                      Navigator.pop(context);
+                      _onImageTap(context);
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl: emojiList.elementAt(index).frameImg ?? '',
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text('Error ${error.toString()}'),
+                      ),
+                      fit: BoxFit.fill,
+                      height: 250,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void loadEmojiList() {
+    apiCallProvider.getRequest(API.getEmoji).then((value) {
+      emojiList.clear();
+      if (value['details'] != null) {
+        for (var item in value['details']) {
+          emojiList.add(EmojiModel.fromJson(item));
+        }
+        setState(() {});
+      }
+    });
   }
 }
