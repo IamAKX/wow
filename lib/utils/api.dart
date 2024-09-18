@@ -107,4 +107,5 @@ class API {
   static const String sendGallery = '$baseUrl/sendGallery';
   static const String hideUnHideLiveUser = '$baseUrl/hideUnHideLiveUser';
   static const String getEmoji = '$baseUrl/getEmoji';
+  static const String getPrimeGift = '$baseUrl/getPrimeGift';
 }

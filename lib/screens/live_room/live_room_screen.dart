@@ -39,6 +39,7 @@ import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
+import 'prime_gift_bottom.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   const LiveRoomScreen({super.key, required this.agoraToken});
@@ -629,7 +630,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // To enable custom height
+                        builder: (context) => PrimeGiftBottom(
+                          roomDetail: roomDetail ??
+                              JoinableLiveRoomModel(
+                                id: widget.agoraToken.mainId,
+                              ),
+                        ),
+                      );
+                    },
                     child: Image.asset(
                       'assets/image/giftlive.png',
                       width: 50,
