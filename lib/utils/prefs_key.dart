@@ -4,4 +4,6 @@ class PrefsKey {
   static const String jwtToken = 'jwtToken';
   static const String loginProvider = 'loginProvider';
   static const String showProfileUpdatePopup = 'showProfileUpdatePopup';
+  static const String localMusic = 'localMusic';
+  static const String musicPlaying = 'musicPlaying';
 }

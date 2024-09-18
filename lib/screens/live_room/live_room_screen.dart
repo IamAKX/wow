@@ -1,9 +1,12 @@
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
@@ -43,7 +46,8 @@ class LiveRoomScreen extends StatefulWidget {
   State<LiveRoomScreen> createState() => _LiveRoomScreenState();
 }
 
-class _LiveRoomScreenState extends State<LiveRoomScreen> {
+class _LiveRoomScreenState extends State<LiveRoomScreen>
+    with SingleTickerProviderStateMixin {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   bool _isClicked = false;
@@ -54,12 +58,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   String liveRoomTheme = '';
   String frame = '';
 
+  Duration _totalDuration = Duration.zero;
+  Duration _currentPosition = Duration.zero;
+  bool _isPlaying = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   late RtcEngine agoraEngine;
   final String appId = '86f31e0182524c3ebc7af02c9a35e0ca';
   String token = 'your-temporary-token';
   String channelName = 'testChannel';
 
   final ScrollController _scrollController = ScrollController();
+  late AnimationController _musicplayerAnimationController;
+  late Animation<Offset> _musicplayerOffsetAnimation;
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -73,8 +84,39 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       firebaseDetailListners();
+      initAudioPlayer();
+      // initializeAgora();
+    });
+  }
 
-      initializeAgora();
+  void initAudioPlayer() async {
+    _musicplayerAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500), // Animation duration
+    );
+
+    _musicplayerOffsetAnimation = Tween<Offset>(
+      begin:
+          Offset(5.0, 0.0), // Start just outside the right side of the screen
+      end: Offset(0.0, 0.0), // End at the original position
+    ).animate(_musicplayerAnimationController);
+
+    _audioPlayer.onDurationChanged.listen((duration) {
+      setState(() {
+        _totalDuration = duration;
+      });
+    });
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    });
+
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+      });
     });
   }
 
@@ -185,9 +227,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   void dispose() {
+    _musicplayerAnimationController.dispose();
     agoraEngine.leaveChannel();
     agoraEngine.release();
     cleanFirebaseListener();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -209,6 +253,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   }
 
   void loadUserData() async {
+    var status = await Permission.manageExternalStorage.request();
     await getCurrentUser().then(
       (value) async {
         user = value;
@@ -235,6 +280,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -301,7 +347,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           widget.agoraToken.mainId ?? '',
                           prefs.getString(PrefsKey.userId) ?? '')
                       .then(
-                    (value) {},
+                    (value) {
+                      Navigator.pop(context);
+                    },
                   );
 
                   LiveroomChat liveroomChat = LiveroomChat(
@@ -352,6 +400,106 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 ),
               ),
             ),
+            Positioned(
+              bottom: MediaQuery.of(context).size.height * 0.27,
+              left: 20,
+              child: SlideTransition(
+                position: _musicplayerOffsetAnimation,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          if (_isPlaying) {
+                            _pauseAudio();
+                            _startGlideAnimation();
+                          } else {
+                            _resumeAudio();
+                          }
+                        },
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Text(
+                                basename(
+                                    prefs.getString(PrefsKey.musicPlaying) ??
+                                        ''),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            Slider(
+                              value: _currentPosition.inSeconds.toDouble(),
+                              min: 0,
+                              thumbColor: Colors.teal,
+                              activeColor: Colors.teal,
+                              inactiveColor: Colors.teal.shade100,
+                              max: _totalDuration.inSeconds.toDouble(),
+                              onChanged: (value) {
+                                final newPosition =
+                                    Duration(seconds: value.toInt());
+                                _seekAudio(newPosition);
+                              },
+                            ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    _formatDuration(_currentPosition),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                const Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Text(
+                                    ' ${_formatDuration(_totalDuration)}',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: _isPlaying,
+              child: Positioned(
+                right: 20,
+                bottom: MediaQuery.of(context).size.height * 0.3,
+                child: InkWell(
+                  onTap: () {
+                    _startGlideAnimation();
+                  },
+                  child: Image.asset(
+                    'assets/image/frkst-records.gif',
+                    width: 50,
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -375,7 +523,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           padding: const EdgeInsets.all(pagePadding / 2),
           child: Column(
             children: [
-              topBar(),
+              topBar(context),
               verticalGap(10),
               getProfileRow(context),
               verticalGap(20),
@@ -577,7 +725,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       itemBuilder: (context, index) {
         return InkWell(
           onTap: () async {
-            showPositionPopup();
+            showPositionPopup(context);
           },
           child: Column(
             children: [
@@ -814,7 +962,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
-  Row topBar() {
+  Row topBar(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -853,7 +1001,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         const Spacer(),
         InkWell(
           onTap: () {
-            showAllMenu();
+            showAllMenu(context);
           },
           child: const CircleAvatar(
             backgroundColor: Colors.black,
@@ -884,7 +1032,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
-  void showPositionPopup() {
+  void showPositionPopup(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -907,7 +1055,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
-  void showAllMenu() {
+  void showAllMenu(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1078,6 +1226,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             context: context,
                             isScrollControlled: true, // To enable custom height
                             builder: (context) => const MusicBottomsheet(),
+                          ).then(
+                            (value) async {
+                              if (prefs.containsKey(PrefsKey.musicPlaying)) {
+                                String musicPath = await prefs
+                                        .getString(PrefsKey.musicPlaying) ??
+                                    '';
+                                if (musicPath.isNotEmpty) {
+                                  _playAudio(musicPath);
+                                }
+                              }
+                            },
                           );
                         },
                         child:
@@ -1127,5 +1286,40 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         setState(() {});
       }
     });
+  }
+
+  Future<void> _playAudio(String filePath) async {
+    await _audioPlayer.play(DeviceFileSource(filePath));
+    prefs.setString(PrefsKey.musicPlaying, filePath);
+  }
+
+  Future<void> _pauseAudio() async {
+    await _audioPlayer.pause();
+    prefs.remove(PrefsKey.musicPlaying);
+  }
+
+  Future<void> _resumeAudio() async {
+    await _audioPlayer.resume();
+    prefs.remove(PrefsKey.musicPlaying);
+  }
+
+  Future<void> _seekAudio(Duration position) async {
+    await _audioPlayer.seek(position);
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return [if (duration.inHours > 0) hours, minutes, seconds].join(':');
+  }
+
+  void _startGlideAnimation() {
+    if (_musicplayerAnimationController.isCompleted) {
+      _musicplayerAnimationController.reverse();
+    } else {
+      _musicplayerAnimationController.forward();
+    }
   }
 }

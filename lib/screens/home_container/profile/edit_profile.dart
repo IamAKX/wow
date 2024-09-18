@@ -9,10 +9,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -121,6 +123,7 @@ class _EditProfileState extends State<EditProfile> {
                 if (apiCallProvider.status == ApiStatus.success) {
                   showToastMessageWithLogo('${value['message']}', context);
                   if (value['success'] == '1') {
+                    prefs.setBool(PrefsKey.showProfileUpdatePopup, false);
                     Navigator.of(context).pop();
                   }
                 } else {

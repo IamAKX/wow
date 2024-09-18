@@ -14,6 +14,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import '../../main.dart';
 import '../../models/joinable_live_room_model.dart';
 import '../../providers/api_call_provider.dart';
+import '../../services/live_room_firebase.dart';
 import '../../utils/api.dart';
 import '../../utils/prefs_key.dart';
 
@@ -51,7 +52,7 @@ class _PurchaseGalleryBottomsheetState
             aspectRatioPresets: [
               CropAspectRatioPreset.original,
               CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio16x9,
+              CropAspectRatioPreset.ratio5x4,
               CropAspectRatioPreset.ratio7x5
             ],
           ),
@@ -91,7 +92,7 @@ class _PurchaseGalleryBottomsheetState
 
   loadPriceList() async {
     Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
-    apiCallProvider.postRequest(API.getGallery, reqBody).then((value) {
+    await apiCallProvider.postRequest(API.getGallery, reqBody).then((value) {
       priceModelList.clear();
       if (value['details'] != null) {
         for (var item in value['details']) {
@@ -117,11 +118,17 @@ class _PurchaseGalleryBottomsheetState
 
     await apiCallProvider
         .postRequest(API.purchaseGallery, reqBody)
-        .then((value) {
-      if (value['success'] != null) {
-        showToastMessage(value['message']);
-        setState(() {});
+        .then((value) async {
+      if (value['success'] == '1' && value['details'] != null) {
+        for (var obj in value['details']) {
+          await LiveRoomFirebase.updateLiveRoomTheme(
+              widget.roomDetail.id ?? '', obj['image']);
+        }
       }
+
+      showToastMessage(value['message']);
+      _image = null;
+      setState(() {});
     });
     return res;
   }
@@ -208,14 +215,21 @@ class _PurchaseGalleryBottomsheetState
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {
-                              if (_image == null) {
-                                showToastMessageWithLogo(
-                                    'Please select image', context);
-                                return;
-                              }
-                              buyGalleyTheme('');
-                            },
+                            onPressed: apiCallProvider.status ==
+                                    ApiStatus.loading
+                                ? null
+                                : () {
+                                    if (_image == null) {
+                                      showToastMessageWithLogo(
+                                          'Please select image', context);
+                                      return;
+                                    }
+                                    showToastMessageWithLogo(
+                                        'Uploading, please wait', context);
+                                    buyGalleyTheme(
+                                      priceModelList.elementAt(index).id ?? '',
+                                    );
+                                  },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.red,
@@ -224,25 +238,34 @@ class _PurchaseGalleryBottomsheetState
                           ),
                           horizontalGap(10),
                           ElevatedButton(
-                            onPressed: () {
-                              if (_image == null) {
-                                showToastMessageWithLogo(
-                                    'Please select image', context);
-                                return;
-                              }
+                            onPressed:
+                                apiCallProvider.status == ApiStatus.loading
+                                    ? null
+                                    : () {
+                                        if (_image == null) {
+                                          showToastMessageWithLogo(
+                                              'Please select image', context);
+                                          return;
+                                        }
+                                        showToastMessageWithLogo(
+                                            'Uploading, please wait', context);
 
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled:
-                                    true, // To enable custom height
-                                builder: (context) => GetFriendBottomsheet(
-                                    roomDetail: widget.roomDetail,
-                                    permissionId: '',
-                                    themeId: '',
-                                    image: _image!,
-                                    isStoreTheme: false),
-                              );
-                            },
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled:
+                                              true, // To enable custom height
+                                          builder: (context) =>
+                                              GetFriendBottomsheet(
+                                                  roomDetail: widget.roomDetail,
+                                                  permissionId: priceModelList
+                                                          .elementAt(index)
+                                                          .id ??
+                                                      '',
+                                                  themeId: '',
+                                                  image: _image!,
+                                                  isStoreTheme: false),
+                                        );
+                                      },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.red,

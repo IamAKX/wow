@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:files_scanner_android/files_scanner_android.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,17 +29,29 @@ class _LoadMusicBottomsheetState extends State<LoadMusicBottomsheet> {
 
   Future<List<File>> getMp3FilesFromStorage() async {
     List<File> mp3Files = [];
+    log('getMp3FilesFromStorage');
+    final plugin = DeviceInfoPlugin();
+    final android = await plugin.androidInfo;
 
-    // Request storage permission
-    if (await Permission.storage.request().isGranted) {
-      // Get the external storage directory
-      Directory? externalDir = await getExternalStorageDirectory();
+    final storageStatus = android.version.sdkInt < 33
+        ? await Permission.storage.request()
+        : PermissionStatus.granted;
+    if (storageStatus == PermissionStatus.granted) {
+      log('permission granted');
+
+      Directory? externalDir = Directory('/storage/emulated/0/');
+      log('dir = ${externalDir?.path}');
 
       if (externalDir != null) {
-        // Recursively scan the storage for mp3 files
         log('calling scan');
         mp3Files = await _scanDirectory(externalDir);
       }
+    }
+    if (storageStatus == PermissionStatus.denied) {
+      log("denied");
+    }
+    if (storageStatus == PermissionStatus.permanentlyDenied) {
+      openAppSettings();
     }
 
     return mp3Files;

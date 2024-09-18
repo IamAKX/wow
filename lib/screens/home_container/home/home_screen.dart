@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.index = 1;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      log('show profile update : ${prefs.getBool(PrefsKey.showProfileUpdatePopup) ?? false}');
+
       if (prefs.getBool(PrefsKey.showProfileUpdatePopup) ?? false) {
         showUpdateProfilePopup();
       }
@@ -63,10 +67,8 @@ class _HomeScreenState extends State<HomeScreen>
         Navigator.of(context)
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
-          (value) {
-            showUpdateProfilePopup();
-          },
-        );
+              (value) {},
+            );
       }
     });
   }
