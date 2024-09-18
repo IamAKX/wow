@@ -74,7 +74,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       loadUserData();
       firebaseDetailListners();
 
-      // initializeAgora();
+      initializeAgora();
     });
   }
 

@@ -38,7 +38,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.0.10+1
-  flutter_webview_plugin: ^0.4.0
+  flutter_webview_pro:
+    git:
+      url: https://github.com/wenzhiming/flutter-plugins.git
+      ref: dev-3.0.4
+      path: packages/webview_flutter/webview_flutter
   fluttertoast: ^8.2.6
   geocoding: ^3.0.0
   geolocator: ^12.0.0

@@ -186,17 +186,21 @@ class _HomeScreenState extends State<HomeScreen>
               color: Colors.white,
             ),
           ),
-          IconButton(
-            onPressed: apiCallProvider.status == ApiStatus.loading
-                ? null
-                : () {
-                    getAgoraToken();
-                  },
-            icon: SvgPicture.asset(
-              'assets/svg/go_live.svg',
-              color: Colors.white,
-            ),
-          )
+          apiCallProvider.status == ApiStatus.loading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : IconButton(
+                  onPressed: apiCallProvider.status == ApiStatus.loading
+                      ? null
+                      : () {
+                          getAgoraToken();
+                        },
+                  icon: SvgPicture.asset(
+                    'assets/svg/go_live.svg',
+                    color: Colors.white,
+                  ),
+                )
         ],
       ),
     );
