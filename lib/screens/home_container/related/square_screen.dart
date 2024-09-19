@@ -57,7 +57,7 @@ class _SquareScreenState extends State<SquareScreen> {
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
 
-    return apiCallProvider.status == ApiStatus.loading
+    return apiCallProvider.status == ApiStatus.loading && momentsList.isEmpty
         ? const DefaultPageLoader()
         : ListView.builder(
             itemCount: momentsList.length,
@@ -127,7 +127,6 @@ class _SquareScreenState extends State<SquareScreen> {
           ),
           Container(
             alignment: Alignment.center,
-           
             color: Colors.white,
             child: moment.status == '1'
                 ? FeedVideoPlayer(

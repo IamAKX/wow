@@ -97,12 +97,12 @@ class _ShareEventState extends State<ShareEvent> {
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-          onPressed: () {
-            sendEvent(visitorList.elementAt(index).id ?? '');
-          },
-          child: apiCallProvider.status == ApiStatus.loading
-              ? const ButtonLoader()
-              : const Text('SEND'),
+          onPressed: apiCallProvider.status == ApiStatus.loading
+              ? null
+              : () {
+                  sendEvent(visitorList.elementAt(index).id ?? '');
+                },
+          child: const Text('SEND'),
         ),
       ),
     );

@@ -53,60 +53,62 @@ class UserTileWithAction extends StatelessWidget {
             ),
           ),
           horizontalGap(5),
-          Container(
-            width: 60,
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    'assets/image/level_1.png',
+          if ((visitorModel.sendLevel ?? '0') != '0')
+            Container(
+              width: 60,
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      'assets/image/level_1.png',
+                    ),
+                    fit: BoxFit.fill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/image/coins_img.png',
+                    width: 12,
                   ),
-                  fit: BoxFit.fill),
+                  horizontalGap(5),
+                  Text(
+                    (visitorModel.sendLevel ?? '0'),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  )
+                ],
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/image/coins_img.png',
-                  width: 12,
-                ),
-                horizontalGap(5),
-                const Text(
-                  '22',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                )
-              ],
-            ),
-          ),
           horizontalGap(5),
-          Container(
-            width: 60,
-            padding: const EdgeInsets.all(3),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    'assets/image/level_9.png',
+          if ((visitorModel.reciveLevel ?? '0') != '0')
+            Container(
+              width: 60,
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      'assets/image/level_9.png',
+                    ),
+                    fit: BoxFit.fill),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/image/coins_img.png',
+                    width: 12,
                   ),
-                  fit: BoxFit.fill),
+                  horizontalGap(5),
+                  Text(
+                    (visitorModel.reciveLevel ?? '0'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+                ],
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/image/coins_img.png',
-                  width: 12,
-                ),
-                horizontalGap(5),
-                const Text(
-                  '22',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                )
-              ],
-            ),
-          ),
         ],
       ),
     );

@@ -107,8 +107,8 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  '0',
+                Text(
+                  '${member?.myLevel ?? ''}',
                   style: TextStyle(fontSize: 10),
                 ),
                 horizontalGap(2),
@@ -128,55 +128,59 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                 ),
                 horizontalGap(5),
               },
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                decoration: const BoxDecoration(
-                    color: Color(0xFF0FDEA5),
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      member?.gender?.toLowerCase() == 'male'
-                          ? Icons.male
-                          : Icons.female,
-                      color: Colors.white,
-                      size: 10,
-                    ),
-                    horizontalGap(5),
-                    const Text(
-                      '22',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
-                  ],
-                ),
-              ),
-              horizontalGap(10),
-              Container(
-                constraints: const BoxConstraints(minWidth: 50),
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(
-                        'assets/image/level_1.png',
+              if ((member?.sendLevel ?? '0') != '0')
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                  decoration: const BoxDecoration(
+                      color: Color(0xFF0FDEA5),
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        member?.gender?.toLowerCase() == 'male'
+                            ? Icons.male
+                            : Icons.female,
+                        color: Colors.white,
+                        size: 10,
                       ),
-                      fit: BoxFit.fill),
+                      horizontalGap(5),
+                      Text(
+                        '${member?.sendLevel}',
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      )
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/image/coins_img.png',
-                      width: 10,
-                    ),
-                    horizontalGap(5),
-                    const Text(
-                      '22',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    )
-                  ],
+              horizontalGap(10),
+              if ((member?.reciveLevel ?? '0') != '0')
+                Container(
+                  constraints: const BoxConstraints(minWidth: 50),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(
+                          'assets/image/level_1.png',
+                        ),
+                        fit: BoxFit.fill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/image/coins_img.png',
+                        width: 10,
+                      ),
+                      horizontalGap(5),
+                      Text(
+                        '${member?.reciveLevel ?? '0'}',
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      )
+                    ],
+                  ),
                 ),
-              ),
               horizontalGap(5),
               Container(
                 constraints: const BoxConstraints(minWidth: 50),

@@ -72,6 +72,7 @@ class _SearchMemberState extends State<SearchMember> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       appBar: AppBar(
+        title: Text('Search'),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.redAccent,
           statusBarIconBrightness: Brightness.light,

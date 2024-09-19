@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/single_family_detail_model.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart'
+    as carousel;
 
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
@@ -26,32 +28,35 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
 
   late ApiCallProvider apiCallProvider;
   List<List<SingleFamilyDetailModel>> list = [];
-  PageController _carouselController = PageController();
   int _currentCarouselPage = 0;
+  carousel.CarouselController _flutterCarouselController =
+      carousel.CarouselController();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
-    _carouselController.addListener(() {
-      int nextPage = _carouselController.page?.round() ?? _currentCarouselPage;
 
-      if (nextPage != _currentCarouselPage) {
-        // Left swipe (next tab)
-        if (nextPage > _currentCarouselPage) {
-          if (_tabController!.index < _tabController!.length - 1) {
-            _tabController!.animateTo(_tabController!.index + 1);
-          }
-        }
-        // Right swipe (previous tab)
-        else if (nextPage < _currentCarouselPage) {
-          if (_tabController!.index > 0) {
-            _tabController!.animateTo(_tabController!.index - 1);
-          }
-        }
-        _currentCarouselPage = nextPage;
-      }
-    });
+    // _carouselController.addListener(() {
+    //   log('_carouselController = ${_carouselController.offset}');
+    //   int nextPage = _carouselController.page?.round() ?? _currentCarouselPage;
+
+    //   if (nextPage != _currentCarouselPage) {
+    //     // Left swipe (next tab)
+    //     if (nextPage > _currentCarouselPage) {
+    //       if (_tabController.index < _tabController.length - 1) {
+    //         _tabController.animateTo(_tabController.index + 1);
+    //       }
+    //     }
+    //     // Right swipe (previous tab)
+    //     else if (nextPage < _currentCarouselPage) {
+    //       if (_tabController.index > 0) {
+    //         _tabController.animateTo(_tabController.index - 1);
+    //       }
+    //     }
+    //     _currentCarouselPage = nextPage;
+    //   }
+    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
@@ -84,7 +89,6 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    _carouselController.dispose();
     super.dispose();
   }
 
@@ -315,26 +319,50 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
     );
   }
 
+  int secondScrollRight = 0;
+  int secondScrollLeft = 0;
   getMedalCarousel(List<SingleFamilyDetailModel> medalList, int position) {
     return FlutterCarousel(
       options: CarouselOptions(
-        
         height: 180.0,
+        controller: _flutterCarouselController,
         showIndicator: false,
         autoPlay: false,
         pageSnapping: true,
         floatingIndicator: false,
         viewportFraction: 1,
-        onPageChanged: (index, reason) {
-          log('index = $index');
-          log('index = $reason');
-          if (position >= 1 && position <= list.length - 2) {
-            if (index == 0) {
+        onScrolled: (value) {
+          log('scrolled : $value');
+          if (position <= list.length - 1 && value == 0) {
+            if (value == 0.0) {
+              secondScrollLeft++;
+            }
+            if (value == 0.0 && secondScrollLeft == 2) {
+              secondScrollLeft = 0;
               _tabController.animateTo(position - 1);
-            } else if (index == medalList.length - 1) {
+            }
+          }
+          if (position >= 1 && position <= list.length - 2) {
+            if (value == 0.0) {
+              secondScrollLeft++;
+            }
+            if (value == medalList.length - 1) {
+              secondScrollRight++;
+            }
+
+            if (value == 0.0 && secondScrollLeft == 2) {
+              secondScrollLeft = 0;
+              _tabController.animateTo(position - 1);
+            } else if (value == medalList.length - 1 &&
+                secondScrollRight == 2) {
+              secondScrollRight = 0;
               _tabController.animateTo(position + 1);
             }
           }
+        },
+        onPageChanged: (index, reason) {
+          log('index = $index');
+          log('index = $reason');
         },
         slideIndicator: const CircularSlideIndicator(
           slideIndicatorOptions: SlideIndicatorOptions(

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/gift_stats_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/lock_room.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/music_bottomsheet.dart';
@@ -639,6 +641,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               JoinableLiveRoomModel(
                                 id: widget.agoraToken.mainId,
                               ),
+                          myCoins: user?.myCoin ?? '',
                         ),
                       );
                     },
@@ -920,21 +923,39 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 data: Theme.of(context).copyWith(
                   canvasColor: Colors.black.withOpacity(0.2),
                 ),
-                child: Chip(
-                  padding: const EdgeInsets.all(0),
-                  backgroundColor: Colors.transparent,
-                  label: const Text(
-                    '3.5k',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                child: InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true, // To enable custom height
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16.0)),
+                      ),
+                      builder: (context) => GiftStatsBottomsheet(
+                        roomDetail: roomDetail ??
+                            JoinableLiveRoomModel(
+                              id: widget.agoraToken.mainId,
+                            ),
+                      ),
+                    );
+                  },
+                  child: Chip(
+                    padding: const EdgeInsets.all(0),
+                    backgroundColor: Colors.transparent,
+                    label: const Text(
+                      '3.5k',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                  labelPadding: const EdgeInsets.only(right: 5),
-                  visualDensity: VisualDensity.compact,
-                  avatar: Image.asset(
-                    'assets/image/diamond.png',
-                    width: 20,
+                    labelPadding: const EdgeInsets.only(right: 5),
+                    visualDensity: VisualDensity.compact,
+                    avatar: Image.asset(
+                      'assets/image/diamond.png',
+                      width: 20,
+                    ),
                   ),
                 ),
               ),

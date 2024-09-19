@@ -160,7 +160,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text((user?.socialId?.isNotEmpty ?? false)
-                    ? user?.socialId ?? ''
+                    ? user?.email ?? ''
                     : 'ADD'),
                 Icon(Icons.chevron_right),
               ],

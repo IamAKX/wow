@@ -16,8 +16,10 @@ import '../../utils/api.dart';
 import '../../utils/prefs_key.dart';
 
 class PrimeGiftBottom extends StatefulWidget {
-  const PrimeGiftBottom({super.key, required this.roomDetail});
+  const PrimeGiftBottom(
+      {super.key, required this.roomDetail, required this.myCoins});
   final JoinableLiveRoomModel roomDetail;
+  final String myCoins;
 
   @override
   State<PrimeGiftBottom> createState() => _PrimeGiftBottomState();
@@ -73,7 +75,7 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
             children: [
               Row(
                 children: [
-                  Text('3323'),
+                  Text('${widget.myCoins}'),
                   horizontalGap(10),
                   Image.asset(
                     'assets/image/coins_img.png',
