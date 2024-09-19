@@ -2,8 +2,11 @@ import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/utils/firebase_db_node.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 
 class LiveRoomFirebase {
   static FirebaseDatabase database = FirebaseDatabase.instance;
@@ -29,36 +32,29 @@ class LiveRoomFirebase {
   }
 
   static Future<void> toggleUserInRoomArray(
-      String roomId, String userId) async {
+      String roomId, UserProfileDetail? user, bool isEnter) async {
     try {
-      DataSnapshot snapshot = await database
-          .ref(FirebaseDbNode.liveRoomParticipants)
-          .child(roomId)
-          .get();
-
-      if (snapshot.exists) {
-        List<dynamic> userList = List.from(snapshot.value as List);
-
-        if (userList.contains(userId)) {
-          userList.remove(userId);
-          log('User $userId removed from room $roomId');
-        } else {
-          userList.add(userId);
-          log('User $userId added to room $roomId');
-        }
-
-        // Update the database with the modified list
+      // DataSnapshot snapshot = await database
+      //     .ref(FirebaseDbNode.liveRoomParticipants)
+      //     .child(roomId)
+      //     .child(user?.id ?? '')
+      //     .get();
+      LiveRoomUserModel? liveRoomUserModel = convertUserToLiveUser(user);
+      if (!isEnter) {
         await database
             .ref(FirebaseDbNode.liveRoomParticipants)
             .child(roomId)
-            .set(userList);
+            .child(user?.id ?? '')
+            .remove();
       } else {
         // If the room doesn't exist, create it with the userId
+
         await database
             .ref(FirebaseDbNode.liveRoomParticipants)
             .child(roomId)
-            .set([userId]);
-        log('Room $roomId created with user $userId');
+            .child(user?.id ?? '')
+            .set(liveRoomUserModel.toMap());
+        log('Room $roomId created with user ${liveRoomUserModel.id}');
       }
     } catch (e) {
       log('Failed to toggle user: $e');
@@ -91,5 +87,21 @@ class LiveRoomFirebase {
         database.ref('${FirebaseDbNode.liveRoomChat}/$chatWindowId');
     await messageRef.remove();
     sendChat(chatWindowId, chat);
+  }
+
+  static Future<void> addLiveRoomHotSeat(
+      String chatWindowId, int spot, LiveRoomUserModel liveRoom) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomHotSeat}/$chatWindowId/$spot');
+    log('updating : ${liveRoom.id}');
+    await liveRoomRef.set(liveRoom.toMap());
+  }
+
+  static Future<void> removeLiveRoomHotSeat(
+      String chatWindowId, int spot) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomHotSeat}/$chatWindowId/$spot');
+
+    await liveRoomRef.remove();
   }
 }

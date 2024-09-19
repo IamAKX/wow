@@ -6,4 +6,5 @@ class PrefsKey {
   static const String showProfileUpdatePopup = 'showProfileUpdatePopup';
   static const String localMusic = 'localMusic';
   static const String musicPlaying = 'musicPlaying';
+  static const String familyId = 'familyId';
 }

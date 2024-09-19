@@ -12,6 +12,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'providers/generic_auth_provider.dart';
 import 'services/fcm_service.dart';
+import 'utils/generic_api_calls.dart';
 import 'utils/router.dart';
 
 late SharedPreferences prefs;
@@ -81,7 +82,11 @@ class MyApp extends StatelessWidget {
   }
 
   bool isUserLoggedIn() {
-    return prefs.containsKey(PrefsKey.loginProvider);
+    bool res = prefs.containsKey(PrefsKey.loginProvider);
+    if (res) {
+      getDailyReward();
+    }
+    return res;
   }
 }
 

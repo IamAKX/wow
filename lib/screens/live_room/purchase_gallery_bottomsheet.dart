@@ -17,6 +17,7 @@ import '../../providers/api_call_provider.dart';
 import '../../services/live_room_firebase.dart';
 import '../../utils/api.dart';
 import '../../utils/prefs_key.dart';
+import '../../widgets/enum.dart';
 
 class PurchaseGalleryBottomsheet extends StatefulWidget {
   const PurchaseGalleryBottomsheet({super.key, required this.roomDetail});
@@ -263,7 +264,11 @@ class _PurchaseGalleryBottomsheetState
                                                       '',
                                                   themeId: '',
                                                   image: _image!,
-                                                  isStoreTheme: false),
+                                                  giftType: GiftType.GALLERY),
+                                        ).then(
+                                          (value) {
+                                            Navigator.pop(context);
+                                          },
                                         );
                                       },
                             style: ElevatedButton.styleFrom(

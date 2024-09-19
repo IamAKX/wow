@@ -12,9 +12,14 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import '../../main.dart';
 import '../../models/friend_model.dart';
 import '../../models/joinable_live_room_model.dart';
+import '../../models/liveroom_chat.dart';
+import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../services/live_room_firebase.dart';
 import '../../utils/api.dart';
+import '../../utils/generic_api_calls.dart';
 import '../../utils/prefs_key.dart';
+import '../../widgets/enum.dart';
 
 class GetFriendBottomsheet extends StatefulWidget {
   const GetFriendBottomsheet(
@@ -23,12 +28,12 @@ class GetFriendBottomsheet extends StatefulWidget {
       required this.permissionId,
       required this.themeId,
       required this.image,
-      required this.isStoreTheme});
+      required this.giftType});
   final JoinableLiveRoomModel roomDetail;
   final String permissionId;
   final String themeId;
   final File image;
-  final bool isStoreTheme;
+  final GiftType giftType;
 
   @override
   State<GetFriendBottomsheet> createState() => _GetFriendBottomsheetState();
@@ -37,6 +42,15 @@ class GetFriendBottomsheet extends StatefulWidget {
 class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
   late ApiCallProvider apiCallProvider;
   List<FriendModel> friendList = [];
+  UserProfileDetail? user;
+
+  void loadUserData() async {
+    await getCurrentUser().then(
+      (value) async {
+        user = value;
+      },
+    );
+  }
 
   getFriends() async {
     Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
@@ -58,6 +72,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
       getFriends();
     });
   }
@@ -122,12 +137,20 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
                                     ApiStatus.loading
                                 ? null
                                 : () async {
-                                    if (widget.isStoreTheme) {
+                                    if (widget.giftType == GiftType.STORE) {
                                       await sendStoreTheme(
-                                          friendList.elementAt(index).id ?? '');
-                                    } else {
+                                          friendList.elementAt(index).id ?? '',
+                                          friendList.elementAt(index));
+                                    }
+                                    if (widget.giftType == GiftType.GALLERY) {
                                       await sendGalleryTheme(
-                                          friendList.elementAt(index).id ?? '');
+                                          friendList.elementAt(index).id ?? '',
+                                          friendList.elementAt(index));
+                                    }
+                                    if (widget.giftType == GiftType.PRIME) {
+                                      await sendPrimeGift(
+                                          friendList.elementAt(index).id ?? '',
+                                          friendList.elementAt(index));
                                     }
                                     Navigator.pop(context);
                                   },
@@ -154,19 +177,67 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
     );
   }
 
-  Future<void> sendStoreTheme(String otherId) async {
+  Future<void> sendPrimeGift(String otherId, FriendModel friend) async {
+    Map<String, dynamic> reqBody = {
+      'senderId': prefs.getString(PrefsKey.userId),
+      'receiverId': otherId,
+      'giftId': widget.themeId,
+      'diamond': widget.permissionId,
+      'liveId': widget.roomDetail.id
+    };
+    await apiCallProvider
+        .postRequest(API.sendGift, reqBody)
+        .then((value) async {
+      showToastMessage(value['message']);
+      if (value['success'] == '1') {
+        LiveroomChat liveroomChat = LiveroomChat(
+            message: '${user?.name ?? ''} sent gift to ${friend.name ?? ''}',
+            timeStamp: DateTime.now().millisecondsSinceEpoch,
+            userId: user?.id,
+            userImage: user?.image,
+            userName: user?.name);
+        LiveRoomFirebase.sendChat(widget.roomDetail.id ?? '', liveroomChat)
+            .then(
+          (value) {},
+        );
+      }
+    });
+  }
+
+  Future<void> sendStoreTheme(String otherId, FriendModel friend) async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
       'otherUserId': otherId,
       'themeId': widget.themeId
     };
-    await apiCallProvider.postRequest(API.sendThemes, reqBody).then((value) {
+    await apiCallProvider
+        .postRequest(API.sendThemes, reqBody)
+        .then((value) async {
       showToastMessage(value['message']);
-      if (value['success'] == '1') {}
+      if (value['success'] == '1') {
+        await apiCallProvider
+            .postRequest(API.sendGallery, reqBody)
+            .then((value) {
+          showToastMessage(value['message']);
+          if (value['success'] == '1') {
+            LiveroomChat liveroomChat = LiveroomChat(
+                message:
+                    '${user?.name ?? ''} sent theme to ${friend.name ?? ''}',
+                timeStamp: DateTime.now().millisecondsSinceEpoch,
+                userId: user?.id,
+                userImage: user?.image,
+                userName: user?.name);
+            LiveRoomFirebase.sendChat(widget.roomDetail.id ?? '', liveroomChat)
+                .then(
+              (value) {},
+            );
+          }
+        });
+      }
     });
   }
 
-  Future<void> sendGalleryTheme(String otherId) async {
+  Future<void> sendGalleryTheme(String otherId, FriendModel friend) async {
     showToastMessage('Uploading, please wait');
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
@@ -183,7 +254,18 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
 
     await apiCallProvider.postRequest(API.sendGallery, reqBody).then((value) {
       showToastMessage(value['message']);
-      if (value['success'] == '1') {}
+      if (value['success'] == '1') {
+        LiveroomChat liveroomChat = LiveroomChat(
+            message: '${user?.name ?? ''} sent theme to ${friend.name ?? ''}',
+            timeStamp: DateTime.now().millisecondsSinceEpoch,
+            userId: user?.id,
+            userImage: user?.image,
+            userName: user?.name);
+        LiveRoomFirebase.sendChat(widget.roomDetail.id ?? '', liveroomChat)
+            .then(
+          (value) {},
+        );
+      }
     });
   }
 }

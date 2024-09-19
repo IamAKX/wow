@@ -4,6 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:worldsocialintegrationapp/models/new_live_user_model.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'dart:io';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -11,6 +13,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+
+import '../models/live_room_user_model.dart';
 
 Future<void> openInBrowser(String url) async {
   if (await launchUrl(Uri.parse(url))) {
@@ -130,4 +134,41 @@ String getChatRoomId(String userID1, String userID2) {
 String getChatTimesAgo(int epochTime) {
   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epochTime);
   return timeago.format(dateTime, locale: 'en');
+}
+
+LiveRoomUserModel convertUserToLiveUser(UserProfileDetail? user) {
+  return LiveRoomUserModel(
+    id: user?.id,
+    username: user?.name,
+    familyId: user?.familyId,
+    phone: user?.phone,
+    image: user?.image,
+    country: user?.country,
+    age: user?.age,
+    gender: user?.gender,
+    sandColor: user?.lavelInfomation?.sandColor,
+    sandBgImage: user?.lavelInfomation?.sandBgImage,
+    sendLevel: user?.lavelInfomation?.sendLevel,
+    sendExp: user?.lavelInfomation?.sendExp,
+    sendStart: user?.lavelInfomation?.sendStart,
+    sendEnd: user?.lavelInfomation?.sendEnd,
+    reciveColor: user?.lavelInfomation?.reciveColor,
+    reciveBgImage: user?.lavelInfomation?.reciveBgImage,
+    reciveLevel: user?.lavelInfomation?.reciveLevel,
+    reciveExp: user?.lavelInfomation?.reciveExp,
+    reciveStart: user?.lavelInfomation?.reciveStart,
+    reciveEnd: user?.lavelInfomation?.reciveEnd,
+  );
+}
+
+Map<int, Object?> convertToObjectMap(Map<int, LiveRoomUserModel?> inputMap) {
+  return inputMap.map((key, value) {
+    return MapEntry(key, value?.toMap());
+  });
+}
+
+Map<int, LiveRoomUserModel?> convertToHotSeat(Map<String, Object?> inputMap) {
+  return inputMap.map((key, value) {
+    return MapEntry(int.parse(key), value as LiveRoomUserModel?);
+  });
 }

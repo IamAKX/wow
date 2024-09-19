@@ -24,6 +24,53 @@ Future<UserProfileDetail?> getCurrentUser() async {
   return user;
 }
 
+Future<UserProfileDetail?> getUserById(String id) async {
+  UserProfileDetail? user;
+  Map<String, dynamic> reqBody = {
+    'userId': id,
+    'otherUserId': id,
+    'kickTo': id
+  };
+  await ApiCallProvider.instance
+      .postRequest(API.getUserDataById, reqBody)
+      .then((value) {
+    if (value['details'] != null) {
+      user = UserProfileDetail.fromMap(value['details']);
+    }
+  });
+  return user;
+}
+
+Future<void> getDailyReward() async {
+  Map<String, dynamic> reqBody = {
+    'userId': prefs.getString(PrefsKey.userId) ?? '0',
+    'familyId': prefs.getString(PrefsKey.familyId) ?? '0',
+  };
+  ApiCallProvider.instance
+      .postRequest(API.userActivityDaily, reqBody)
+      .then((value) {});
+}
+
+Future<void> getSelfRoomReward() async {
+  Map<String, dynamic> reqBody = {
+    'userId': prefs.getString(PrefsKey.userId) ?? '0',
+    'type': '2',
+  };
+  ApiCallProvider.instance
+      .postRequest(API.addLiveExp, reqBody)
+      .then((value) {});
+}
+
+Future<void> getOtherRoomReward() async {
+  Map<String, dynamic> reqBody = {
+    'userId': prefs.getString(PrefsKey.userId) ?? '0',
+    'type': '1',
+  };
+  ApiCallProvider.instance
+      .postRequest(API.addLiveExp, reqBody)
+      .then((value) {});
+}
+
 Future<String> loadFrame() async {
   Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
   String frame = '';

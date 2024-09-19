@@ -138,6 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 PrefsKey.userId, value['details']['id']);
                             prefs.setString(PrefsKey.userName,
                                 value['details']['username']);
+                            prefs.setString(PrefsKey.familyId,
+                                value['details']['familyId']);
                             prefs.setString(PrefsKey.loginProvider, 'Phone');
                             prefs.setBool(PrefsKey.showProfileUpdatePopup,
                                 value['details']['name'].toString().isEmpty);

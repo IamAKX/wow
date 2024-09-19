@@ -60,10 +60,11 @@ class _HomeScreenState extends State<HomeScreen>
       if (value['details'] != null) {
         AgoraToken agoraToken = AgoraToken.fromJson(value['details']);
         LiveRoomDetailModel liveRoomDetailModel = LiveRoomDetailModel(
-          channelName: agoraToken.channelName,
-          mainId: agoraToken.mainId,
-          token: agoraToken.toke,
-        );
+            channelName: agoraToken.channelName,
+            mainId: agoraToken.mainId,
+            token: agoraToken.toke,
+            isSelfCreated: true,
+            roomCreatedBy: prefs.getString(PrefsKey.userId));
         Navigator.of(context)
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(

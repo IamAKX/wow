@@ -18,6 +18,7 @@ import '../../models/theme_paid_image_model.dart';
 import '../../providers/api_call_provider.dart';
 import '../../utils/api.dart';
 import '../../utils/prefs_key.dart';
+import '../../widgets/enum.dart';
 
 class ThemeBottomsheet extends StatefulWidget {
   const ThemeBottomsheet({
@@ -364,7 +365,11 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                                                         .id ??
                                                     '',
                                                 image: File(''),
-                                                isStoreTheme: true),
+                                                giftType: GiftType.STORE),
+                                      ).then(
+                                        (value) {
+                                          Navigator.pop(context);
+                                        },
                                       );
                                     },
                                     child: Container(

@@ -108,4 +108,7 @@ class API {
   static const String hideUnHideLiveUser = '$baseUrl/hideUnHideLiveUser';
   static const String getEmoji = '$baseUrl/getEmoji';
   static const String getPrimeGift = '$baseUrl/getPrimeGift';
+  static const String userActivityDaily = '$baseUrl/userActivityDaily';
+  static const String addLiveExp = '$baseUrl/addLiveExp';
+  static const String sendGift = '$baseUrl/sendGift';
 }

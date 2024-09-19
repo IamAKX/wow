@@ -143,6 +143,8 @@ class _PopularScreenState extends State<PopularScreen> {
                           channelName: roomList.elementAt(index).channelName,
                           mainId: roomList.elementAt(index).id,
                           token: roomList.elementAt(index).rtmToken,
+                          isSelfCreated: false,
+                          roomCreatedBy: roomList.elementAt(index).userId,
                         );
                         Navigator.of(context)
                             .pushNamed(LiveRoomScreen.route,

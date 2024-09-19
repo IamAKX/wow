@@ -7,6 +7,7 @@ import 'package:svgaplayer_flutter_rhr/svgaplayer_flutter.dart';
 import 'package:worldsocialintegrationapp/models/prime_gift_list_model.dart';
 import 'package:worldsocialintegrationapp/models/prime_gift_model.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/get_friend_bottonsheet.dart';
+import 'package:worldsocialintegrationapp/widgets/enum.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../main.dart';
@@ -144,10 +145,14 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
               isScrollControlled: true, // To enable custom height
               builder: (context) => GetFriendBottomsheet(
                   roomDetail: widget.roomDetail,
-                  permissionId: list?.elementAt(index).id ?? '',
-                  themeId: '',
+                  permissionId: list?.elementAt(index).primeAccount ?? '',
+                  themeId: list?.elementAt(index).id ?? '',
                   image: File(''),
-                  isStoreTheme: false),
+                  giftType: GiftType.PRIME),
+            ).then(
+              (value) {
+                Navigator.pop(context);
+              },
             );
           },
           child: Column(
