@@ -278,7 +278,9 @@ class _DailySpinScreenState extends State<DailySpinScreen> {
       index += spinDataList.length;
     }
     SpinDataModel result = spinDataList[index];
-    publishSpinResult(result);
+    publishSpinResult(
+      result,
+    );
 
     showWinninDialog(context, result);
   }
@@ -302,7 +304,9 @@ class _DailySpinScreenState extends State<DailySpinScreen> {
       builder: (BuildContext context) {
         return Dialog(
           insetPadding: const EdgeInsets.all(20.0), // Margin around the dialog
-          child: SpinwheelWinnerPopup(),
+          child: SpinwheelWinnerPopup(
+            spinDataModel: result,
+          ),
         );
       },
     );

@@ -6,8 +6,11 @@ import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../models/spin_data_model.dart';
+
 class SpinwheelWinnerPopup extends StatefulWidget {
-  const SpinwheelWinnerPopup({super.key});
+  const SpinwheelWinnerPopup({super.key, required this.spinDataModel});
+  final SpinDataModel spinDataModel;
 
   @override
   State<SpinwheelWinnerPopup> createState() => _SpinwheelWinnerPopupState();
@@ -122,14 +125,14 @@ class _SpinwheelWinnerPopupState extends State<SpinwheelWinnerPopup> {
                 height: 50,
                 width: 130,
                 alignment: Alignment.center,
-                child: Text(
-                  '10',
-                  style: TextStyle(color: Colors.white),
-                ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/image/bg_coin_profile.png'),
                   ),
+                ),
+                child: Text(
+                  '${widget.spinDataModel.header ?? ''} ${widget.spinDataModel.subtitle ?? ''}',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
