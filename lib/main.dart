@@ -14,6 +14,7 @@ import 'providers/generic_auth_provider.dart';
 import 'services/fcm_service.dart';
 import 'utils/generic_api_calls.dart';
 import 'utils/router.dart';
+import 'widgets/background_detector.dart';
 
 late SharedPreferences prefs;
 void main() async {
@@ -22,7 +23,7 @@ void main() async {
   await FCMService.instance.initializeFCM();
 
   prefs = await SharedPreferences.getInstance();
-  runApp(const MyApp());
+  runApp(const BackgroundDetector(child: MyApp()));
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
