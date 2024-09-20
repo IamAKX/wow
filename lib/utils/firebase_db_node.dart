@@ -8,4 +8,5 @@ class FirebaseDbNode {
   static const String liveRoomChat = 'liveRoomChat';
   static const String liveRoomTheme = 'liveRoomTheme';
   static const String liveRoomHotSeat = 'liveRoomHotSeat';
+  static const String liveRoomAdminControl = 'liveRoomAdminControl';
 }

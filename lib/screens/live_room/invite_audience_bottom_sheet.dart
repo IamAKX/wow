@@ -101,18 +101,22 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
         if (visitorModel.id == widget.roomDetail.userId) {
           return;
         }
-        widget.hotSeatMap.entries.forEach(
-          (element) {
-            if (element.value.id == visitorModel.id) {
-              LiveRoomFirebase.removeLiveRoomHotSeat(
-                widget.roomDetail.id ?? '',
-                element.key,
-              );
-            }
-          },
-        );
-        LiveRoomFirebase.addLiveRoomHotSeat(
-            widget.roomDetail.id ?? '', widget.position + 1, visitorModel);
+        // widget.hotSeatMap.entries.forEach(
+        //   (element) {
+        //     if (element.value.id == visitorModel.id) {
+        //       LiveRoomFirebase.removeLiveRoomHotSeat(
+        //         widget.roomDetail.id ?? '',
+        //         element.key,
+        //       );
+        //     }
+        //   },
+        // );
+        // LiveRoomFirebase.addLiveRoomHotSeat(
+        //     widget.roomDetail.id ?? '', widget.position + 1, visitorModel);
+        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
+            visitorModel.id ?? '', 'position', widget.position);
+        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
+            visitorModel.id ?? '', 'invite', true);
         Navigator.pop(context);
       },
       subtitle: Row(

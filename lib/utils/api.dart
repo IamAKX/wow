@@ -111,4 +111,5 @@ class API {
   static const String userActivityDaily = '$baseUrl/userActivityDaily';
   static const String addLiveExp = '$baseUrl/addLiveExp';
   static const String sendGift = '$baseUrl/sendGift';
+  static const String kickOutLiveUser = '$baseUrl/kickOutLiveUser';
 }

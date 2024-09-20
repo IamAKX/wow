@@ -12,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/emoji_model.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
@@ -46,6 +47,7 @@ import '../../utils/generic_api_calls.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
 import 'prime_gift_bottom.dart';
+import 'profile_bottomsheet.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   const LiveRoomScreen({super.key, required this.agoraToken});
@@ -92,18 +94,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   final ReceivePort _receivePort = ReceivePort();
   Map<int, LiveRoomUserModel> hotSeatMap = {};
 
+  AdminLiveRoomControls liveRoomControls = AdminLiveRoomControls();
+  Map<String, AdminLiveRoomControls> hotSeatAdminControlMap = {};
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 500), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    Isolate.spawn(getPeriodicReward, _receivePort.sendPort);
+    // Isolate.spawn(getPeriodicReward, _receivePort.sendPort);
+    _timer = Timer.periodic(const Duration(minutes: 10), (timer) async {
+      if (widget.agoraToken.isSelfCreated ?? false) {
+        getSelfRoomReward();
+      } else {
+        getOtherRoomReward();
+      }
+    });
     initAudioPlayer();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       loadRoomOwnerData();
@@ -114,15 +127,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     });
   }
 
-  Future<void> getPeriodicReward(SendPort sendPort) async {
-    Timer.periodic(Duration(minutes: 10), (timer) async {
-      if (widget.agoraToken.isSelfCreated ?? false) {
-        getSelfRoomReward();
-      } else {
-        getOtherRoomReward();
-      }
-    });
-  }
+  Timer? _timer;
+  // Future<void> getPeriodicReward(SendPort sendPort) async {
+  //   _timer = Timer.periodic(const Duration(minutes: 10), (timer) async {
+  //     if (widget.agoraToken.isSelfCreated ?? false) {
+  //       getSelfRoomReward();
+  //     } else {
+  //       getOtherRoomReward();
+  //     }
+  //   });
+  // }
 
   void initAudioPlayer() async {
     _musicplayerAnimationController = AnimationController(
@@ -149,9 +163,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     });
 
     _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      setState(() {
-        _isPlaying = state == PlayerState.playing;
-      });
+      if (mounted)
+        setState(() {
+          _isPlaying = state == PlayerState.playing;
+        });
     });
   }
 
@@ -253,6 +268,69 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         }
       }
     });
+
+    database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}/${user?.id}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        liveRoomControls =
+            AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
+        if (liveRoomControls.invite ?? false) {
+          showInvitePopup(liveRoomControls.position ?? 0);
+        }
+
+        if (liveRoomControls.kickout ?? false) {
+          Navigator.pop(currentContex);
+        }
+      } else {
+        liveRoomControls = AdminLiveRoomControls(
+            giftSound: false,
+            giftVisiualEffect: false,
+            isMicMute: false,
+            isSpeakerMute: false,
+            kickout: false,
+            rewardEffects: false,
+            invite: false,
+            position: 0,
+            vehicalVisiualEffect: false);
+        LiveRoomFirebase.addLiveRoomAdminSettings(
+            widget.agoraToken.mainId ?? '', user?.id ?? '', liveRoomControls);
+      }
+    });
+
+    database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      if (event.snapshot.exists) {
+        Map seatControlMapList = {};
+        if (event.snapshot.value is List) {
+          List l = (event.snapshot.value as List);
+          for (int i = 0; i < l.length; i++) {
+            if (l.elementAt(i) != null) {
+              seatControlMapList['$i'] = l.elementAt(i);
+            }
+          }
+        } else {
+          seatControlMapList = event.snapshot.value as Map;
+        }
+        hotSeatAdminControlMap = {};
+        seatControlMapList.entries.forEach(
+          (element) {
+            hotSeatAdminControlMap[element.key] =
+                AdminLiveRoomControls.fromMap(element.value);
+          },
+        );
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    });
+
     LiveRoomFirebase.toggleUserInRoomArray(
         widget.agoraToken.mainId ?? '', user, true);
   }
@@ -305,10 +383,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   @override
   void dispose() {
-    _receivePort.close();
+    // _receivePort.close();
+    _timer?.cancel();
     _musicplayerAnimationController.dispose();
-    agoraEngine.leaveChannel();
-    agoraEngine.release();
+    // agoraEngine.leaveChannel();
+    // agoraEngine.release();
     cleanFirebaseListener();
     _audioPlayer.dispose();
     _emojiAnimationController.dispose();
@@ -316,6 +395,23 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   }
 
   void cleanFirebaseListener() async {
+    hotSeatMap.entries.forEach(
+      (element) {
+        if (element.value.id == user?.id) {
+          LiveRoomFirebase.removeLiveRoomHotSeat(
+            widget.agoraToken.mainId ?? '',
+            element.key,
+          );
+        }
+      },
+    );
+
+    await LiveRoomFirebase.removeLiveRoomHotSeat(
+        widget.agoraToken.mainId ?? '', liveRoomControls.position ?? 0);
+    await LiveRoomFirebase.updateLiveRoomAdminSettings(
+        widget.agoraToken.mainId ?? '', user?.id ?? '', 'position', 0);
+    await LiveRoomFirebase.updateLiveRoomAdminSettings(
+        widget.agoraToken.mainId ?? '', user?.id ?? '', 'kickout', false);
     await database
         .ref('${FirebaseDbNode.liveRoom}/${widget.agoraToken.mainId}')
         .onValue
@@ -371,10 +467,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     setState(() {});
   }
 
+  late BuildContext currentContex;
   @override
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
-
+    currentContex = context;
     return WillPopScope(
       onWillPop: () async {
         setState(() {
@@ -693,11 +790,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
-                    child: const CircleAvatar(
+                    onTap: () {
+                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          user?.id ?? '',
+                          'isMicMute',
+                          !(liveRoomControls.isMicMute ?? false));
+                    },
+                    child: CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
-                        Icons.mic,
+                        (liveRoomControls.isMicMute ?? false)
+                            ? Icons.mic_off
+                            : Icons.mic,
                         color: Colors.white,
                       ),
                     ),
@@ -742,11 +847,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
-                    child: const CircleAvatar(
+                    onTap: () {
+                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          user?.id ?? '',
+                          'isSpeakerMute',
+                          !(liveRoomControls.isSpeakerMute ?? false));
+                    },
+                    child: CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
-                        Icons.volume_up,
+                        (liveRoomControls.isSpeakerMute ?? false)
+                            ? Icons.volume_up
+                            : Icons.volume_off_sharp,
                         color: Colors.white,
                       ),
                     ),
@@ -964,13 +1077,36 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     }
                   }
                 },
-                child: CircularImage(
-                    imagePath: hotSeatMap[index + 1]?.image ?? '',
-                    diameter: 60),
+                child: Stack(
+                  children: [
+                    CircularImage(
+                        imagePath: hotSeatMap[index + 1]?.image ?? '',
+                        diameter: 60),
+                    if (hotSeatAdminControlMap[
+                                hotSeatMap[index + 1]?.id ?? ''] !=
+                            null &&
+                        (hotSeatAdminControlMap[hotSeatMap[index + 1]?.id ?? '']
+                                ?.isMicMute ??
+                            false))
+                      const Positioned(
+                        right: 1,
+                        bottom: 1,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white54,
+                          radius: 15,
+                          child: Icon(
+                            Icons.mic_off,
+                            size: 15,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                  ],
+                ),
               ),
             verticalGap(20),
             Text(
-              '${index + 1}',
+              '${hotSeatMap[index + 1] == null ? (index + 1) : (hotSeatMap[index + 1]?.username == null) ? (index + 1) : hotSeatMap[index + 1]?.username}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -1084,7 +1220,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true, // To enable custom height
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(16.0)),
                       ),
@@ -1119,29 +1255,46 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           ),
         ),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              verticalGap(20),
-              frame.isEmpty || true
-                  ? CircularImage(
-                      imagePath: roomOwner?.image ?? '',
-                      diameter: 80,
-                    )
-                  : AnimatedFramedCircularImage(
-                      imagePath: user?.image ?? '',
-                      imageSize: 80,
-                      framePath: frame),
-              verticalGap(10),
-              Text(
-                roomOwner?.name ?? '',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+          child: InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (context) => ProfileBottomsheet(
+                  roomDetail: roomDetail ??
+                      JoinableLiveRoomModel(
+                        id: widget.agoraToken.mainId,
+                      ),
+                  liveRoomUserModel: convertUserToLiveUser(roomOwner),
+                  myCoins: user?.myCoin ?? '',
+                  user: user,
                 ),
-              )
-            ],
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                verticalGap(20),
+                frame.isEmpty || true
+                    ? CircularImage(
+                        imagePath: roomOwner?.image ?? '',
+                        diameter: 80,
+                      )
+                    : AnimatedFramedCircularImage(
+                        imagePath: user?.image ?? '',
+                        imageSize: 80,
+                        framePath: frame),
+                verticalGap(10),
+                Text(
+                  roomOwner?.name ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
         Expanded(
@@ -1313,13 +1466,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               ),
               if (!isLocked)
                 ListTile(
-                  title: Text('Invite Audience'),
+                  title: const Text('Invite Audience'),
                   onTap: () {
                     Navigator.of(context).pop();
 
                     showModalBottomSheet(
                       context: context,
-                      isScrollControlled: true, // To enable custom height
+                      isScrollControlled: true,
                       builder: (context) => InviteAudienceBottomSheet(
                         roomDetail: roomDetail ??
                             JoinableLiveRoomModel(
@@ -1351,7 +1504,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('Kickout'),
+                title: const Text('Stand'),
                 onTap: () {
                   LiveRoomFirebase.removeLiveRoomHotSeat(
                           widget.agoraToken.mainId ?? '', position + 1)
@@ -1362,9 +1515,78 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   );
                 },
               ),
-              // ListTile(
-              //   title: Text('Invite Audience'),
-              // ),
+              ListTile(
+                title: const Text('Toggle Mic Mute'),
+                onTap: () async {
+                  AdminLiveRoomControls? settings =
+                      await LiveRoomFirebase.getLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          hotSeatMap[position + 1]?.id ?? '');
+                  log('settings : ${settings}');
+                  LiveRoomFirebase.updateLiveRoomAdminSettings(
+                      widget.agoraToken.mainId ?? '',
+                      hotSeatMap[position + 1]?.id ?? '',
+                      'isMicMute',
+                      !(settings?.isMicMute ?? false));
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                title: const Text('Kick out'),
+                onTap: () async {
+                  Map<String, dynamic> reqBody = {
+                    'kickToId': hotSeatMap[position + 1]?.id,
+                    'liveId': widget.agoraToken.mainId,
+                    'kickById': user?.id
+                  };
+                  apiCallProvider
+                      .postRequest(API.kickOutLiveUser, reqBody)
+                      .then((value) async {
+                    if (value['success'] == '1') {
+                      LiveroomChat liveroomChat = LiveroomChat(
+                          message:
+                              '${user?.name} kicked out ${hotSeatMap[position + 1]?.username}',
+                          timeStamp: DateTime.now().millisecondsSinceEpoch,
+                          userId: user?.id,
+                          userImage: user?.image,
+                          userName: user?.name);
+                      LiveRoomFirebase.sendChat(
+                          widget.agoraToken.mainId ?? '', liveroomChat);
+
+                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          hotSeatMap[position + 1]?.id ?? '',
+                          'position',
+                          position);
+                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          hotSeatMap[position + 1]?.id ?? '',
+                          'kickout',
+                          true);
+                      Navigator.pop(context);
+                    }
+                  });
+                },
+              ),
+              ListTile(
+                title: Text('Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => ProfileBottomsheet(
+                      roomDetail: roomDetail ??
+                          JoinableLiveRoomModel(
+                            id: widget.agoraToken.mainId,
+                          ),
+                      liveRoomUserModel: hotSeatMap[position + 1]!,
+                      myCoins: user?.myCoin ?? '',
+                      user: user,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         );
@@ -1383,7 +1605,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text('Stand'),
+                title: const Text('Stand'),
                 onTap: () {
                   LiveRoomFirebase.removeLiveRoomHotSeat(
                           widget.agoraToken.mainId ?? '', position + 1)
@@ -1396,6 +1618,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               ),
               ListTile(
                 title: Text('Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => ProfileBottomsheet(
+                      roomDetail: roomDetail ??
+                          JoinableLiveRoomModel(
+                            id: widget.agoraToken.mainId,
+                          ),
+                      liveRoomUserModel: hotSeatMap[position + 1]!,
+                      myCoins: user?.myCoin ?? '',
+                      user: user,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -1771,5 +2009,57 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         setState(() {});
       }
     });
+  }
+
+  void showInvitePopup(int position) {
+    showDialog(
+      context: navigatorKey.currentContext!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Invite'),
+          content:
+              Text('Home Owner has invited you to join seat ${position + 1}'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                hotSeatMap.entries.forEach(
+                  (element) {
+                    if (element.value.id == user?.id) {
+                      LiveRoomFirebase.removeLiveRoomHotSeat(
+                        widget.agoraToken.mainId ?? '',
+                        element.key,
+                      );
+                    }
+                  },
+                );
+                LiveRoomFirebase.addLiveRoomHotSeat(
+                    widget.agoraToken.mainId ?? '',
+                    position + 1,
+                    convertUserToLiveUser(user));
+                LiveRoomFirebase.updateLiveRoomAdminSettings(
+                    widget.agoraToken.mainId ?? '',
+                    user?.id ?? '',
+                    'invite',
+                    false);
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Join',
+                style: TextStyle(color: Colors.teal),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

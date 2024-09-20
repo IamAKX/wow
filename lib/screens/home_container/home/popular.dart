@@ -60,15 +60,15 @@ class _PopularScreenState extends State<PopularScreen> {
       'userId': prefs.getString(PrefsKey.userId),
       'otherId': prefs.getString(PrefsKey.userId),
     };
-    await apiCallProvider
-        .postRequest(API.getPopularUserLive, reqBody)
-        .then((value) {
+    apiCallProvider.postRequest(API.getPopularUserLive, reqBody).then((value) {
       roomList.clear();
       if (value['details'] != null) {
         for (var item in value['details']) {
           roomList.add(JoinableLiveRoomModel.fromJson(item));
         }
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
   }

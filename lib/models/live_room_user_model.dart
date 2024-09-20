@@ -3,6 +3,7 @@ import 'dart:convert';
 class LiveRoomUserModel {
   String? id;
   String? username;
+  String? usernameID;
   String? familyId;
   String? phone;
   String? image;
@@ -24,6 +25,7 @@ class LiveRoomUserModel {
   LiveRoomUserModel({
     this.id,
     this.username,
+    this.usernameID,
     this.familyId,
     this.phone,
     this.image,
@@ -47,6 +49,7 @@ class LiveRoomUserModel {
   LiveRoomUserModel copyWith({
     String? id,
     String? username,
+    String? usernameID,
     String? familyId,
     String? phone,
     String? image,
@@ -69,6 +72,7 @@ class LiveRoomUserModel {
     return LiveRoomUserModel(
       id: id ?? this.id,
       username: username ?? this.username,
+      usernameID: usernameID ?? this.usernameID,
       familyId: familyId ?? this.familyId,
       phone: phone ?? this.phone,
       image: image ?? this.image,
@@ -98,6 +102,9 @@ class LiveRoomUserModel {
     }
     if (username != null) {
       result.addAll({'username': username});
+    }
+    if (usernameID != null) {
+      result.addAll({'usernameID': usernameID});
     }
     if (familyId != null) {
       result.addAll({'familyId': familyId});
@@ -161,6 +168,7 @@ class LiveRoomUserModel {
     return LiveRoomUserModel(
       id: map['id'],
       username: map['username'],
+      usernameID: map['usernameID'],
       familyId: map['familyId'],
       phone: map['phone'],
       image: map['image'],
@@ -189,7 +197,7 @@ class LiveRoomUserModel {
 
   @override
   String toString() {
-    return 'LiveRoomUserModel(id: $id, username: $username, familyId: $familyId, phone: $phone, image: $image, country: $country, age: $age, gender: $gender, sandColor: $sandColor, sandBgImage: $sandBgImage, sendLevel: $sendLevel, sendExp: $sendExp, sendStart: $sendStart, sendEnd: $sendEnd, reciveColor: $reciveColor, reciveBgImage: $reciveBgImage, reciveLevel: $reciveLevel, reciveExp: $reciveExp, reciveStart: $reciveStart, reciveEnd: $reciveEnd)';
+    return 'LiveRoomUserModel(id: $id, username: $username, usernameID: $usernameID, familyId: $familyId, phone: $phone, image: $image, country: $country, age: $age, gender: $gender, sandColor: $sandColor, sandBgImage: $sandBgImage, sendLevel: $sendLevel, sendExp: $sendExp, sendStart: $sendStart, sendEnd: $sendEnd, reciveColor: $reciveColor, reciveBgImage: $reciveBgImage, reciveLevel: $reciveLevel, reciveExp: $reciveExp, reciveStart: $reciveStart, reciveEnd: $reciveEnd)';
   }
 
   @override
@@ -199,6 +207,7 @@ class LiveRoomUserModel {
     return other is LiveRoomUserModel &&
         other.id == id &&
         other.username == username &&
+        other.usernameID == usernameID &&
         other.familyId == familyId &&
         other.phone == phone &&
         other.image == image &&
@@ -223,6 +232,7 @@ class LiveRoomUserModel {
   int get hashCode {
     return id.hashCode ^
         username.hashCode ^
+        usernameID.hashCode ^
         familyId.hashCode ^
         phone.hashCode ^
         image.hashCode ^

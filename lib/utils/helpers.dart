@@ -140,6 +140,7 @@ LiveRoomUserModel convertUserToLiveUser(UserProfileDetail? user) {
   return LiveRoomUserModel(
     id: user?.id,
     username: user?.name,
+    usernameID: user?.username,
     familyId: user?.familyId,
     phone: user?.phone,
     image: user?.image,

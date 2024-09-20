@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
@@ -103,5 +104,36 @@ class LiveRoomFirebase {
         database.ref('${FirebaseDbNode.liveRoomHotSeat}/$chatWindowId/$spot');
 
     await liveRoomRef.remove();
+  }
+
+  static Future<void> addLiveRoomAdminSettings(String chatWindowId,
+      String userId, AdminLiveRoomControls adminLiveRoomControls) async {
+    DatabaseReference liveRoomRef = database
+        .ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/$userId');
+    log('updating liveRoomAdminControl : ${userId}');
+    await liveRoomRef.set(adminLiveRoomControls.toMap());
+  }
+
+  static Future<void> updateLiveRoomAdminSettings(
+      String chatWindowId, String userId, String key, dynamic value) async {
+    DatabaseReference liveRoomRef = database
+        .ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/$userId');
+    log('updating liveRoomAdminControl : ${userId}');
+    Map<String, Object?> map = {};
+    map[key] = value;
+    await liveRoomRef.update(map);
+  }
+
+  static Future<AdminLiveRoomControls?> getLiveRoomAdminSettings(
+      String chatWindowId, String userId) async {
+    DatabaseReference liveRoomRef =
+        database.ref(FirebaseDbNode.liveRoomAdminControl).child(chatWindowId);
+    AdminLiveRoomControls? settings;
+    DataSnapshot snapshot = await liveRoomRef.get();
+    if (snapshot.exists) {
+      Map map = snapshot.value as Map<dynamic, dynamic>;
+      settings = AdminLiveRoomControls.fromMap(map[userId]);
+    }
+    return settings;
   }
 }
