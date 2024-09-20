@@ -138,17 +138,20 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
       ),
       itemCount: list?.length ?? 0,
       itemBuilder: (context, index) {
-        return GestureDetector(
+        return InkWell(
           onTap: () {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true, // To enable custom height
               builder: (context) => GetFriendBottomsheet(
-                  roomDetail: widget.roomDetail,
-                  permissionId: list?.elementAt(index).primeAccount ?? '',
-                  themeId: list?.elementAt(index).id ?? '',
-                  image: File(''),
-                  giftType: GiftType.PRIME),
+                roomDetail: widget.roomDetail,
+                permissionId: list?.elementAt(index).primeAccount ?? '',
+                themeId: list?.elementAt(index).id ?? '',
+                image: File(''),
+                giftType: GiftType.PRIME,
+                isSvga: isSvga,
+                imageLink: list?.elementAt(index).image ?? '',
+              ),
             ).then(
               (value) {
                 Navigator.pop(context);

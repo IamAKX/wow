@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:polar_tab_bar/models/polar_tab_item.dart';
+import 'package:polar_tab_bar/polar_tab_bar.dart';
+import 'package:polar_tab_bar/widgets/polar_tab_page.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/widgets/gift_history.dart';
 
 import '../../models/joinable_live_room_model.dart';
 import '../../models/prime_gift_list_model.dart';
@@ -13,16 +17,12 @@ class GiftStatsBottomsheet extends StatefulWidget {
   State<GiftStatsBottomsheet> createState() => _GiftStatsBottomsheetState();
 }
 
-class _GiftStatsBottomsheetState extends State<GiftStatsBottomsheet>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _GiftStatsBottomsheetState extends State<GiftStatsBottomsheet> {
   late ApiCallProvider apiCallProvider;
-  PrimeGiftListModel? primeGift;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadPrimeGift();
     });
@@ -33,9 +33,30 @@ class _GiftStatsBottomsheetState extends State<GiftStatsBottomsheet>
   @override
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
+    final List<PolarTabItem> tabs = [
+      PolarTabItem(
+        index: 0,
+        title: '24 Hours',
+        page: PolarTabPage(
+          child: GiftStatsHistory(
+            type: 1,
+            liveId: widget.roomDetail.id ?? '',
+          ),
+        ),
+      ),
+      PolarTabItem(
+          index: 1,
+          title: 'Total',
+          page: PolarTabPage(
+            child: GiftStatsHistory(
+              type: 0,
+              liveId: widget.roomDetail.id ?? '',
+            ),
+          )),
+    ];
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
+      initialChildSize: 0.7,
       minChildSize: 0.2,
       maxChildSize: 0.8,
       expand: false,
@@ -49,35 +70,10 @@ class _GiftStatsBottomsheetState extends State<GiftStatsBottomsheet>
           decoration: const BoxDecoration(
             color: Colors.white,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TabBar(
-                controller: _tabController,
-                labelColor: Colors.black,
-                labelStyle: TextStyle(fontSize: 14),
-                labelPadding:
-                    const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-                indicatorPadding: EdgeInsets.zero,
-                tabs: const [
-                  Tab(
-                    text: 'Privilege',
-                  ),
-                  Tab(
-                    text: 'Trick',
-                  ),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    Container(),
-                    Container(),
-                  ],
-                ),
-              )
-            ],
+          child: PolarTabBar(
+            radius: 10,
+            tabs: tabs,
+            background: const Color(0xFFD6D6D6),
           ),
         ),
       ),

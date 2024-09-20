@@ -129,4 +129,11 @@ class FirebaseDbService {
         database.ref('${FirebaseDbNode.message}/$chatWindowId/${chat.id}');
     return await messageRef.update(chat.toMap());
   }
+
+  static Future<void> updateOnlineStatus(
+      String userId, String onlineStatus) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.onlineStatus}/$userId');
+    await liveRoomRef.set(onlineStatus);
+  }
 }

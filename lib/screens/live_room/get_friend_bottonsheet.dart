@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
+import 'package:svgaplayer_flutter_rhr/svgaplayer_flutter.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -22,18 +23,22 @@ import '../../utils/prefs_key.dart';
 import '../../widgets/enum.dart';
 
 class GetFriendBottomsheet extends StatefulWidget {
-  const GetFriendBottomsheet(
+  GetFriendBottomsheet(
       {super.key,
       required this.roomDetail,
       required this.permissionId,
       required this.themeId,
       required this.image,
-      required this.giftType});
+      required this.giftType,
+      this.isSvga,
+      this.imageLink});
   final JoinableLiveRoomModel roomDetail;
   final String permissionId;
   final String themeId;
   final File image;
   final GiftType giftType;
+  bool? isSvga;
+  String? imageLink;
 
   @override
   State<GetFriendBottomsheet> createState() => _GetFriendBottomsheetState();
@@ -200,6 +205,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
             .then(
           (value) {},
         );
+        _showSnackbarWithImage();
       }
     });
   }
@@ -267,5 +273,30 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
         );
       }
     });
+  }
+
+  void _showSnackbarWithImage() {
+    log('img = ${widget.imageLink}');
+    final snackBar = SnackBar(
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 300,
+            child: SVGASimpleImage(
+              resUrl: widget.imageLink,
+            ),
+          )
+        ],
+      ),
+      duration: Duration(seconds: 5), // Show for 5 seconds
+      backgroundColor: Colors
+          .transparent, // Transparent background for better image visibility
+      behavior: SnackBarBehavior.floating, // Floating Snackbar at the bottom
+      elevation: 0, // Remove shadow to focus on the image
+    );
+
+    // Show the SnackBar
+    ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackBar);
   }
 }

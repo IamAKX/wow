@@ -112,4 +112,9 @@ class API {
   static const String addLiveExp = '$baseUrl/addLiveExp';
   static const String sendGift = '$baseUrl/sendGift';
   static const String kickOutLiveUser = '$baseUrl/kickOutLiveUser';
+  static const String getLiveGifting = '$baseUrl/getLiveGifting';
+  static const String getTotalLiveGifting = '$baseUrl/getTotalLiveGifting';
+  static const String getReceiverGiftHistory =
+      '$baseUrl/getReceiverGiftHistory';
+  static const String nearByUsers = '$baseUrl/nearByUsers';
 }

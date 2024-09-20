@@ -72,6 +72,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   String frame = '';
   List<EmojiModel> emojiList = [];
   String selectedEmoji = '';
+  int totalDiamond = 0;
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -90,7 +91,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   late AnimationController _emojiAnimationController;
   late Animation<double> _emojiAnimation;
   bool _isImageVisible = false;
-
+  Timer? _timer;
+  Timer? _diamondtimer;
   final ReceivePort _receivePort = ReceivePort();
   Map<int, LiveRoomUserModel> hotSeatMap = {};
 
@@ -98,6 +100,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Map<String, AdminLiveRoomControls> hotSeatAdminControlMap = {};
 
   void _scrollToBottom() {
+    // fetchDiamond();
     if (_scrollController.hasClients) {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
@@ -115,6 +118,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         getOtherRoomReward();
       }
     });
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      fetchDiamond();
+    });
     initAudioPlayer();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -127,7 +133,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     });
   }
 
-  Timer? _timer;
   // Future<void> getPeriodicReward(SendPort sendPort) async {
   //   _timer = Timer.periodic(const Duration(minutes: 10), (timer) async {
   //     if (widget.agoraToken.isSelfCreated ?? false) {
@@ -275,9 +280,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .onValue
         .listen((event) async {
       final dataSnapshot = event.snapshot;
+
       if (dataSnapshot.exists) {
         liveRoomControls =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
+
+        setState(() {});
+        log('updating ${liveRoomControls.giftVisiualEffect}');
         if (liveRoomControls.invite ?? false) {
           showInvitePopup(liveRoomControls.position ?? 0);
         }
@@ -385,6 +394,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   void dispose() {
     // _receivePort.close();
     _timer?.cancel();
+    _diamondtimer?.cancel();
     _musicplayerAnimationController.dispose();
     // agoraEngine.leaveChannel();
     // agoraEngine.release();
@@ -877,7 +887,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      showMoreOptionPopup(context);
+                    },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
                       child: Icon(
@@ -1235,9 +1247,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   child: Chip(
                     padding: const EdgeInsets.all(0),
                     backgroundColor: Colors.transparent,
-                    label: const Text(
-                      '3.5k',
-                      style: TextStyle(
+                    label: Text(
+                      '${formatDiamondNumber(totalDiamond)}',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
                       ),
@@ -1569,7 +1581,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 },
               ),
               ListTile(
-                title: Text('Profile'),
+                title: const Text('Profile'),
                 onTap: () {
                   Navigator.pop(context);
                   showModalBottomSheet(
@@ -1617,7 +1629,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 },
               ),
               ListTile(
-                title: Text('Profile'),
+                title: const Text('Profile'),
                 onTap: () {
                   Navigator.pop(context);
                   showModalBottomSheet(
@@ -1798,7 +1810,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
-                            builder: (context) => const ScoreboardBottomsheet(),
+                            builder: (context) => ScoreboardBottomsheet(
+                              roomDetail: roomDetail ??
+                                  JoinableLiveRoomModel(
+                                    id: widget.agoraToken.mainId,
+                                  ),
+                            ),
                           );
                         },
                         child: getMenuItem(
@@ -1870,6 +1887,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         roomDetail?.password = '';
         await LiveRoomFirebase.updateLiveRoomInfo(roomDetail!);
         showToastMessage('Live room unlocked');
+        setState(() {});
+      }
+    });
+  }
+
+  void fetchDiamond() {
+    Map<String, dynamic> reqBody = {
+      'liveId': widget.agoraToken.mainId,
+    };
+    apiCallProvider
+        .postRequest(API.getTotalLiveGifting, reqBody)
+        .then((value) async {
+      if (value['success'] == '1' && value['details'] != null) {
+        totalDiamond = value['details']['diamond'];
         setState(() {});
       }
     });
@@ -2060,6 +2091,192 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           ],
         );
       },
+    );
+  }
+
+  showMoreOptionPopup(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => Stack(
+        children: [
+          Positioned(
+            bottom: 1, // Ensures dialog stays on top of keyboard
+            left: 0,
+            right: 0,
+            child: Dialog(
+              child: Container(
+                height: 100,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {},
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                              'assets/image/maill.png',
+                              width: 35,
+                            ),
+                            const Text(
+                              'Lucky Bags',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => StatefulBuilder(builder:
+                                      (BuildContext context,
+                                          StateSetter setModalState) {
+                                    return loadVisualEffect(
+                                        context, setModalState);
+                                  }));
+                        },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                              'assets/image/setting.png',
+                              width: 30,
+                            ),
+                            const Text(
+                              'Visual Effects',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {},
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                              'assets/image/shareoption.png',
+                              width: 30,
+                            ),
+                            const Text(
+                              'Share',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadVisualEffect(BuildContext context, StateSetter setModalState) {
+    return FractionallySizedBox(
+      heightFactor: 0.5,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: const Text(
+              'Visual effect switch',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          SwitchListTile(
+            value: liveRoomControls.giftVisiualEffect ?? false,
+            title: const Text('Gift Visual Effects'),
+            onChanged: (value) async {
+              // giftVisiualEffect = !giftVisiualEffect;
+              await LiveRoomFirebase.updateLiveRoomAdminSettings(
+                  widget.agoraToken.mainId ?? '',
+                  user?.id ?? '',
+                  'giftVisiualEffect',
+                  !(liveRoomControls.giftVisiualEffect ?? false));
+              setModalState(() {});
+            },
+          ),
+          const Divider(
+            color: Colors.grey,
+          ),
+          SwitchListTile(
+            value: liveRoomControls.vehicalVisiualEffect ?? false,
+            title: const Text('Vehical Visual Effects'),
+            onChanged: (value) async {
+              // giftVisiualEffect = !giftVisiualEffect;
+              await LiveRoomFirebase.updateLiveRoomAdminSettings(
+                  widget.agoraToken.mainId ?? '',
+                  user?.id ?? '',
+                  'vehicalVisiualEffect',
+                  !(liveRoomControls.vehicalVisiualEffect ?? false));
+              setModalState(() {});
+            },
+          ),
+          const Divider(
+            color: Colors.grey,
+          ),
+          SwitchListTile(
+            value: liveRoomControls.giftSound ?? false,
+            title: const Text('Gift Sounds'),
+            onChanged: (value) async {
+              // giftVisiualEffect = !giftVisiualEffect;
+              await LiveRoomFirebase.updateLiveRoomAdminSettings(
+                  widget.agoraToken.mainId ?? '',
+                  user?.id ?? '',
+                  'giftSound',
+                  !(liveRoomControls.giftSound ?? false));
+              setModalState(() {});
+            },
+          ),
+          const Divider(
+            color: Colors.grey,
+          ),
+          SwitchListTile(
+            value: liveRoomControls.rewardEffects ?? false,
+            title: const Text('Reward Effect'),
+            onChanged: (value) async {
+              // giftVisiualEffect = !giftVisiualEffect;
+              await LiveRoomFirebase.updateLiveRoomAdminSettings(
+                  widget.agoraToken.mainId ?? '',
+                  user?.id ?? '',
+                  'rewardEffects',
+                  !(liveRoomControls.rewardEffects ?? false));
+              setModalState(() {});
+            },
+          ),
+          const Divider(
+            color: Colors.grey,
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              'If the image jitters, try to switch off the Visual Effects',
+              style: TextStyle(fontSize: 10),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

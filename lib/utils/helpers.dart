@@ -173,3 +173,16 @@ Map<int, LiveRoomUserModel?> convertToHotSeat(Map<String, Object?> inputMap) {
     return MapEntry(int.parse(key), value as LiveRoomUserModel?);
   });
 }
+
+String formatDiamondNumber(int number) {
+  if (number >= 1000000) {
+    // Format numbers in millions
+    return (number / 1000000).toStringAsFixed(1) + 'M';
+  } else if (number >= 1000) {
+    // Format numbers in thousands
+    return (number / 1000).toStringAsFixed(1) + 'k';
+  } else {
+    // Return numbers as is if they are less than 1000
+    return number.toString();
+  }
+}

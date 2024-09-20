@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/live_room_detail_model.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home/near_by.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/popular.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/related.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/search_member.dart';
@@ -98,14 +99,7 @@ class _HomeScreenState extends State<HomeScreen>
             children: const [
               RelatedScreen(),
               PopularScreen(),
-              Center(
-                  child: Text(
-                'Result Not Found',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
-              )),
+              NearBy()
             ],
           ),
         ),

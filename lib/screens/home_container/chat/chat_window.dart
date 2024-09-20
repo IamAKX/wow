@@ -26,6 +26,7 @@ import 'dart:ui' as ui show Gradient;
 import '../../../providers/api_call_provider.dart';
 import '../../../services/storage_service.dart';
 import '../../../utils/api.dart';
+import '../../../utils/firebase_db_node.dart';
 import '../../../widgets/enum.dart';
 import '../../../widgets/network_image_preview_fullscreen.dart';
 
@@ -47,17 +48,41 @@ class _ChatWindowState extends State<ChatWindow> {
   late final RecorderController recorderController;
   PlayerController controller = PlayerController();
   late ApiCallProvider apiCallProvider;
+  String isOnline = 'Offline';
+  static FirebaseDatabase database = FirebaseDatabase.instance;
 
   @override
   void initState() {
     super.initState();
     recorderController = RecorderController();
+    // FirebaseDbService.updateOnlineStatus(
+    //     widget.chatWindowDetails.currentUser?.id ?? '', 'Online');
+    database
+        .ref(
+            '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        isOnline = dataSnapshot.value as String;
+        setState(() {
+          log('status = $isOnline');
+        });
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
   @override
   void dispose() {
     recorderController.dispose();
+    // FirebaseDbService.updateOnlineStatus(
+    //     widget.chatWindowDetails.currentUser?.id ?? '', 'Offline');
+    database
+        .ref(
+            '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
+        .onValue
+        .drain();
     super.dispose();
   }
 
@@ -89,8 +114,8 @@ class _ChatWindowState extends State<ChatWindow> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          subtitle: const Text(
-            'Offline',
+          subtitle: Text(
+            '$isOnline',
             style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
           ),
         ),

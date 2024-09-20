@@ -12,6 +12,8 @@ class WhatsonModel {
   String? name;
   String? username;
   String? dob;
+  List<String>? eventSubscribers;
+  bool? isSubscribe;
   String? imageDp;
 
   WhatsonModel(
@@ -28,6 +30,8 @@ class WhatsonModel {
       this.name,
       this.username,
       this.dob,
+      this.eventSubscribers,
+      this.isSubscribe,
       this.imageDp});
 
   WhatsonModel.fromJson(Map<String, dynamic> json) {
@@ -44,12 +48,15 @@ class WhatsonModel {
     name = json['name'];
     username = json['username'];
     dob = json['dob'];
+    eventSubscribers = json['eventSubscribers'].cast<String>();
+    isSubscribe = json['isSubscribe'];
     imageDp = json['imageDp'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['event_topic'] = eventTopic;
     data['eventCreaterId'] = eventCreaterId;
     data['description'] = description;
     data['event_startTime'] = eventStartTime;
@@ -61,6 +68,8 @@ class WhatsonModel {
     data['name'] = name;
     data['username'] = username;
     data['dob'] = dob;
+    data['eventSubscribers'] = eventSubscribers;
+    data['isSubscribe'] = isSubscribe;
     data['imageDp'] = imageDp;
     return data;
   }

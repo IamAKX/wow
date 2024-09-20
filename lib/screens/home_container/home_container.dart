@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/explore/explore_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/home_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/profile/profile_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+
+import '../../services/firebase_db_service.dart';
 
 class HomeContainer extends StatefulWidget {
   static const String route = '/homeContainer';
@@ -28,6 +32,20 @@ class _HomeContainerState extends State<HomeContainer> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseDbService.updateOnlineStatus(
+        prefs.getString(PrefsKey.userId) ?? '', 'Online');
+  }
+
+  @override
+  void dispose() {
+    FirebaseDbService.updateOnlineStatus(
+        prefs.getString(PrefsKey.userId) ?? '', 'Offline');
+    super.dispose();
   }
 
   @override

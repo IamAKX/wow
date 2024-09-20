@@ -215,7 +215,12 @@ class _WhatsOnScreenState extends State<WhatsOnScreen> {
                                             subscribeUnSubscribeEvent(
                                                 list.elementAt(index).id ?? '');
                                           },
-                                          child: const Text('SUBSCRIBE'),
+                                          child: Text((list
+                                                      .elementAt(index)
+                                                      .isSubscribe ??
+                                                  false)
+                                              ? 'SUBSCRIBED'
+                                              : 'SUBSCRIBE'),
                                         ),
                                 ],
                               ),
