@@ -4,7 +4,6 @@ import 'dart:isolate';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -128,8 +127,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       loadRoomOwnerData();
       initEmojiAnimation();
       loadEmojiList();
-
-      // initializeAgora();
+      initializeAgora();
     });
   }
 
@@ -284,9 +282,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       if (dataSnapshot.exists) {
         liveRoomControls =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
-
-        setState(() {});
+        if (mounted) setState(() {});
         log('updating ${liveRoomControls.giftVisiualEffect}');
+
+        agoraEngine.muteLocalAudioStream(liveRoomControls.isMicMute ?? true);
+        agoraEngine
+            .setEnableSpeakerphone(liveRoomControls.isSpeakerMute ?? true);
         if (liveRoomControls.invite ?? false) {
           showInvitePopup(liveRoomControls.position ?? 0);
         }
@@ -334,6 +335,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 AdminLiveRoomControls.fromMap(element.value);
           },
         );
+
         if (mounted) {
           setState(() {});
         }
@@ -396,8 +398,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     _timer?.cancel();
     _diamondtimer?.cancel();
     _musicplayerAnimationController.dispose();
-    // agoraEngine.leaveChannel();
-    // agoraEngine.release();
+    agoraEngine.leaveChannel();
+    agoraEngine.release();
     cleanFirebaseListener();
     _audioPlayer.dispose();
     _emojiAnimationController.dispose();
@@ -801,11 +803,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ),
                   InkWell(
                     onTap: () {
+                      log('agora mic : ${!(liveRoomControls.isMicMute ?? true)}');
+                      agoraEngine.muteLocalAudioStream(
+                          !(liveRoomControls.isMicMute ?? true));
                       LiveRoomFirebase.updateLiveRoomAdminSettings(
                           widget.agoraToken.mainId ?? '',
                           user?.id ?? '',
                           'isMicMute',
-                          !(liveRoomControls.isMicMute ?? false));
+                          !(liveRoomControls.isMicMute ?? true));
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.white38,
@@ -858,11 +863,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ),
                   InkWell(
                     onTap: () {
+                      log('agora speaker : ${!(liveRoomControls.isSpeakerMute ?? true)}');
+                      agoraEngine.setEnableSpeakerphone(
+                          !(liveRoomControls.isSpeakerMute ?? true));
+                      agoraEngine.adjustPlaybackSignalVolume(
+                          (!(liveRoomControls.isSpeakerMute ?? true))
+                              ? 100
+                              : 0);
+
                       LiveRoomFirebase.updateLiveRoomAdminSettings(
                           widget.agoraToken.mainId ?? '',
                           user?.id ?? '',
                           'isSpeakerMute',
-                          !(liveRoomControls.isSpeakerMute ?? false));
+                          !(liveRoomControls.isSpeakerMute ?? true));
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.white38,
