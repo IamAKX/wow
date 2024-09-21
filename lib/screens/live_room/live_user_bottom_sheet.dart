@@ -6,24 +6,22 @@ import '../../services/live_room_firebase.dart';
 import '../../widgets/circular_image.dart';
 import '../../widgets/gaps.dart';
 
-class InviteAudienceBottomSheet extends StatefulWidget {
-  const InviteAudienceBottomSheet(
+class LiveUserBottomSheet extends StatefulWidget {
+  const LiveUserBottomSheet(
       {super.key,
       required this.roomDetail,
-      required this.position,
       required this.participants,
       required this.hotSeatMap});
   final JoinableLiveRoomModel roomDetail;
-  final int position;
+
   final List<LiveRoomUserModel> participants;
   final Map<int, LiveRoomUserModel> hotSeatMap;
 
   @override
-  State<InviteAudienceBottomSheet> createState() =>
-      _InviteAudienceBottomSheetState();
+  State<LiveUserBottomSheet> createState() => _LiveUserBottomSheetState();
 }
 
-class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
+class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
   @override
   Widget build(BuildContext context) {
     LiveRoomUserModel owner = widget.participants.firstWhere((element) {
@@ -53,7 +51,7 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
                   ),
                   const Spacer(),
                   Text(
-                    '${widget.participants.length} people online',
+                    '${widget.participants.length + 1} people online',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
@@ -62,13 +60,13 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
               ),
             ),
             verticalGap(5),
-            Text('Homeowner'),
+            Text('    Homeowner'),
             getMemberList(owner, context),
             Divider(
               color: Colors.grey,
             ),
             verticalGap(5),
-            Text('Member'),
+            Text('    Member'),
             Expanded(
               child: ListView.separated(
                   itemBuilder: (context, index) {
@@ -97,28 +95,6 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      onTap: () {
-        if (visitorModel.id == widget.roomDetail.userId) {
-          return;
-        }
-        // widget.hotSeatMap.entries.forEach(
-        //   (element) {
-        //     if (element.value.id == visitorModel.id) {
-        //       LiveRoomFirebase.removeLiveRoomHotSeat(
-        //         widget.roomDetail.id ?? '',
-        //         element.key,
-        //       );
-        //     }
-        //   },
-        // );
-        // LiveRoomFirebase.addLiveRoomHotSeat(
-        //     widget.roomDetail.id ?? '', widget.position + 1, visitorModel);
-        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
-            visitorModel.id ?? '', 'position', widget.position);
-        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
-            visitorModel.id ?? '', 'invite', true);
-        Navigator.pop(context);
-      },
       subtitle: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

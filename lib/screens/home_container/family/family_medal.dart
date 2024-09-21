@@ -32,6 +32,9 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
   carousel.CarouselController _flutterCarouselController =
       carousel.CarouselController();
 
+  String members = '0';
+  String admins = '0';
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +61,15 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
     //   }
     // });
 
+    _tabController.addListener(
+      () {
+        members =
+            list.elementAt(_tabController.index).elementAt(0).members ?? '0';
+        admins = list.elementAt(_tabController.index).elementAt(0).admin ?? '0';
+        setState(() {});
+      },
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadData();
     });
@@ -66,6 +78,10 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
   void loadData() async {
     for (int i = 1; i <= 5; i++) {
       await loadSingleFamilyDeatilsData(i);
+    }
+    if (list.isNotEmpty) {
+      members = list.first.first.members ?? '0';
+      admins = list.first.first.admin ?? '0';
     }
   }
 
@@ -142,7 +158,7 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
           ],
         ),
       ),
-      body: apiCallProvider.status == ApiStatus.loading
+      body: apiCallProvider.status == ApiStatus.loading || list.isEmpty
           ? const DefaultPageLoader(
               progressColor: Color(0xFF00DA39),
             )
@@ -186,16 +202,14 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
                         child: getPrivilegeCard('Rank Medal',
                             list[position].first.mainImage ?? '')),
                     Expanded(
-                        child: getPrivilegeCard(
-                            '${list[position].first.members} Medal',
+                        child: getPrivilegeCard('$members Members',
                             list[position].first.memberImage ?? '')),
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(
-                        child: getPrivilegeCard(
-                            '${list[position].first.admin} Admins',
+                        child: getPrivilegeCard('$admins Admins',
                             list[position].first.adminImage ?? '')),
                     (position == 0)
                         ? Expanded(
@@ -363,6 +377,9 @@ class _FamilyMedalScreenState extends State<FamilyMedalScreen>
         onPageChanged: (index, reason) {
           log('index = $index');
           log('index = $reason');
+          members = list.elementAt(position).elementAt(index).members ?? '0';
+          admins = list.elementAt(position).elementAt(index).admin ?? '0';
+          setState(() {});
         },
         slideIndicator: const CircularSlideIndicator(
           slideIndicatorOptions: SlideIndicatorOptions(

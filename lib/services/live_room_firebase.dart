@@ -83,11 +83,14 @@ class LiveRoomFirebase {
     return await newMessageRef.set(chat.toMap());
   }
 
-  static Future<void> clearChat(String chatWindowId, LiveroomChat chat) async {
+  static Future<void> clearChat(String chatWindowId, LiveroomChat chat,
+      {bool? sendMessage}) async {
     DatabaseReference messageRef =
         database.ref('${FirebaseDbNode.liveRoomChat}/$chatWindowId');
     await messageRef.remove();
-    sendChat(chatWindowId, chat);
+    if (sendMessage ?? true) {
+      sendChat(chatWindowId, chat);
+    }
   }
 
   static Future<void> addLiveRoomHotSeat(

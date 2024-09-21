@@ -22,6 +22,7 @@ import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dar
 import 'package:worldsocialintegrationapp/screens/live_room/gift_stats_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/invite_audience_bottom_sheet.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/live_user_bottom_sheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/lock_room.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/music_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/scoreboard_bottomsheet.dart';
@@ -36,6 +37,7 @@ import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/country_continent.dart';
+import '../../models/family_id_model.dart';
 import '../../models/live_room_detail_model.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
@@ -43,6 +45,7 @@ import '../../services/live_room_firebase.dart';
 import '../../services/location_service.dart';
 import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import '../home_container/family/family_screen.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
 import 'prime_gift_bottom.dart';
@@ -677,6 +680,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               Navigator.pop(context);
             },
           );
+          hotSeatMap.entries.forEach((entry) {
+            LiveRoomFirebase.updateLiveRoomAdminSettings(
+                widget.agoraToken.mainId ?? '',
+                hotSeatMap[entry.key]?.id ?? '',
+                'position',
+                entry.key);
+            LiveRoomFirebase.updateLiveRoomAdminSettings(
+                widget.agoraToken.mainId ?? '',
+                hotSeatMap[entry.key]?.id ?? '',
+                'kickout',
+                true);
+          });
+
+          LiveRoomFirebase.clearChat(
+              widget.agoraToken.mainId ?? '', LiveroomChat(),
+              sendMessage: false);
 
           LiveroomChat liveroomChat = LiveroomChat(
               message: 'left Stream',
@@ -1001,9 +1020,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.green, Colors.yellow, Colors.deepOrange],
-          ),
+          // gradient: const LinearGradient(
+          //   colors: [Colors.green, Colors.yellow, Colors.deepOrange],
+          // ),
+          color: const Color(0xFF252526),
           border: Border.all(color: Colors.red),
           borderRadius: BorderRadius.circular(10)),
       child: Row(
@@ -1377,51 +1397,76 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Theme(
-                data: Theme.of(context).copyWith(
-                  canvasColor: Colors.black.withOpacity(0.2),
-                ),
-                child: Chip(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  backgroundColor: Colors.transparent,
-                  label: Text(
-                    '$participantCount',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+              InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => LiveUserBottomSheet(
+                      roomDetail: roomDetail ??
+                          JoinableLiveRoomModel(
+                            id: widget.agoraToken.mainId,
+                          ),
+                      participants: List.from(participants),
+                      hotSeatMap: hotSeatMap,
                     ),
+                  );
+                },
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    canvasColor: Colors.black.withOpacity(0.2),
                   ),
-                  labelPadding: const EdgeInsets.only(right: 5),
-                  visualDensity: VisualDensity.compact,
-                  avatar: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 15,
+                  child: Chip(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    backgroundColor: Colors.transparent,
+                    label: Text(
+                      '$participantCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    labelPadding: const EdgeInsets.only(right: 5),
+                    visualDensity: VisualDensity.compact,
+                    avatar: const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 15,
+                    ),
                   ),
                 ),
               ),
-              Container(
-                alignment: Alignment.centerRight,
-                height: 30,
-                width: 90,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(
-                        'assets/image/family_badge_23.webp',
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pushNamed(FamilyScreen.route,
+                      arguments: FamilyIdModel(
+                          userId: roomOwner?.id,
+                          familyId: roomOwner?.familyId));
+                },
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  height: 30,
+                  width: 90,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(
+                          'assets/image/family_badge_23.webp',
+                        ),
+                        fit: BoxFit.fill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        roomOwner?.familyName ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
                       ),
-                      fit: BoxFit.fill),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      user?.familyName ?? '',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                    )
-                  ],
+                      horizontalGap(5),
+                    ],
+                  ),
                 ),
               )
             ],
