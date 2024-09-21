@@ -102,7 +102,7 @@ class LiveRoomFirebase {
       String chatWindowId, int spot) async {
     DatabaseReference liveRoomRef =
         database.ref('${FirebaseDbNode.liveRoomHotSeat}/$chatWindowId/$spot');
-
+    log('Removing $spot');
     await liveRoomRef.remove();
   }
 

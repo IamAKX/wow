@@ -62,13 +62,13 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
               ),
             ),
             verticalGap(5),
-            Text('Homeowner'),
+            Text('    Homeowner'),
             getMemberList(owner, context),
             Divider(
               color: Colors.grey,
             ),
             verticalGap(5),
-            Text('Member'),
+            Text('    Member'),
             Expanded(
               child: ListView.separated(
                   itemBuilder: (context, index) {
@@ -115,8 +115,8 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
         //     widget.roomDetail.id ?? '', widget.position + 1, visitorModel);
         LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
             visitorModel.id ?? '', 'position', widget.position);
-        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
-            visitorModel.id ?? '', 'invite', true);
+        LiveRoomFirebase.updateLiveRoomAdminSettings(
+            widget.roomDetail.id ?? '', visitorModel.id ?? '', 'invite', true);
         Navigator.pop(context);
       },
       subtitle: Row(

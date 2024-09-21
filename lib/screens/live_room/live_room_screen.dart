@@ -96,6 +96,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Map<int, LiveRoomUserModel> hotSeatMap = {};
 
   AdminLiveRoomControls liveRoomControls = AdminLiveRoomControls();
+  AdminLiveRoomControls liveRoomControlsForAdmin = AdminLiveRoomControls();
   Map<String, AdminLiveRoomControls> hotSeatAdminControlMap = {};
 
   void _scrollToBottom() {
@@ -266,9 +267,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 LiveRoomUserModel.fromMap(element.value);
           },
         );
-        if (mounted) {
-          setState(() {});
-        }
+        log(hotSeatMap.toString());
+        setState(() {});
+      } else {
+        hotSeatMap = {};
+        setState(() {});
       }
     });
 
@@ -282,7 +285,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       if (dataSnapshot.exists) {
         liveRoomControls =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
-        if (mounted) setState(() {});
+        setState(() {});
         log('updating ${liveRoomControls.giftVisiualEffect}');
 
         agoraEngine.muteLocalAudioStream(liveRoomControls.isMicMute ?? true);
@@ -297,6 +300,33 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         }
       } else {
         liveRoomControls = AdminLiveRoomControls(
+            giftSound: false,
+            giftVisiualEffect: false,
+            isMicMute: false,
+            isSpeakerMute: false,
+            kickout: false,
+            rewardEffects: false,
+            invite: false,
+            position: 0,
+            vehicalVisiualEffect: false);
+        LiveRoomFirebase.addLiveRoomAdminSettings(
+            widget.agoraToken.mainId ?? '', user?.id ?? '', liveRoomControls);
+      }
+    });
+
+    database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}/${widget.agoraToken.roomCreatedBy}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.exists) {
+        liveRoomControlsForAdmin =
+            AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
+        setState(() {});
+      } else {
+        liveRoomControlsForAdmin = AdminLiveRoomControls(
             giftSound: false,
             giftVisiualEffect: false,
             isMicMute: false,
@@ -1304,15 +1334,37 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 verticalGap(20),
-                frame.isEmpty || true
-                    ? CircularImage(
-                        imagePath: roomOwner?.image ?? '',
-                        diameter: 80,
-                      )
-                    : AnimatedFramedCircularImage(
-                        imagePath: user?.image ?? '',
-                        imageSize: 80,
-                        framePath: frame),
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: frame.isEmpty || true
+                      ? Stack(
+                          children: [
+                            CircularImage(
+                              imagePath: roomOwner?.image ?? '',
+                              diameter: 80,
+                            ),
+                            if (liveRoomControlsForAdmin.isMicMute ?? false)
+                              const Positioned(
+                                right: 1,
+                                bottom: 1,
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white54,
+                                  radius: 15,
+                                  child: Icon(
+                                    Icons.mic_off,
+                                    size: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              )
+                          ],
+                        )
+                      : AnimatedFramedCircularImage(
+                          imagePath: user?.image ?? '',
+                          imageSize: 80,
+                          framePath: frame),
+                ),
                 verticalGap(10),
                 Text(
                   roomOwner?.name ?? '',
@@ -1557,6 +1609,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       'isMicMute',
                       !(settings?.isMicMute ?? false));
                   Navigator.of(context).pop();
+                  setState(() {});
                 },
               ),
               ListTile(
@@ -1640,6 +1693,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       .then(
                     (value) {
                       Navigator.pop(context);
+                      setState(() {});
                     },
                   );
                 },

@@ -78,6 +78,7 @@ import '../screens/home_container/chat/chat_screen.dart';
 import '../screens/home_container/event/create_event_one.dart';
 import '../screens/home_container/explore/wow_leaderboard.dart';
 import '../screens/home_container/profile/comment.dart';
+import '../screens/income/income_Screen.dart';
 
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
@@ -297,6 +298,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const AnchorRequestScreen());
       case ChatScreen.route:
         return MaterialPageRoute(builder: (_) => const ChatScreen());
+      case IncomeScreen.route:
+        return MaterialPageRoute(builder: (_) => const IncomeScreen());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
