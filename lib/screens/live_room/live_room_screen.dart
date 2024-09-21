@@ -167,10 +167,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     });
 
     _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      if (mounted)
-        setState(() {
-          _isPlaying = state == PlayerState.playing;
-        });
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+      });
     });
   }
 
@@ -211,11 +210,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           },
         );
 
-        if (mounted) {
-          setState(() {
-            participantCount = participants.length;
-          });
-        }
+        setState(() {
+          participantCount = participants.length;
+        });
       }
     });
 
@@ -366,9 +363,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           },
         );
 
-        if (mounted) {
-          setState(() {});
-        }
+        setState(() {});
       }
     });
 
