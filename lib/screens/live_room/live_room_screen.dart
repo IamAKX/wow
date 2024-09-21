@@ -642,7 +642,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       child: InkWell(
         onTap: () async {
           _isClicked = !_isClicked;
-          await LiveRoomFirebase.toggleUserInRoomArray(
+          if (widget.agoraToken.isSelfCreated ?? false) {
+            archiveLiveRoom();
+          }
+          LiveRoomFirebase.toggleUserInRoomArray(
                   widget.agoraToken.mainId ?? '', user, false)
               .then(
             (value) {
@@ -2291,5 +2294,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         ],
       ),
     );
+  }
+
+  void archiveLiveRoom() {
+    Map<String, dynamic> reqBody = {
+      'liveId': widget.agoraToken.mainId,
+    };
+    apiCallProvider.postRequest(API.archieveLive, reqBody).then((value) async {
+      if (value['success'] == '1') {}
+    });
   }
 }

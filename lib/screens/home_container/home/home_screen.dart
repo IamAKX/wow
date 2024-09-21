@@ -69,8 +69,10 @@ class _HomeScreenState extends State<HomeScreen>
         Navigator.of(context)
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
-              (value) {},
-            );
+          (value) {
+            setState(() {});
+          },
+        );
       }
     });
   }
@@ -96,11 +98,7 @@ class _HomeScreenState extends State<HomeScreen>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              RelatedScreen(),
-              PopularScreen(),
-              NearBy()
-            ],
+            children: const [RelatedScreen(), PopularScreen(), NearBy()],
           ),
         ),
       ],

@@ -16,6 +16,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
 import '../../../models/feed.dart';
+import '../../../models/live_room_detail_model.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
@@ -25,6 +26,7 @@ import '../../../utils/helpers.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/feed_video_player.dart';
 import '../../../widgets/network_image_preview_fullscreen.dart';
+import '../../live_room/live_room_screen.dart';
 import '../profile/comment.dart';
 
 class OtherUserDeatilScreen extends StatefulWidget {
@@ -426,16 +428,57 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                       imagePath: otherUser?.image ?? '',
                     ),
                   )),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: pagePadding),
-                child: Text(
-                  otherUser?.name ?? '',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: pagePadding),
+                    child: Text(
+                      otherUser?.name ?? '',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  Visibility(
+                    visible: otherUser?.liveStatus ?? false,
+                    child: InkWell(
+                      onTap: () async {
+                        if (otherUser?.userLive?.password?.isNotEmpty ??
+                            false) {
+                          String? isPasswordVerified = await showPasswordDialog(
+                              context, otherUser!.userLive!.password!);
+                          if (isPasswordVerified != 'true') {
+                            return;
+                          }
+                        }
+                        LiveRoomDetailModel liveRoomDetailModel =
+                            LiveRoomDetailModel(
+                          channelName: otherUser?.userLive?.channelName,
+                          mainId: otherUser?.userLive?.id,
+                          token: otherUser?.userLive?.rtmToken,
+                          isSelfCreated: false,
+                          roomCreatedBy: otherUser?.userLive?.userId,
+                        );
+                        Navigator.of(context)
+                            .pushNamed(LiveRoomScreen.route,
+                                arguments: liveRoomDetailModel)
+                            .then(
+                              (value) {},
+                            );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Image.asset(
+                          'assets/image/audio-8777_128.gif',
+                          width: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -469,10 +512,11 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                     Container(
                       width: 60,
                       padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
                         image: DecorationImage(
-                            image: AssetImage(
-                              'assets/image/level_1.png',
+                            image: NetworkImage(
+                              user?.lavelInfomation?.sandBgImage ?? '',
                             ),
                             fit: BoxFit.fill),
                       ),
@@ -495,10 +539,11 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                     Container(
                       width: 60,
                       padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
                         image: DecorationImage(
-                            image: AssetImage(
-                              'assets/image/level_9.png',
+                            image: NetworkImage(
+                              user?.lavelInfomation?.reciveBgImage ?? '',
                             ),
                             fit: BoxFit.fill),
                       ),

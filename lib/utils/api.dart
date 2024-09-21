@@ -117,4 +117,6 @@ class API {
   static const String getReceiverGiftHistory =
       '$baseUrl/getReceiverGiftHistory';
   static const String nearByUsers = '$baseUrl/nearByUsers';
+  static const String archieveLive = '$baseUrl/archieveLive';
+  static const String listGameSectionDetails = '$baseUrl/listGameSectionDetails';
 }

@@ -96,5 +96,10 @@
 	<string>This app is requires Mic permission.</string>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Wows requires access to media library</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+	</dict>
 </dict>
 </plist>

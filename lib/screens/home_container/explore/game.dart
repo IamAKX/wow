@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/games_model.dart';
+import 'package:worldsocialintegrationapp/utils/api.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/custom_webview.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
@@ -33,10 +34,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   loadData() async {
-    await apiCallProvider
-        .getRequest(
-            'https://xrdsimulators.tech/wow_project/index.php/listGameSectionDetails')
-        .then((value) {
+    await apiCallProvider.getRequest(API.listGameSectionDetails).then((value) {
       list.clear();
       if (value['data'] != null) {
         for (var item in value['data']) {

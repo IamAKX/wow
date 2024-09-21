@@ -25,12 +25,15 @@ import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
+import '../../../models/family_live_members.dart';
+import '../../../models/live_room_detail_model.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/default_page_loader.dart';
 import '../../../widgets/framed_circular_image.dart';
+import '../../live_room/live_room_screen.dart';
 import '../profile/profile_detail_screen.dart';
 
 class FamilyScreen extends StatefulWidget {
@@ -48,12 +51,14 @@ class _FamilyScreenState extends State<FamilyScreen> {
   UserProfileDetail? user;
   SingleFamilyDetailModel? singleFamilyDetailModel;
   int familyLevel = 0;
+  List<FamilyLiveMembers> list = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
+      loadLiveMemebers();
     });
   }
 
@@ -82,6 +87,23 @@ class _FamilyScreenState extends State<FamilyScreen> {
     });
   }
 
+  Future<void> loadLiveMemebers() async {
+    Map<String, dynamic> reqBody = {
+      'userId': widget.familyIdModel.userId,
+      'kickTo': widget.familyIdModel.userId,
+      'familyId': widget.familyIdModel.familyId
+    };
+    apiCallProvider.postRequest(API.getLiveJoiners, reqBody).then((value) {
+      list.clear();
+      if (value['details'] != null) {
+        for (var obj in value['details']) {
+          list.add(FamilyLiveMembers.fromMap(obj));
+        }
+        setState(() {});
+      }
+    });
+  }
+
   Future<void> loadSingleFamilyDeatilsData(String type) async {
     Map<String, dynamic> reqBody = {'type': type};
     apiCallProvider
@@ -100,7 +122,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF6F7F9),
-      body: apiCallProvider.status == ApiStatus.loading
+      body: apiCallProvider.status == ApiStatus.loading || user == null
           ? const DefaultPageLoader()
           // : familyDetails == null
           //     ? Center(
@@ -455,61 +477,99 @@ class _FamilyScreenState extends State<FamilyScreen> {
           ),
         ),
         verticalGap(10),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: 150,
-            height: 150,
+        GridView.builder(
+          padding: const EdgeInsets.all(10),
+          primary: true,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1),
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+                onTap: () async {
+                  if (list.elementAt(index).password?.isNotEmpty ?? false) {
+                    String? isPasswordVerified = await showPasswordDialog(
+                        context, list.elementAt(index).password!);
+                    if (isPasswordVerified != 'true') {
+                      return;
+                    }
+                  }
+                  LiveRoomDetailModel liveRoomDetailModel = LiveRoomDetailModel(
+                    channelName: list.elementAt(index).channelName,
+                    mainId: list.elementAt(index).id,
+                    token: list.elementAt(index).rtmToken,
+                    isSelfCreated: false,
+                    roomCreatedBy: list.elementAt(index).userId,
+                  );
+                  Navigator.of(context)
+                      .pushNamed(LiveRoomScreen.route,
+                          arguments: liveRoomDetailModel)
+                      .then(
+                    (value) {
+                      loadLiveMemebers();
+                    },
+                  );
+                },
+                child: getFamilyLiveMemberCard(list.elementAt(index)));
+          },
+        ),
+      ],
+    );
+  }
+
+  Container getFamilyLiveMemberCard(FamilyLiveMembers liveMember) {
+    return Container(
+      width: 150,
+      height: 150,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        image: DecorationImage(
+            image: NetworkImage('${liveMember.imageDp}'), fit: BoxFit.cover),
+      ),
+      alignment: Alignment.bottomLeft,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+            margin: const EdgeInsets.all(pagePadding / 2),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                  image: NetworkImage('${familyDetails?.family?.image}'),
-                  fit: BoxFit.cover),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xffFE3400),
+                  Color(0xffFBC108),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(2.0),
             ),
-            alignment: Alignment.bottomLeft,
-            child: Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                  margin: const EdgeInsets.all(pagePadding / 2),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xffFE3400),
-                        Color(0xffFBC108),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(2.0),
-                  ),
-                  child: const Text(
-                    'Any',
-                    style: TextStyle(fontSize: 14, color: Colors.white),
-                  ),
-                ),
-                const Spacer(),
-                Image.asset(
-                  'assets/image/increasing_bar.png',
-                  width: 20,
-                ),
-                horizontalGap(5),
-                SvgPicture.asset(
-                  'assets/svg/user.svg',
-                  width: 18,
-                ),
-                horizontalGap(5),
-                Text(
-                  '${familyDetails?.family?.members}',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
-                horizontalGap(10),
-              ],
+            child: Text(
+              liveMember.status ?? '',
+              style: TextStyle(fontSize: 14, color: Colors.white),
             ),
           ),
-        )
-      ],
+          const Spacer(),
+          Image.asset(
+            'assets/image/increasing_bar.png',
+            width: 20,
+          ),
+          horizontalGap(5),
+          SvgPicture.asset(
+            'assets/svg/user.svg',
+            width: 18,
+          ),
+          horizontalGap(5),
+          Text(
+            '${liveMember.liveCount ?? 0}',
+            style: TextStyle(fontSize: 14, color: Colors.white),
+          ),
+          horizontalGap(10),
+        ],
+      ),
     );
   }
 
