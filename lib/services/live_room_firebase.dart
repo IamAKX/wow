@@ -139,4 +139,32 @@ class LiveRoomFirebase {
     }
     return settings;
   }
+
+  static Future<List<LiveRoomUserModel>> getLiveRoomParticipants(
+      String roomId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomParticipants}/$roomId');
+    List<LiveRoomUserModel> participants = [];
+    DataSnapshot snapshot = await liveRoomRef.get();
+    if (snapshot.exists) {
+      List p = [];
+      if (snapshot.value is List) {
+        List l = (snapshot.value as List);
+        for (int i = 0; i < l.length; i++) {
+          if (l.elementAt(i) != null) {
+            p.add(l.elementAt(i));
+          }
+        }
+      } else {
+        (snapshot.value as Map).values.forEach((item) => p.add(item));
+      }
+      participants.clear();
+      p.forEach(
+        (element) {
+          participants.add(LiveRoomUserModel.fromMap(element));
+        },
+      );
+    }
+    return participants;
+  }
 }

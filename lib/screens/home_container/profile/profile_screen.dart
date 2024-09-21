@@ -26,6 +26,7 @@ import '../../../main.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/custom_webview.dart';
+import '../family/family_medal.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -268,7 +269,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(FamilyMedalScreen.route);
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(

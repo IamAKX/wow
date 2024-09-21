@@ -693,10 +693,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 true);
           });
 
-          LiveRoomFirebase.clearChat(
-              widget.agoraToken.mainId ?? '', LiveroomChat(),
-              sendMessage: false);
-
           LiveroomChat liveroomChat = LiveroomChat(
               message: 'left Stream',
               timeStamp: DateTime.now().millisecondsSinceEpoch,
@@ -710,6 +706,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               _scrollToBottom();
             },
           );
+
+          LiveRoomFirebase.clearChat(
+              widget.agoraToken.mainId ?? '', LiveroomChat(),
+              sendMessage: false);
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1479,37 +1479,54 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Row topBar(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 160,
-          height: 40,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.green, Colors.yellow, Colors.orange],
+        InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => ProfileBottomsheet(
+                roomDetail: roomDetail ??
+                    JoinableLiveRoomModel(
+                      id: widget.agoraToken.mainId,
+                    ),
+                liveRoomUserModel: convertUserToLiveUser(roomOwner),
+                myCoins: user?.myCoin ?? '',
+                user: user,
+              ),
+            );
+          },
+          child: Container(
+            width: 160,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.green, Colors.yellow, Colors.orange],
+              ),
+              border: Border.all(color: Colors.red),
+              borderRadius: BorderRadius.circular(50),
             ),
-            border: Border.all(color: Colors.red),
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Row(
-            children: [
-              CircularImage(
-                  imagePath: roomDetail?.liveimage ?? '', diameter: 40),
-              horizontalGap(10),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    roomDetail?.imageTitle ?? '',
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'ID : ${user?.username ?? ''}',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              )
-            ],
+            child: Row(
+              children: [
+                CircularImage(
+                    imagePath: roomDetail?.liveimage ?? '', diameter: 40),
+                horizontalGap(10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      roomDetail?.imageTitle ?? '',
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'ID : ${user?.username ?? ''}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
         const Spacer(),
@@ -2113,7 +2130,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 ),
                 itemCount: emojiList.length,
                 itemBuilder: (context, index) {
-                  return GestureDetector(
+                  return InkWell(
                     onTap: () {
                       selectedEmoji = emojiList.elementAt(index).frameImg ?? '';
                       Navigator.pop(context);
@@ -2122,7 +2139,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     child: CachedNetworkImage(
                       imageUrl: emojiList.elementAt(index).frameImg ?? '',
                       placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
+                        child: SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
                       errorWidget: (context, url, error) => Center(
                         child: Text('Error ${error.toString()}'),
