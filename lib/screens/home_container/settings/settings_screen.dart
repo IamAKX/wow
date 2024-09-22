@@ -56,7 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           onTap: () {
-            Navigator.of(context).pushNamed(ConnectedAccountScreen.route);
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(ConnectedAccountScreen.route);
           },
         ),
         const Divider(
@@ -67,7 +68,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           tileColor: Colors.white,
           title: const Text('Privacy'),
           onTap: () {
-            Navigator.of(context).pushNamed(PrivacyScreen.route);
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(PrivacyScreen.route);
           },
         ),
         const Divider(
@@ -78,7 +80,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           tileColor: Colors.white,
           title: const Text('Blocked List'),
           onTap: () {
-            Navigator.of(context).pushNamed(BlockedUserScreen.route);
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(BlockedUserScreen.route);
           },
         ),
         const Divider(
@@ -89,7 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           tileColor: Colors.white,
           title: const Text('About Us'),
           onTap: () {
-            Navigator.of(context).pushNamed(AboutUsScreen.route);
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(AboutUsScreen.route);
           },
         ),
         // const Divider(
@@ -160,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'Cancel',
@@ -171,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () async {
                 var appDir = (await getTemporaryDirectory()).path;
                 Directory(appDir).delete(recursive: true);
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'Continue',
@@ -196,8 +200,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 await GenericAuthProvider.instance.logoutUser().then(
                   (value) {
                     log('loging out');
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
+                    Navigator.of(context, rootNavigator: true).pop();
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamedAndRemoveUntil(
                       SplashScreen.route,
                       (route) => false,
                     );
@@ -211,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'No',

@@ -23,7 +23,8 @@ class UserTile extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-      onTap: () => Navigator.of(context).pushNamed(OtherUserDeatilScreen.route,
+      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
+          OtherUserDeatilScreen.route,
           arguments: visitorModel.id ?? ''),
       subtitle: Row(
         mainAxisSize: MainAxisSize.min,

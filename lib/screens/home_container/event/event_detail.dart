@@ -213,7 +213,7 @@ class _EventDetailState extends State<EventDetail> {
                   onTap: () {
                     if (subscribers?.userId ==
                         prefs.getString(PrefsKey.userId)) {
-                      Navigator.of(context)
+                      Navigator.of(context, rootNavigator: true)
                           .pushNamed(ProfileDeatilScreen.route)
                           .then(
                         (value) {
@@ -221,7 +221,7 @@ class _EventDetailState extends State<EventDetail> {
                         },
                       );
                     } else {
-                      Navigator.of(context)
+                      Navigator.of(context, rootNavigator: true)
                           .pushNamed(OtherUserDeatilScreen.route,
                               arguments: subscribers?.userId)
                           .then(
@@ -271,7 +271,8 @@ class _EventDetailState extends State<EventDetail> {
                     children: [
                       Text(
                         '${subscribers?.createdAt?.split(' ')[1]}',
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                       const Text(
                         'Subscribed',
@@ -302,7 +303,8 @@ class _EventDetailState extends State<EventDetail> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pushNamed(ShareEvent.route,
+                    Navigator.of(context, rootNavigator: true).pushNamed(
+                        ShareEvent.route,
                         arguments: widget.whatsonModel.id);
                   },
                   child: const Padding(

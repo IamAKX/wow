@@ -83,7 +83,7 @@ class _BlockedUserScreenState extends State<BlockedUserScreen> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      onTap: () => Navigator.of(context)
+      onTap: () => Navigator.of(context, rootNavigator: true)
           .pushNamed(OtherUserDeatilScreen.route,
               arguments: blockedUser.id ?? '')
           .then(

@@ -96,7 +96,7 @@ class _NearByState extends State<NearBy> {
               isSelfCreated: false,
               roomCreatedBy: roomList.elementAt(index).userId,
             );
-            Navigator.of(context)
+            Navigator.of(context, rootNavigator: true)
                 .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
                 .then(
               (value) {
@@ -226,7 +226,7 @@ class _NearByState extends State<NearBy> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context)
+                Navigator.of(context, rootNavigator: true)
                     .pop(); // Close dialog without returning a value
               },
               child: const Text('Cancel'),

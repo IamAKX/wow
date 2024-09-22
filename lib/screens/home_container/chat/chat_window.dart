@@ -466,7 +466,7 @@ class _ChatWindowState extends State<ChatWindow> {
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: InkWell(
-            onTap: () => Navigator.of(context).pushNamed(
+            onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
                 NetworkImagePreviewFullScreen.route,
                 arguments: chat.url ?? ''),
             child: CachedNetworkImage(

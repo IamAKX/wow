@@ -112,7 +112,8 @@ class _PromptCreateFamilyState extends State<PromptCreateFamily> {
           InkWell(
             onTap: () {
               if (isEligible()) {
-                Navigator.of(context).pushNamed(CreateFamily.route);
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(CreateFamily.route);
               } else {
                 showErrorPopup();
               }
@@ -182,7 +183,7 @@ class _PromptCreateFamilyState extends State<PromptCreateFamily> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

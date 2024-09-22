@@ -58,7 +58,8 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(LiveRecord.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(LiveRecord.route);
             },
             child: const Text('Live Record'),
           )
@@ -118,7 +119,8 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
         Container(
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pushNamed(WithdrawlScreen.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(WithdrawlScreen.route);
             },
             child: Container(
               alignment: Alignment.center,
@@ -139,7 +141,8 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
         Container(
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pushNamed(IncomeScreen.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(IncomeScreen.route);
             },
             child: Container(
               alignment: Alignment.center,
@@ -164,7 +167,8 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
           alignment: Alignment.center,
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pushNamed(DiamondHelp.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(DiamondHelp.route);
             },
             child: const Column(
               children: [

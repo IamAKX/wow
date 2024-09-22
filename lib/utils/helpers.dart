@@ -223,7 +223,7 @@ Future<String?> showPasswordDialog(
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context)
+              Navigator.of(context, rootNavigator: true)
                   .pop(); // Close dialog without returning a value
             },
             child: const Text('Cancel'),

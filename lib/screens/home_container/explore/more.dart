@@ -81,7 +81,8 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
                 TextButton.icon(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(GiftWallMore.route);
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(GiftWallMore.route);
                   },
                   label: const Text(
                     'More',
@@ -284,7 +285,8 @@ class _MoreScreenState extends State<MoreScreen> {
 
   Widget getLiveUser(NewLiveUserModel liveUser) {
     return InkWell(
-      onTap: () => Navigator.of(context).pushNamed(OtherUserDeatilScreen.route,
+      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
+          OtherUserDeatilScreen.route,
           arguments: liveUser.userId ?? ''),
       child: Container(
         decoration: BoxDecoration(

@@ -143,7 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             prefs.setString(PrefsKey.loginProvider, 'Phone');
                             prefs.setBool(PrefsKey.showProfileUpdatePopup,
                                 value['details']['name'].toString().isEmpty);
-                            Navigator.of(context).pushNamedAndRemoveUntil(
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamedAndRemoveUntil(
                               HomeContainer.route,
                               (route) => false,
                             );
@@ -211,12 +212,13 @@ class _LoginScreenState extends State<LoginScreen> {
           isLoading = false;
         });
         widget.phoneNumberModel.verificationId = verificationId;
-        Navigator.of(context)
+        Navigator.of(context, rootNavigator: true)
             .pushNamed(VerifyOtpScreen.route,
                 arguments: widget.phoneNumberModel)
             .then((res) {
           if (res == true) {
-            Navigator.of(context).pushNamed(ResetPasswordScreen.route,
+            Navigator.of(context, rootNavigator: true).pushNamed(
+                ResetPasswordScreen.route,
                 arguments: widget.phoneNumberModel);
           }
         });

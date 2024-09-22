@@ -80,7 +80,8 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           ),
           tileColor: Colors.white,
           onTap: () {
-            Navigator.of(context).pushNamed(PhoneVerificationScreen.route);
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed(PhoneVerificationScreen.route);
           },
         ),
         const Divider(
@@ -338,7 +339,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
                 funtion();
               },
               child: const Text(
@@ -348,7 +349,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'No',
@@ -371,7 +372,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'Yes',
@@ -380,7 +381,7 @@ class _ConnectedAccountScreenState extends State<ConnectedAccountScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'No',

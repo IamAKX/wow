@@ -41,7 +41,7 @@ class _EditAnnouncementState extends State<EditAnnouncement> {
             OutlinedButton(
               onPressed: () {
                 // Handle cancel action
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text('Cancel'),
             ),
@@ -49,7 +49,7 @@ class _EditAnnouncementState extends State<EditAnnouncement> {
               onPressed: () {
                 LiveRoomFirebase.updateLiveRoomAnnoucement(
                     widget.roomDetail.id ?? '', _textController.text);
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: Text('Confirm'),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

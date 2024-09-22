@@ -35,7 +35,7 @@ class _CleanChatRoomState extends State<CleanChatRoom> {
             OutlinedButton(
               onPressed: () {
                 // Handle cancel action
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text('Cancel'),
             ),
@@ -43,7 +43,7 @@ class _CleanChatRoomState extends State<CleanChatRoom> {
               onPressed: () {
                 LiveRoomFirebase.clearChat(widget.chatRoomId, widget.chat);
 
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Confirm'),

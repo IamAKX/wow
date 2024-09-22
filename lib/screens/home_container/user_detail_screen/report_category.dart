@@ -110,9 +110,9 @@ class _ReportCategoryState extends State<ReportCategory> {
             onPressed: widget.reportModel.reportCategory == null
                 ? null
                 : () {
-                    Navigator.of(context).pushReplacementNamed(
-                        ReportSubCategory.route,
-                        arguments: widget.reportModel);
+                    Navigator.of(context, rootNavigator: true)
+                        .pushReplacementNamed(ReportSubCategory.route,
+                            arguments: widget.reportModel);
                   },
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(

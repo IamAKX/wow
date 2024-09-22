@@ -107,7 +107,7 @@ class _LockRoomState extends State<LockRoom> {
             OutlinedButton(
               onPressed: () {
                 // Handle cancel action
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text('Cancel'),
             ),
@@ -116,7 +116,7 @@ class _LockRoomState extends State<LockRoom> {
                 // Handle confirm action
                 if (otpInput.length == 6) {
                   lockRoom();
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                 } else {
                   showToastMessage('Enter 6 digits code');
                 }

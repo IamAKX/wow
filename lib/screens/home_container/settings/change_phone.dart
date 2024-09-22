@@ -245,7 +245,7 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
           isLoading = false;
         });
         phoneNumberModel.verificationId = verificationId;
-        Navigator.of(context)
+        Navigator.of(context, rootNavigator: true)
             .pushNamed(VerifyOtpScreen.route, arguments: phoneNumberModel)
             .then((res) async {
           if (res == true) {
@@ -260,7 +260,7 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
                 .then(
               (value) {
                 showToastMessage(value['message']);
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
             );
           }
@@ -275,4 +275,3 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
     );
   }
 }
-

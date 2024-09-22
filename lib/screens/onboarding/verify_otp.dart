@@ -170,7 +170,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               showToastMessage('Invalid OTP');
             });
             if (userCredential.user != null) {
-              Navigator.of(context).pop(true);
+              Navigator.of(context, rootNavigator: true).pop(true);
             } else {
               showToastMessage('Invalid OTP');
             }

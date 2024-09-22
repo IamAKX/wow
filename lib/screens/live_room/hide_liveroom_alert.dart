@@ -74,14 +74,14 @@ To activate the Hidden Room for 30 min you need to pay:''';
           children: [
             OutlinedButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text('Cancel'),
             ),
             OutlinedButton(
               onPressed: () {
                 hideUnhideRoom();
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text('Confirm'),
             ),

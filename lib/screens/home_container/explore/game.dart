@@ -82,10 +82,10 @@ class _GameScreenState extends State<GameScreen> {
                   itemCount: bettingGames.length,
                   itemBuilder: (context, index) {
                     return InkWell(
-                      onTap: () => Navigator.of(context).pushNamed(
-                          CustomWebview.route,
-                          arguments:
-                              '${bettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${bettingGames.elementAt(index).id}'),
+                      onTap: () => Navigator.of(context, rootNavigator: true)
+                          .pushNamed(CustomWebview.route,
+                              arguments:
+                                  '${bettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${bettingGames.elementAt(index).id}'),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         child: CachedNetworkImage(
@@ -125,10 +125,10 @@ class _GameScreenState extends State<GameScreen> {
                   itemCount: nonbettingGames.length,
                   itemBuilder: (context, index) {
                     return InkWell(
-                      onTap: () => Navigator.of(context).pushNamed(
-                          CustomWebview.route,
-                          arguments:
-                              '${nonbettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${nonbettingGames.elementAt(index).id}'),
+                      onTap: () => Navigator.of(context, rootNavigator: true)
+                          .pushNamed(CustomWebview.route,
+                              arguments:
+                                  '${nonbettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${nonbettingGames.elementAt(index).id}'),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         child: CachedNetworkImage(

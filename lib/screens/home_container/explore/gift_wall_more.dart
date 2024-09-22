@@ -57,7 +57,8 @@ class _GiftWallMoreState extends State<GiftWallMore> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(GiftWall.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(GiftWall.route);
             },
             icon: const Icon(Icons.help_outline),
           ),

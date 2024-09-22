@@ -429,7 +429,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
             ),
             TextButton(
@@ -437,8 +437,8 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
               onPressed: () async {
                 await LiveRoomFirebase.updateLiveRoomTheme(
                     widget.roomDetail.id ?? '', imageUrl);
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
             ),
           ],
@@ -475,7 +475,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
             ),
           ],
@@ -513,7 +513,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
             ),
             TextButton(
@@ -523,8 +523,8 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                 if (res) {
                   await LiveRoomFirebase.updateLiveRoomTheme(
                       widget.roomDetail.id ?? '', pageImageModel.theme ?? '');
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                 }
               },
             ),

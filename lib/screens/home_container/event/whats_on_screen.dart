@@ -80,7 +80,7 @@ class _WhatsOnScreenState extends State<WhatsOnScreen> {
             itemBuilder: (context, index) {
               return InkWell(
                 onTap: () {
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(EventDetail.route,
                           arguments: list.elementAt(index))
                       .then(
@@ -191,10 +191,12 @@ class _WhatsOnScreenState extends State<WhatsOnScreen> {
                                             ),
                                           ),
                                           onPressed: () {
-                                            Navigator.of(context).pushNamed(
-                                                ShareEvent.route,
-                                                arguments:
-                                                    list.elementAt(index).id ??
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pushNamed(ShareEvent.route,
+                                                    arguments: list
+                                                            .elementAt(index)
+                                                            .id ??
                                                         '');
                                           },
                                           child: const Text('SHARE'),

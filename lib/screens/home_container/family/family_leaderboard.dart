@@ -91,7 +91,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.of(context)
+                Navigator.of(context, rootNavigator: true)
                     .pushNamed(InvitationRequestScreen.route,
                         arguments: familyDetails)
                     .then(
@@ -167,7 +167,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(FamilyScreen.route,
                                 arguments: FamilyIdModel(
                                     userId: list.elementAt(1).leaderId,
@@ -190,7 +190,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(FamilyScreen.route,
                                 arguments: FamilyIdModel(
                                     userId: list.elementAt(0).leaderId,
@@ -213,7 +213,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(FamilyScreen.route,
                                 arguments: FamilyIdModel(
                                     userId: list.elementAt(2).leaderId,
@@ -282,7 +282,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context)
+                    Navigator.of(context, rootNavigator: true)
                         .pushNamed(FamilyScreen.route,
                             arguments: FamilyIdModel(
                                 userId: list.elementAt(i).leaderId,
@@ -354,7 +354,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                               borderColor: const Color(0xFFB7945C),
                               borderThickness: 2),
                           onTap: () {
-                            Navigator.of(context)
+                            Navigator.of(context, rootNavigator: true)
                                 .pushNamed(FamilyScreen.route,
                                     arguments: FamilyIdModel(
                                         userId: user?.id,

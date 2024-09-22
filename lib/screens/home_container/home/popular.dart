@@ -84,7 +84,8 @@ class _PopularScreenState extends State<PopularScreen> {
           };
           await apiCallProvider.postRequest(API.getHost, reqBody).then((value) {
             if (value['success'] == '0') {
-              Navigator.of(context).pushNamed(DailySpinScreen.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(DailySpinScreen.route);
             } else {
               showToastMessage(value['message']);
             }
@@ -146,7 +147,7 @@ class _PopularScreenState extends State<PopularScreen> {
                           isSelfCreated: false,
                           roomCreatedBy: roomList.elementAt(index).userId,
                         );
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(LiveRoomScreen.route,
                                 arguments: liveRoomDetailModel)
                             .then(
@@ -384,7 +385,7 @@ class _PopularScreenState extends State<PopularScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context)
+                Navigator.of(context, rootNavigator: true)
                     .pop(); // Close dialog without returning a value
               },
               child: const Text('Cancel'),
@@ -425,8 +426,8 @@ class _PopularScreenState extends State<PopularScreen> {
         return Builder(
           builder: (BuildContext context) {
             return InkWell(
-              onTap: () =>
-                  Navigator.of(context).pushNamed(AnchorRequestScreen.route),
+              onTap: () => Navigator.of(context, rootNavigator: true)
+                  .pushNamed(AnchorRequestScreen.route),
               child: CachedNetworkImage(
                 imageUrl: i.image ?? '',
                 placeholder: (context, url) => const Center(

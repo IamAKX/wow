@@ -108,7 +108,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             showToastMessageWithLogo(
                                 '${value['message']}', context);
                             GenericAuthProvider.instance.logoutUser();
-                            Navigator.of(context).pushNamedAndRemoveUntil(
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamedAndRemoveUntil(
                               SplashScreen.route,
                               (route) => false,
                               arguments: widget.phoneNumberModel,

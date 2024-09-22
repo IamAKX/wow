@@ -93,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(VisitorScreen.route)
                             .then(
                               (value) => loadUserData(),
@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(
                               FriendFansFollowing.route,
                               arguments: FriendNavigatorModel(
@@ -123,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: InkWell(
                         onTap: () {
-                          Navigator.of(context)
+                          Navigator.of(context, rootNavigator: true)
                               .pushNamed(
                                 FriendFansFollowing.route,
                                 arguments: FriendNavigatorModel(
@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(
                               FriendFansFollowing.route,
                               arguments: FriendNavigatorModel(
@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 contentPadding: EdgeInsets.zero,
                 onTap: () {
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(IncomeChoiceScreen.route)
                       .then(
                     (value) {
@@ -227,7 +227,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 contentPadding: EdgeInsets.zero,
                 onTap: () {
-                  Navigator.of(context).pushNamed(UserLevelScreen.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(UserLevelScreen.route);
                 },
               ),
               Divider(
@@ -273,7 +274,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.of(context).pushNamed(FamilyMedalScreen.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(FamilyMedalScreen.route);
                 },
               ),
               ListTile(
@@ -336,7 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     return;
                   }
                   if (user?.familyJoinStatus ?? false) {
-                    Navigator.of(context)
+                    Navigator.of(context, rootNavigator: true)
                         .pushNamed(FamilyScreen.route,
                             arguments: FamilyIdModel(
                                 userId: user?.id, familyId: user?.familyId))
@@ -346,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     );
                   } else {
-                    Navigator.of(context)
+                    Navigator.of(context, rootNavigator: true)
                         .pushNamed(FamilyLeaderboard.route)
                         .then(
                       (value) {
@@ -371,7 +373,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () => Navigator.of(context).pushNamed(
+                onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
                     CustomWebview.route,
                     arguments:
                         'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}'),
@@ -391,7 +393,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.of(context).pushNamed(SettingsScreen.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(SettingsScreen.route);
                 },
               ),
             ],
@@ -480,7 +483,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Spacer(),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(ProfileDeatilScreen.route).then(
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(ProfileDeatilScreen.route)
+                  .then(
                 (value) {
                   loadUserData();
                 },

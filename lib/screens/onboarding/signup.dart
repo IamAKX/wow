@@ -116,7 +116,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value['success'] == '1') {
                       showToastMessageWithLogo('${value['message']}', context);
 
-                      Navigator.of(context).pushNamedAndRemoveUntil(
+                      Navigator.of(context, rootNavigator: true)
+                          .pushNamedAndRemoveUntil(
                         LoginScreen.route,
                         (route) => false,
                         arguments: widget.phoneNumberModel,

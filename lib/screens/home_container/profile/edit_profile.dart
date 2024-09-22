@@ -124,7 +124,7 @@ class _EditProfileState extends State<EditProfile> {
                   showToastMessageWithLogo('${value['message']}', context);
                   if (value['success'] == '1') {
                     prefs.setBool(PrefsKey.showProfileUpdatePopup, false);
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
                   }
                 } else {
                   showToastMessageWithLogo('Request failed', context);
@@ -344,7 +344,7 @@ class _EditProfileState extends State<EditProfile> {
                       setState(() {
                         _genderCtrl.text = value!;
                       });
-                      Navigator.of(context).pop();
+                      Navigator.of(context, rootNavigator: true).pop();
                     },
                   ),
                   const Text('Male'),
@@ -356,7 +356,7 @@ class _EditProfileState extends State<EditProfile> {
                       setState(() {
                         _genderCtrl.text = value!;
                       });
-                      Navigator.of(context).pop();
+                      Navigator.of(context, rootNavigator: true).pop();
                     },
                   ),
                   const Text('Female'),

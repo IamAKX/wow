@@ -186,7 +186,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context)
+                    Navigator.of(context, rootNavigator: true)
                         .pushNamed(InviteFamilyMember.route, arguments: user);
                   },
                   child: const Text('Invite'),
@@ -263,7 +263,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(EditFamily.route).then(
+                      Navigator.of(context, rootNavigator: true)
+                          .pushNamed(EditFamily.route)
+                          .then(
                         (value) {
                           loadFamilyDeatilsData();
                         },
@@ -278,7 +280,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(FamilyRule.route);
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(FamilyRule.route);
                   },
                   icon: SvgPicture.asset(
                     'assets/svg/question.svg',
@@ -291,7 +294,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(InvitationRequestScreen.route,
                                 arguments: familyDetails)
                             .then(
@@ -326,7 +329,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 ? SizedBox()
                 : InkWell(
                     onTap: () {
-                      Navigator.of(context).pushNamed(FamilyMedalScreen.route);
+                      Navigator.of(context, rootNavigator: true)
+                          .pushNamed(FamilyMedalScreen.route);
                     },
                     child: CachedNetworkImage(
                       imageUrl: singleFamilyDetailModel?.rankMedal ?? '',
@@ -452,7 +456,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
             ),
             IconButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(FamilyMemberScreen.route);
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(FamilyMemberScreen.route);
               },
               icon: const Icon(
                 Icons.chevron_right,
@@ -505,7 +510,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     isSelfCreated: false,
                     roomCreatedBy: list.elementAt(index).userId,
                   );
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(LiveRoomScreen.route,
                           arguments: liveRoomDetailModel)
                       .then(
@@ -630,7 +635,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     ? null
                     : () {
                         if (secondaryUserId == user?.id) {
-                          Navigator.of(context)
+                          Navigator.of(context, rootNavigator: true)
                               .pushNamed(ProfileDeatilScreen.route)
                               .then(
                             (value) {
@@ -638,7 +643,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                             },
                           );
                         } else {
-                          Navigator.of(context)
+                          Navigator.of(context, rootNavigator: true)
                               .pushNamed(OtherUserDeatilScreen.route,
                                   arguments: secondaryUserId)
                               .then(
@@ -688,7 +693,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'No',
@@ -697,7 +702,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
                 Map<String, dynamic> reqBody = {
                   'userId': '${user?.id}',
                   'familyId': '${familyDetails?.id}'

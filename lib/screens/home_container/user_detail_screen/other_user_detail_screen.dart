@@ -339,9 +339,9 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                   width: double.infinity,
                 )
               : InkWell(
-                  onTap: () => Navigator.of(context).pushNamed(
-                      NetworkImagePreviewFullScreen.route,
-                      arguments: otherUser?.image ?? ''),
+                  onTap: () => Navigator.of(context, rootNavigator: true)
+                      .pushNamed(NetworkImagePreviewFullScreen.route,
+                          arguments: otherUser?.image ?? ''),
                   child: CachedNetworkImage(
                     imageUrl: otherUser?.image ?? '',
                     placeholder: (context, url) => const Center(
@@ -373,7 +373,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                     onSelected: (value) {
                       switch (value) {
                         case 'report':
-                          Navigator.of(context).pushNamed(
+                          Navigator.of(context, rootNavigator: true).pushNamed(
                             ReportCategory.route,
                             arguments: ReportModel(
                               postId: '',
@@ -418,9 +418,9 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
               Padding(
                   padding: const EdgeInsets.all(20),
                   child: InkWell(
-                    onTap: () => Navigator.of(context).pushNamed(
-                        NetworkImagePreviewFullScreen.route,
-                        arguments: otherUser?.image ?? ''),
+                    onTap: () => Navigator.of(context, rootNavigator: true)
+                        .pushNamed(NetworkImagePreviewFullScreen.route,
+                            arguments: otherUser?.image ?? ''),
                     child: BorderedCircularImage(
                       borderColor: Colors.white,
                       borderThickness: 2,
@@ -462,7 +462,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                           isSelfCreated: false,
                           roomCreatedBy: otherUser?.userLive?.userId,
                         );
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(LiveRoomScreen.route,
                                 arguments: liveRoomDetailModel)
                             .then(
@@ -713,7 +713,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                 onSelected: (value) {
                   switch (value) {
                     case 'report':
-                      Navigator.of(context).pushNamed(
+                      Navigator.of(context, rootNavigator: true).pushNamed(
                         ReportCategory.route,
                         arguments: ReportModel(
                           postId: moment.id,
@@ -779,7 +779,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
               },
               InkWell(
                 onTap: () {
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(
                     CommentScreen.route,
                     arguments: CommentData(
@@ -830,7 +830,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context)
+              Navigator.of(context, rootNavigator: true)
                   .pushNamed(
                 CommentScreen.route,
                 arguments: CommentData(

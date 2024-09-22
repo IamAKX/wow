@@ -103,7 +103,7 @@ class _FriendFeedScreenState extends State<FriendFeedScreen> {
                 onSelected: (value) {
                   switch (value) {
                     case 'report':
-                      Navigator.of(context).pushNamed(
+                      Navigator.of(context, rootNavigator: true).pushNamed(
                         ReportCategory.route,
                         arguments: ReportModel(
                           postId: moment.id,
@@ -166,7 +166,7 @@ class _FriendFeedScreenState extends State<FriendFeedScreen> {
               },
               InkWell(
                 onTap: () {
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(
                     CommentScreen.route,
                     arguments: CommentData(
@@ -215,7 +215,7 @@ class _FriendFeedScreenState extends State<FriendFeedScreen> {
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context)
+              Navigator.of(context, rootNavigator: true)
                   .pushNamed(
                 CommentScreen.route,
                 arguments: CommentData(

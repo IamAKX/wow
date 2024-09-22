@@ -391,7 +391,7 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                                   widget.roomDetail.id ?? '', liveroomChat)
                               .then(
                             (value) {
-                              Navigator.of(context).pop();
+                              Navigator.of(context, rootNavigator: true).pop();
                             },
                           );
                         }

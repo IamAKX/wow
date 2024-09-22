@@ -40,7 +40,8 @@ class _RelatedScreenState extends State<RelatedScreen> {
           Expanded(
             child: InkWell(
               onTap: () {
-                Navigator.of(context).pushNamed(MomentsScreen.route);
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(MomentsScreen.route);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(

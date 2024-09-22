@@ -102,8 +102,9 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
                           if (value['isRegistered'] == 'false') {
                             sendOtp(context);
                           } else {
-                            Navigator.of(context).pushNamed(LoginScreen.route,
-                                arguments: widget.phoneNumberModel);
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamed(LoginScreen.route,
+                                    arguments: widget.phoneNumberModel);
                           }
                         } else {
                           showToastMessageWithLogo('Request failed', context);
@@ -139,12 +140,13 @@ class _VerifyPhoneScreenState extends State<VerifyPhoneScreen> {
           isLoading = false;
         });
         widget.phoneNumberModel.verificationId = verificationId;
-        Navigator.of(context)
+        Navigator.of(context, rootNavigator: true)
             .pushNamed(VerifyOtpScreen.route,
                 arguments: widget.phoneNumberModel)
             .then((res) {
           if (res == true) {
-            Navigator.of(context).pushNamed(SignUpScreen.route,
+            Navigator.of(context, rootNavigator: true).pushNamed(
+                SignUpScreen.route,
                 arguments: widget.phoneNumberModel);
           }
         });

@@ -129,7 +129,7 @@ class _UserLevelScreenState extends State<UserLevelScreen>
       children: [
         IconButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
           },
           icon: const Icon(
             Icons.chevron_left,

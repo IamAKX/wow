@@ -139,9 +139,9 @@ class _SearchMemberState extends State<SearchMember> {
                   itemCount: searchList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      onTap: () => Navigator.of(context).pushNamed(
-                          OtherUserDeatilScreen.route,
-                          arguments: searchList.elementAt(index).id),
+                      onTap: () => Navigator.of(context, rootNavigator: true)
+                          .pushNamed(OtherUserDeatilScreen.route,
+                              arguments: searchList.elementAt(index).id),
                       leading: CircularImage(
                           imagePath: searchList.elementAt(index).image ?? '',
                           diameter: 50),

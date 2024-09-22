@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen>
             token: agoraToken.toke,
             isSelfCreated: true,
             roomCreatedBy: prefs.getString(PrefsKey.userId));
-        Navigator.of(context)
+        Navigator.of(context, rootNavigator: true)
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
           (value) {
@@ -187,7 +187,8 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(SearchMember.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(SearchMember.route);
             },
             icon: const Icon(
               Icons.search,
@@ -225,8 +226,9 @@ class _HomeScreenState extends State<HomeScreen>
           actions: <Widget>[
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed(EditProfile.route);
+                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(EditProfile.route);
               },
               child: const Text(
                 'Next',

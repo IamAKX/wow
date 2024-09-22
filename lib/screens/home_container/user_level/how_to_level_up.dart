@@ -25,7 +25,8 @@ class _HowToLevelUpState extends State<HowToLevelUp> {
         leading: IconButton(
           icon: const Icon(Icons.close), // Replace with your custom icon
           onPressed: () {
-            Navigator.of(context).pop(); // Default back navigation
+            Navigator.of(context, rootNavigator: true)
+                .pop(); // Default back navigation
           },
         ),
       ),

@@ -108,7 +108,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             showToastMessageWithLogo(
                                 '${value['message']}', context);
 
-                            Navigator.of(context).pushNamedAndRemoveUntil(
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamedAndRemoveUntil(
                               SplashScreen.route,
                               (route) => false,
                               arguments: widget.phoneNumberModel,

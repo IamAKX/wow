@@ -155,7 +155,8 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
           ),
           child: ListTile(
             onTap: () {
-              Navigator.of(context).pushNamed(BankDetails.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(BankDetails.route);
             },
             title: const Text(
               'Withdraw',
@@ -257,8 +258,8 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
 
   void initiateRazorPayPayment() {
     var options = {
-      'key': 'rzp_test_usEmd5LTJQKCTA', 
-      'amount': 100, 
+      'key': 'rzp_test_usEmd5LTJQKCTA',
+      'amount': 100,
       'name': user?.name ?? '',
       'description': 'Requesting for withdrawl from ${user?.username}',
       'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},

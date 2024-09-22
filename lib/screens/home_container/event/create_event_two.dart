@@ -186,7 +186,7 @@ class _CreateEventTwoState extends State<CreateEventTwo> {
                     : () async {
                         await postEvent().then(
                           (value) {
-                            Navigator.of(context).pop();
+                            Navigator.of(context, rootNavigator: true).pop();
                           },
                         );
                       },

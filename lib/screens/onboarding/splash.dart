@@ -123,7 +123,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         prefs.setString(
                             PrefsKey.userName, value['details']['username']);
                         prefs.setString(PrefsKey.loginProvider, 'Google');
-                        Navigator.of(context).pushNamedAndRemoveUntil(
+                        Navigator.of(context, rootNavigator: true)
+                            .pushNamedAndRemoveUntil(
                           HomeContainer.route,
                           (route) => false,
                         );
@@ -190,7 +191,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         prefs.setString(
                             PrefsKey.userName, value['details']['username']);
                         prefs.setString(PrefsKey.loginProvider, 'Facebook');
-                        Navigator.of(context).pushNamedAndRemoveUntil(
+                        Navigator.of(context, rootNavigator: true)
+                            .pushNamedAndRemoveUntil(
                           HomeContainer.route,
                           (route) => false,
                         );
@@ -219,7 +221,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         'Please accept the terms and conditions', context);
                     return;
                   }
-                  Navigator.of(context).pushNamed(PhoneScreen.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(PhoneScreen.route);
                 },
                 child: getMobileButton(),
               ),
@@ -353,6 +356,4 @@ class _SplashScreenState extends State<SplashScreen> {
     log('continent : ${countryContinent?.continent}');
     log('LatLong : ${countryContinent?.position?.latitude},${countryContinent?.position?.longitude}');
   }
-
-  
 }

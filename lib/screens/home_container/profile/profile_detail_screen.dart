@@ -72,7 +72,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
       body: getBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddMoments.route).then(
+          Navigator.of(context, rootNavigator: true)
+              .pushNamed(AddMoments.route)
+              .then(
             (value) {
               loadMoments();
             },
@@ -112,7 +114,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                 children: [
                   InkWell(
                       onTap: () {
-                        Navigator.of(context)
+                        Navigator.of(context, rootNavigator: true)
                             .pushNamed(
                               FriendFansFollowing.route,
                               arguments: FriendNavigatorModel(
@@ -126,7 +128,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           getProfileMetric('Fans', '${user?.followersCount}')),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context)
+                      Navigator.of(context, rootNavigator: true)
                           .pushNamed(
                             FriendFansFollowing.route,
                             arguments: FriendNavigatorModel(
@@ -293,7 +295,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               },
               InkWell(
                 onTap: () {
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(
                     CommentScreen.route,
                     arguments: CommentData(
@@ -344,7 +346,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           ),
           InkWell(
             onTap: () {
-              Navigator.of(context)
+              Navigator.of(context, rootNavigator: true)
                   .pushNamed(
                 CommentScreen.route,
                 arguments: CommentData(
@@ -424,9 +426,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                   width: double.infinity,
                 )
               : InkWell(
-                  onTap: () => Navigator.of(context).pushNamed(
-                      NetworkImagePreviewFullScreen.route,
-                      arguments: user?.image ?? ''),
+                  onTap: () => Navigator.of(context, rootNavigator: true)
+                      .pushNamed(NetworkImagePreviewFullScreen.route,
+                          arguments: user?.image ?? ''),
                   child: CachedNetworkImage(
                     imageUrl: user?.image ?? '',
                     placeholder: (context, url) => const Center(
@@ -455,7 +457,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
               actions: [
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(EditProfile.route).then(
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(EditProfile.route)
+                        .then(
                       (value) {
                         loadUserData();
                       },
@@ -476,9 +480,9 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             child: Row(
               children: [
                 InkWell(
-                  onTap: () => Navigator.of(context).pushNamed(
-                      NetworkImagePreviewFullScreen.route,
-                      arguments: user?.image ?? ''),
+                  onTap: () => Navigator.of(context, rootNavigator: true)
+                      .pushNamed(NetworkImagePreviewFullScreen.route,
+                          arguments: user?.image ?? ''),
                   child: BorderedCircularImage(
                     borderColor: Colors.white,
                     borderThickness: 1,
@@ -725,7 +729,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
           actions: <Widget>[
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'CANCEL',
@@ -735,7 +739,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
             TextButton(
               onPressed: () async {
                 deletePost(moment);
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'OK',

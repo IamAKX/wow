@@ -109,7 +109,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           // onTap: () {
           //   PhoneNumberModel phoneNumberModel =
           //       PhoneNumberModel(phoneNumber: user?.phone);
-          //   Navigator.of(context).pushNamed(ChangePasswordScreen.route,
+          //   Navigator.of(context, rootNavigator: true).pushNamed(ChangePasswordScreen.route,
           //       arguments: phoneNumberModel);
           // },
         ),
@@ -167,17 +167,20 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         PhoneNumberModel phoneNumberModel = PhoneNumberModel(
             verificationId: verificationId, phoneNumber: user?.phone);
 
-        Navigator.of(context)
+        Navigator.of(context, rootNavigator: true)
             .pushNamed(VerifyOtpScreen.route, arguments: phoneNumberModel)
             .then((res) {
           if (res == true) {
             if (isPasswordChange) {
               PhoneNumberModel phoneNumberModel =
                   PhoneNumberModel(phoneNumber: user?.phone);
-              Navigator.of(context).pushNamed(ChangePasswordScreen.route,
+              Navigator.of(context, rootNavigator: true).pushNamed(
+                  ChangePasswordScreen.route,
                   arguments: phoneNumberModel);
             } else {
-              Navigator.of(context).pushNamed(ChangePhoneScreen.route).then(
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(ChangePhoneScreen.route)
+                  .then(
                 (value) {
                   loadUserData();
                 },

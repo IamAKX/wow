@@ -63,7 +63,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(LiveRecord.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(LiveRecord.route);
             },
             child: const Text('Live Record'),
           )
@@ -345,7 +346,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.of(context).pushNamed(DiamondHelp.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(DiamondHelp.route);
                 },
                 child: Icon(
                   Icons.help_outline,

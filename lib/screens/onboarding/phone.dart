@@ -105,7 +105,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                               'Enter your phone number', context);
                           return;
                         }
-                        Navigator.of(context).pushNamed(
+                        Navigator.of(context, rootNavigator: true).pushNamed(
                           VerifyPhoneScreen.route,
                           arguments: PhoneNumberModel(
                             countryCode: selectedCountryCode,

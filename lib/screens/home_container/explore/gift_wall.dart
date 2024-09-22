@@ -25,7 +25,7 @@ class _GiftWallState extends State<GiftWall> {
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
           },
         ),
       ),

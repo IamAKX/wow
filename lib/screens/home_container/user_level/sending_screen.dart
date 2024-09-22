@@ -128,7 +128,8 @@ class _SendingScreenState extends State<SendingScreen> {
                     ),
                     TextButton.icon(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(UserLevelCars.route);
+                        Navigator.of(context, rootNavigator: true)
+                            .pushNamed(UserLevelCars.route);
                       },
                       icon: const Icon(
                         Icons.chevron_right,

@@ -258,7 +258,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     width: 120,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
@@ -278,7 +278,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     width: 120,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                         sendLucky(friend);
                       },
                       style: ElevatedButton.styleFrom(

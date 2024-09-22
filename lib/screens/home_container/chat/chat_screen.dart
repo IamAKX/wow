@@ -76,7 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(FriendRequest.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(FriendRequest.route);
             },
             icon: const Icon(Icons.person_add_alt_1_outlined),
           )
@@ -112,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           prefs.getString(PrefsKey.userId)!),
                       currentUser: user,
                       friendUser: list.elementAt(index));
-                  Navigator.of(context)
+                  Navigator.of(context, rootNavigator: true)
                       .pushNamed(ChatWindow.route, arguments: chatWindowModel);
                 }),
             separatorBuilder: (context, index) => const Divider(

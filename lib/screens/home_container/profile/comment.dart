@@ -214,7 +214,7 @@ class _CommentScreenState extends State<CommentScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
                 _focusNode.unfocus();
               },
               child: const Text(
@@ -230,7 +230,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   'commentId': commentId
                 }).then(
                   (value) {
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
                     showToastMessageWithLogo(value['message'], context);
                     loadComment();
                   },

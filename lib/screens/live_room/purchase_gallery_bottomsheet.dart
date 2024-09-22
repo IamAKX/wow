@@ -190,7 +190,8 @@ class _PurchaseGalleryBottomsheetState
                                 TextButton(
                                   child: const Text('Close'),
                                   onPressed: () {
-                                    Navigator.of(context).pop();
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
                                   },
                                 ),
                               ],

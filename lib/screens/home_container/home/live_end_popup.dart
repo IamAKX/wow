@@ -69,7 +69,7 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
             verticalGap(20),
             InkWell(
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: Container(
                 alignment: Alignment.center,

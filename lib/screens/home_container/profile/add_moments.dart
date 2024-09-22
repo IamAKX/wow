@@ -141,9 +141,9 @@ class _AddMomentsState extends State<AddMoments> {
                           ? null
                           : () {
                               if (file != null) {
-                                Navigator.of(context).pushNamed(
-                                    MediaPreviewFullScreen.route,
-                                    arguments: file!.path);
+                                Navigator.of(context, rootNavigator: true)
+                                    .pushNamed(MediaPreviewFullScreen.route,
+                                        arguments: file!.path);
                               }
                             },
                       child: Text('Preview'),
@@ -168,7 +168,7 @@ class _AddMomentsState extends State<AddMoments> {
           Expanded(
             child: InkWell(
               onTap: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -230,7 +230,7 @@ class _AddMomentsState extends State<AddMoments> {
                           showToastMessageWithLogo(
                               '${value['message']}', context);
                           if (value['success'] == '1') {
-                            Navigator.of(context).pop();
+                            Navigator.of(context, rootNavigator: true).pop();
                           }
                         } else {
                           showToastMessageWithLogo('Request failed', context);

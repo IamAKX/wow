@@ -260,7 +260,7 @@ class _CarsScreenState extends State<CarsScreen> {
                     width: 100,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
@@ -281,7 +281,7 @@ class _CarsScreenState extends State<CarsScreen> {
                     width: 100,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                         purchaseLuckyId(luckyId, index);
                       },
                       style: ElevatedButton.styleFrom(

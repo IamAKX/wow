@@ -7,8 +7,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_in_app_pip/picture_in_picture.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:pip_view/pip_view.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
@@ -17,6 +19,7 @@ import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/clean_chat_alert.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/gift_stats_bottomsheet.dart';
@@ -596,50 +599,54 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     currentContex = context;
-    return WillPopScope(
-      onWillPop: () async {
-        setState(() {
-          _isClicked = !_isClicked;
-        });
-        return false;
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
-            children: [
-              getBody(context),
-              buildExistSwitchTop(context),
-              buildExistSwitchBottom(context),
-              musicControllerLayout(context),
-              musicPlayerButton(context),
-              if (_isImageVisible)
-                AnimatedBuilder(
-                  animation: _emojiAnimation,
-                  builder: (context, child) {
-                    return Positioned(
-                      top: _emojiAnimation
-                          .value, // Smoothly animate the top position
-                      left: MediaQuery.of(context).size.width / 2 - 50,
-                      child: CachedNetworkImage(
-                        imageUrl: selectedEmoji,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => Center(
-                          child: Text('Error ${error.toString()}'),
-                        ),
-                        fit: BoxFit.cover,
-                        height: 100,
-                        width: 100,
+    return PIPView(
+        avoidKeyboard: true,
+        builder: (context, isFloating) {
+          return WillPopScope(
+            onWillPop: () async {
+              setState(() {
+                _isClicked = !_isClicked;
+              });
+              return isFloating;
+            },
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    getBody(context),
+                    buildExistSwitchTop(context),
+                    buildExistSwitchBottom(context),
+                    musicControllerLayout(context),
+                    musicPlayerButton(context),
+                    if (_isImageVisible)
+                      AnimatedBuilder(
+                        animation: _emojiAnimation,
+                        builder: (context, child) {
+                          return Positioned(
+                            top: _emojiAnimation
+                                .value, // Smoothly animate the top position
+                            left: MediaQuery.of(context).size.width / 2 - 50,
+                            child: CachedNetworkImage(
+                              imageUrl: selectedEmoji,
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Text('Error ${error.toString()}'),
+                              ),
+                              fit: BoxFit.cover,
+                              height: 100,
+                              width: 100,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                  ],
                 ),
-            ],
-          ),
-        ),
-      ),
-    );
+              ),
+            ),
+          );
+        });
   }
 
   Visibility musicPlayerButton(BuildContext context) {
@@ -856,6 +863,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           setState(() {
             _isClicked = !_isClicked;
           });
+          //TODO: PIP
+          PIPView.of(context)?.presentBelow(
+            HomeContainer(),
+          );
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1033,7 +1044,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.of(context).pushNamed(ChatScreen.route);
+                      // Navigator.of(context, rootNavigator: true).pushNamed(ChatScreen.route);
+                      // TODO
+                      PIPView.of(context)?.presentBelow(
+                        ChatScreen(),
+                      );
                     },
                     child: const CircleAvatar(
                       backgroundColor: Colors.white38,
@@ -1343,7 +1358,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                   widget.agoraToken.mainId ?? '', liveroomChat)
                               .then(
                             (value) {
-                              Navigator.of(context).pop();
+                              Navigator.of(context, rootNavigator: true).pop();
                               _scrollToBottom();
                             },
                           );
@@ -1569,7 +1584,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               ),
               InkWell(
                 onTap: () {
-                  Navigator.of(context).pushNamed(FamilyScreen.route,
+                  Navigator.of(context, rootNavigator: true).pushNamed(
+                      FamilyScreen.route,
                       arguments: FamilyIdModel(
                           userId: roomOwner?.id,
                           familyId: roomOwner?.familyId));
@@ -1736,7 +1752,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 ListTile(
                   title: const Text('Invite Audience'),
                   onTap: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context, rootNavigator: true).pop();
 
                     showModalBottomSheet(
                       context: context,
@@ -1796,7 +1812,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       hotSeatMap[position + 1]?.id ?? '',
                       'isMicMute',
                       !(settings?.isMicMute ?? false));
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                   setState(() {});
                 },
               ),
@@ -1930,7 +1946,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
@@ -1950,7 +1966,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showDialog(
                             context: context,
                             builder: (context) => EditAnnouncement(
@@ -1967,7 +1983,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
@@ -1981,7 +1997,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           if ((roomDetail?.password?.isEmpty ?? true)) {
                             showDialog(
                               context: context,
@@ -2006,7 +2022,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showDialog(
                             context: context,
                             builder: (context) => CleanChatRoom(
@@ -2033,7 +2049,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
@@ -2052,7 +2068,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showDialog(
                             context: context,
                             builder: (context) => const HideLiveRoom(),
@@ -2064,7 +2080,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true, // To enable custom height
@@ -2083,7 +2099,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           showModalBottomSheet(
                             context: context,
                             isDismissible: false,
@@ -2336,7 +2352,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'Cancel',
@@ -2364,7 +2380,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     user?.id ?? '',
                     'invite',
                     false);
-                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: const Text(
                 'Join',

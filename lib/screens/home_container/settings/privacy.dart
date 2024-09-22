@@ -127,7 +127,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     width: 100,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
@@ -148,7 +148,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     width: 100,
                     child: ElevatedButton(
                       onPressed: () async {
-                        Navigator.of(context).pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                         Map<String, dynamic> reqBody = {
                           'userId': user?.id,
                         };

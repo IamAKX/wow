@@ -126,7 +126,8 @@ class _ExploreScreenState extends State<ExploreScreen>
           horizontalGap(120),
           IconButton(
             onPressed: () {
-              Navigator.of(context).pushNamed(WowLeaderboard.route);
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(WowLeaderboard.route);
             },
             icon: SvgPicture.asset('assets/svg/trophy.svg'),
           ),
