@@ -45,6 +45,7 @@ import '../../services/live_room_firebase.dart';
 import '../../services/location_service.dart';
 import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import '../../widgets/audio_wave_painter.dart';
 import '../home_container/family/family_screen.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
@@ -75,7 +76,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   List<EmojiModel> emojiList = [];
   String selectedEmoji = '';
   int totalDiamond = 0;
-  
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -105,6 +105,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Map<String, String> activeUserEmojis = {};
 
+  Map<String, int> speakingMap = {};
+
   void _scrollToBottom() {
     // fetchDiamond();
     if (_scrollController.hasClients) {
@@ -127,6 +129,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     _timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       fetchDiamond();
     });
+
     initAudioPlayer();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -134,7 +137,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       loadRoomOwnerData();
       initEmojiAnimation();
       loadEmojiList();
-      // initializeAgora();
+      initializeAgora();
     });
   }
 
@@ -387,6 +390,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         });
       }
     });
+
+    database
+        .ref('${FirebaseDbNode.currentSpeaker}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map?;
+      if (data != null) {
+        data.entries.forEach((entry) {
+          showAudioSignal(entry.key, entry.value);
+        });
+      }
+    });
+    // userProfileAudioCtrl.repeat();
+  }
+
+  void showAudioSignal(String userID, int volume) {
+    setState(() {
+      speakingMap[userID] = volume;
+    });
   }
 
   void showEmojiOnUser(String position, String emojiGifUrl) {
@@ -413,7 +435,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     // Enable audio
     await agoraEngine.enableAudio();
     await agoraEngine.setDefaultAudioRouteToSpeakerphone(true);
-    await agoraEngine.enableAudio();
+
+    await agoraEngine.enableAudioVolumeIndication(
+        interval: 1, smooth: 3, reportVad: true);
     await agoraEngine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     await agoraEngine.setAudioProfile(
       profile: AudioProfileType.audioProfileDefault,
@@ -431,6 +455,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         },
         onUserOffline: (connection, remoteUid, reason) {
           log('Remote user $remoteUid left the channel');
+        },
+        onAudioVolumeIndication:
+            (connection, speakers, speakerNumber, totalVolume) {
+          for (var speaker in speakers) {
+            // The local user has uid 0
+            if (speaker.uid == 0) {
+              log('agora listner - ${speaker.volume} ${speaker.uid}');
+              log('agora listner - ${speaker.volume}');
+              LiveRoomFirebase.sendAudioSignal(widget.agoraToken.mainId ?? '',
+                  prefs.getString(PrefsKey.userId) ?? '', speaker.volume ?? 0);
+            } else {}
+          }
         },
       ),
     );
@@ -1189,6 +1225,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                         imagePath: activeUserEmojis['${index + 1}'] ?? '',
                         diameter: 60,
                       ),
+                    if (speakingMap
+                            .containsKey(hotSeatMap[index + 1]?.id ?? '') &&
+                        speakingMap[hotSeatMap[index + 1]?.id ?? ''] != 0)
+                      Image.asset(
+                        'assets/image/sound_wave.gif',
+                        width: 60,
+                        height: 60,
+                      ),
                     if (hotSeatAdminControlMap[
                                 hotSeatMap[index + 1]?.id ?? ''] !=
                             null &&
@@ -1196,8 +1240,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 ?.isMicMute ??
                             false))
                       const Positioned(
+                        top: 1,
                         right: 1,
-                        bottom: 1,
                         child: CircleAvatar(
                           backgroundColor: Colors.white54,
                           radius: 15,
@@ -1211,7 +1255,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ],
                 ),
               ),
-            verticalGap(20),
+            verticalGap(10),
             Text(
               '${hotSeatMap[index + 1] == null ? (index + 1) : (hotSeatMap[index + 1]?.username == null) ? (index + 1) : hotSeatMap[index + 1]?.username}',
               style: const TextStyle(
@@ -1397,6 +1441,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               CircularImage(
                                 imagePath: activeUserEmojis['-1'] ?? '',
                                 diameter: 80,
+                              ),
+                            if (speakingMap.containsKey(roomOwner?.id ?? '') &&
+                                speakingMap[roomOwner?.id ?? ''] != 0)
+                              Image.asset(
+                                'assets/image/sound_wave.gif',
+                                width: 80,
+                                height: 80,
                               ),
                             if (liveRoomControlsForAdmin.isMicMute ?? false)
                               const Positioned(

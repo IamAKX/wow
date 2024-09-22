@@ -178,4 +178,15 @@ class LiveRoomFirebase {
     log('map = $map');
     return await messageRef.set(map);
   }
+
+  static Future<void> sendAudioSignal(
+      String chatWindowId, String userId, int volume) async {
+    DatabaseReference messageRef =
+        database.ref('${FirebaseDbNode.currentSpeaker}/$chatWindowId');
+
+    Map map = {};
+    map[userId] = volume;
+
+    return await messageRef.set(map);
+  }
 }
