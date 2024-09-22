@@ -106,6 +106,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Map<String, String> activeUserEmojis = {};
 
   Map<String, int> speakingMap = {};
+  String musicUrl = '';
 
   void _scrollToBottom() {
     // fetchDiamond();
@@ -402,7 +403,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         });
       }
     });
-    // userProfileAudioCtrl.repeat();
+    database
+        .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        setState(() {
+          musicUrl = dataSnapshot.value as String;
+          if (musicUrl.isNotEmpty)
+            _playAudio(musicUrl);
+          else
+            _audioPlayer.stop();
+        });
+      }
+    });
   }
 
   void showAudioSignal(String userID, int volume) {
@@ -531,6 +546,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             '${FirebaseDbNode.liveRoomAnnouncement}/${widget.agoraToken.mainId}')
         .onValue
         .drain();
+    await database
+        .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
   }
 
   void loadRoomOwnerData() async {
@@ -625,7 +644,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Visibility musicPlayerButton(BuildContext context) {
     return Visibility(
-      visible: _isPlaying,
+      visible:
+          ((widget.agoraToken.isSelfCreated ?? false) && musicUrl.isNotEmpty),
       child: Positioned(
         right: 20,
         bottom: MediaQuery.of(context).size.height * 0.3,
@@ -664,7 +684,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 onPressed: () {
                   if (_isPlaying) {
                     _pauseAudio();
-                    _startGlideAnimation();
                   } else {
                     _resumeAudio();
                   }
@@ -717,7 +736,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     )
                   ],
                 ),
-              )
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.stop_circle,
+                  color: Colors.white,
+                  size: 30,
+                ),
+                onPressed: () {
+                  _audioPlayer.stop();
+                  _startGlideAnimation();
+                  LiveRoomFirebase.updateLiveRoomMusic(
+                      widget.agoraToken.mainId ?? '', '');
+                },
+              ),
             ],
           ),
         ),
@@ -2054,18 +2086,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           Navigator.of(context).pop();
                           showModalBottomSheet(
                             context: context,
+                            isDismissible: false,
+                            showDragHandle: false,
                             isScrollControlled: true, // To enable custom height
-                            builder: (context) => const MusicBottomsheet(),
+                            builder: (context) => MusicBottomsheet(
+                              roomId: widget.agoraToken.mainId ?? '',
+                            ),
                           ).then(
                             (value) async {
-                              if (prefs.containsKey(PrefsKey.musicPlaying)) {
-                                String musicPath = await prefs
-                                        .getString(PrefsKey.musicPlaying) ??
-                                    '';
-                                if (musicPath.isNotEmpty) {
-                                  _playAudio(musicPath);
-                                }
-                              }
+                              // if (prefs.containsKey(PrefsKey.musicPlaying)) {
+                              //   String musicPath = await prefs
+                              //           .getString(PrefsKey.musicPlaying) ??
+                              //       '';
+                              //   if (musicPath.isNotEmpty) {
+                              //     _playAudio(musicPath);
+                              //   }
+                              // }
                             },
                           );
                         },
@@ -2133,7 +2169,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   }
 
   Future<void> _playAudio(String filePath) async {
-    await _audioPlayer.play(DeviceFileSource(filePath));
+    await _audioPlayer.play(UrlSource(filePath));
     prefs.setString(PrefsKey.musicPlaying, filePath);
   }
 

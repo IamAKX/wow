@@ -124,6 +124,7 @@ class LiveRoomFirebase {
     log('updating liveRoomAdminControl : ${userId}');
     Map<String, Object?> map = {};
     map[key] = value;
+
     await liveRoomRef.update(map);
   }
 
@@ -188,5 +189,12 @@ class LiveRoomFirebase {
     map[userId] = volume;
 
     return await messageRef.set(map);
+  }
+
+  static Future<void> updateLiveRoomMusic(
+      String roomId, String musicUrl) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomMusic}/$roomId');
+    await liveRoomRef.set(musicUrl);
   }
 }

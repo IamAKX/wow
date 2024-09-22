@@ -4,17 +4,22 @@ import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/load_music_bottomsheet.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
+import 'package:worldsocialintegrationapp/services/storage_service.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class MusicBottomsheet extends StatefulWidget {
-  const MusicBottomsheet({super.key});
+  const MusicBottomsheet({super.key, required this.roomId});
 
+  final String roomId;
   @override
   State<MusicBottomsheet> createState() => _MusicBottomsheetState();
 }
@@ -25,6 +30,7 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
+  bool isUploading = false;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -78,10 +84,12 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
               Row(
                 children: [
                   IconButton(
-                    onPressed: () {
-                      _pauseAudio();
-                      Navigator.pop(context);
-                    },
+                    onPressed: isUploading
+                        ? null
+                        : () {
+                            _pauseAudio();
+                            Navigator.pop(context);
+                          },
                     icon: const Icon(
                       Icons.chevron_left,
                     ),
@@ -96,13 +104,34 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
                   const Spacer(),
                   TextButton(
                     onPressed: () async {
-                      if (Platform.isAndroid) {
-                        // await loadForAndroid(context);
-                        await loadForIos();
-                      } else if (Platform.isIOS) {
-                        await loadForIos();
-                      }
+                      setState(() {
+                        isUploading = true;
+                      });
+                      _pauseAudio();
+                      Navigator.pop(context);
+                      String downloadUrl = await StorageService.uploadFile(
+                          File(fileList.elementAt(playingIndex)),
+                          'liveRoomAudio/${widget.roomId}/${basename(fileList.elementAt(playingIndex))}');
+                      await LiveRoomFirebase.updateLiveRoomMusic(
+                          widget.roomId, downloadUrl);
                     },
+                    child: isUploading
+                        ? ButtonLoader(
+                            color: Colors.black,
+                          )
+                        : const Text('SET'),
+                  ),
+                  TextButton(
+                    onPressed: isUploading
+                        ? null
+                        : () async {
+                            if (Platform.isAndroid) {
+                              // await loadForAndroid(context);
+                              await loadForIos();
+                            } else if (Platform.isIOS) {
+                              await loadForIos();
+                            }
+                          },
                     child: const Text('Add'),
                   )
                 ],
