@@ -16,6 +16,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/profile/profile
 import 'package:worldsocialintegrationapp/screens/home_container/settings/settings_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_level/user_level.dart';
 import 'package:worldsocialintegrationapp/screens/income/income_Screen.dart';
+import 'package:worldsocialintegrationapp/screens/income/income_screen_choice.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/widgets/animated_framed_circular_image.dart';
@@ -206,7 +207,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 contentPadding: EdgeInsets.zero,
                 onTap: () {
-                  Navigator.of(context).pushNamed(IncomeScreen.route).then(
+                  Navigator.of(context)
+                      .pushNamed(IncomeChoiceScreen.route)
+                      .then(
                     (value) {
                       loadUserData();
                     },

@@ -78,7 +78,12 @@ import '../screens/home_container/chat/chat_screen.dart';
 import '../screens/home_container/event/create_event_one.dart';
 import '../screens/home_container/explore/wow_leaderboard.dart';
 import '../screens/home_container/profile/comment.dart';
+import '../screens/income/bank_details.dart';
+import '../screens/income/diamond_help.dart';
 import '../screens/income/income_Screen.dart';
+import '../screens/income/income_screen_choice.dart';
+import '../screens/income/live_record.dart';
+import '../screens/income/withdrawl.dart';
 
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
@@ -300,6 +305,16 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const ChatScreen());
       case IncomeScreen.route:
         return MaterialPageRoute(builder: (_) => const IncomeScreen());
+      case DiamondHelp.route:
+        return MaterialPageRoute(builder: (_) => const DiamondHelp());
+      case LiveRecord.route:
+        return MaterialPageRoute(builder: (_) => const LiveRecord());
+      case IncomeChoiceScreen.route:
+        return MaterialPageRoute(builder: (_) => const IncomeChoiceScreen());
+      case WithdrawlScreen.route:
+        return MaterialPageRoute(builder: (_) => const WithdrawlScreen());
+      case BankDetails.route:
+        return MaterialPageRoute(builder: (_) => const BankDetails());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

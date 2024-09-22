@@ -107,6 +107,14 @@ String getTodaysDate() {
   }
 }
 
+String formatDate(DateTime dateTime) {
+  try {
+    return DateFormat('dd-MM-yyyy').format(dateTime);
+  } catch (e) {
+    return '';
+  }
+}
+
 Future<File> getFileFromAssets(String path) async {
   final byteData = await rootBundle.load(path);
 
@@ -188,52 +196,51 @@ String formatDiamondNumber(int number) {
 }
 
 Future<String?> showPasswordDialog(
-      BuildContext context, String roomPassword) async {
-    TextEditingController passwordController = TextEditingController();
+    BuildContext context, String roomPassword) async {
+  TextEditingController passwordController = TextEditingController();
 
-    return await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Room Password'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Room is locked, enter password to enter'),
-              const SizedBox(height: 16),
-              TextField(
-                keyboardType: TextInputType.number,
-                controller: passwordController,
-                obscureText: true, // To hide the text for password input
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
+  return await showDialog<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Room Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Room is locked, enter password to enter'),
+            const SizedBox(height: 16),
+            TextField(
+              keyboardType: TextInputType.number,
+              controller: passwordController,
+              obscureText: true, // To hide the text for password input
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Close dialog without returning a value
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (roomPassword == passwordController.text) {
-                  Navigator.pop(context, 'true');
-                } else {
-                  showToastMessage('Incorrect password');
-                  Navigator.pop(context, 'false');
-                } // Return the password
-              },
-              child: const Text('Enter'),
             ),
           ],
-        );
-      },
-    );
-  }
-
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pop(); // Close dialog without returning a value
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (roomPassword == passwordController.text) {
+                Navigator.pop(context, 'true');
+              } else {
+                showToastMessage('Incorrect password');
+                Navigator.pop(context, 'false');
+              } // Return the password
+            },
+            child: const Text('Enter'),
+          ),
+        ],
+      );
+    },
+  );
+}
