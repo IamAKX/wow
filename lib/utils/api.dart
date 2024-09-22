@@ -118,5 +118,11 @@ class API {
       '$baseUrl/getReceiverGiftHistory';
   static const String nearByUsers = '$baseUrl/nearByUsers';
   static const String archieveLive = '$baseUrl/archieveLive';
-  static const String listGameSectionDetails = '$baseUrl/listGameSectionDetails';
+  static const String listGameSectionDetails =
+      '$baseUrl/listGameSectionDetails';
+  static const String addBankAccountDetails = '$baseUrl/addBankAccountDetails';
+  static const String getUserBankDetails = '$baseUrl/getUserBankDetails';
+  static const String checkWithdrawal = '$baseUrl/checkWithdrawal';
+  static const String generateWithdrawalRquest =
+      '$baseUrl/generateWithdrawalRquest';
 }

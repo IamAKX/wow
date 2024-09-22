@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:worldsocialintegrationapp/screens/income/diamond_help.dart';
 import 'package:worldsocialintegrationapp/screens/income/live_record.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -8,6 +9,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
 import '../../utils/generic_api_calls.dart';
+import '../../utils/helpers.dart';
 
 class IncomeScreen extends StatefulWidget {
   const IncomeScreen({super.key});
@@ -22,10 +24,17 @@ class _IncomeScreenState extends State<IncomeScreen> {
   String exchangedGold = '0';
   final TextEditingController editingController = TextEditingController();
   late ApiCallProvider apiCallProvider;
+  late Razorpay _razorpay;
 
   @override
   void initState() {
     super.initState();
+
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
     editingController.addListener(() {
       if (editingController.text.isEmpty) {
         exchangedGold = '0';
@@ -38,6 +47,44 @@ class _IncomeScreenState extends State<IncomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
     });
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    showToastMessage('Payment Successful: ${response.paymentId}');
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    showToastMessage('Payment Failed: ${response.code} - ${response.message}');
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    showToastMessage('External Wallet Selected: ${response.walletName}');
+  }
+
+  void initiateRazorPayPayment() {
+    double amount = int.parse(user?.myDiamond ?? '0') / 1000 * 75;
+    var options = {
+      'key': 'rzp_test_usEmd5LTJQKCTA',
+      'amount': 100, // amount * 100,
+      'name': user?.name ?? '',
+      'description': 'Requesting for withdrawl from ${user?.username}',
+      'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void loadUserData() async {
@@ -296,7 +343,9 @@ class _IncomeScreenState extends State<IncomeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    initiateRazorPayPayment();
+                  },
                   child: Text('EXCHANGE OF GOLDS'),
                 ),
               ),

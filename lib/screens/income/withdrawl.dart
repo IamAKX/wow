@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:worldsocialintegrationapp/models/bank_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/income/bank_details.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
 
 class WithdrawlScreen extends StatefulWidget {
@@ -25,6 +28,7 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
   UserProfileDetail? user;
   int selectedIndex = -1;
   late Razorpay _razorpay;
+  bool eligible = false;
 
   late ApiCallProvider apiCallProvider;
   List<AmountCard> amountCardList = [
@@ -36,6 +40,8 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
         title: 'Custom',
         subtitle: '(In the multiple of\n1,000 Diamonds = 75\nRs INR)'),
   ];
+
+  BankDetailsModel? bankDetailsModel;
 
   @override
   void initState() {
@@ -72,11 +78,69 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
   void loadUserData() async {
     await getCurrentUser().then(
       (value) {
-        setState(() {
-          user = value;
-        });
+        user = value;
+        getBankDetails();
+        setState(() {});
       },
     );
+  }
+
+  getBankDetails() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = user?.id;
+
+    await apiCallProvider
+        .postRequest(API.getUserBankDetails, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        bankDetailsModel = BankDetailsModel.fromJson(value['details']);
+        setState(() {});
+      }
+      showToastMessage(value['message']);
+      checkWithdrawlEligibility();
+    });
+  }
+
+  withdrawl() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = user?.id;
+    reqBody['diamond'] = user?.myDiamond;
+    reqBody['accHolderName'] = bankDetailsModel?.accountHolderName ?? '';
+    reqBody['accNumber'] = bankDetailsModel?.accountNumber ?? '';
+    reqBody['confirmAccNumber'] = bankDetailsModel?.accountNumber ?? '';
+    reqBody['bankName'] = bankDetailsModel?.bankName ?? '';
+    reqBody['branchName'] = bankDetailsModel?.branchName ?? '';
+    reqBody['ifscCode'] = bankDetailsModel?.ifscCode ?? '';
+    reqBody['accountType'] = bankDetailsModel?.accountType ?? '';
+
+    await apiCallProvider
+        .postRequest(API.generateWithdrawalRquest, reqBody)
+        .then((value) async {
+      showToastMessage(value['message']);
+      if (value['success'] == '1') {
+        setState(() {});
+      }
+    });
+  }
+
+  checkWithdrawlEligibility() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = user?.id;
+    reqBody['diamond'] = user?.myDiamond;
+
+    await apiCallProvider
+        .postRequest(API.checkWithdrawal, reqBody)
+        .then((value) async {
+      showToastMessage(value['message']);
+      if (value['success'] == '1') {
+        setState(() {
+          eligible = true;
+        });
+      }
+    });
   }
 
   @override
@@ -90,11 +154,24 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
         ),
         title: const Text('Withdraw'),
         actions: [
-          TextButton(
-            onPressed: () {
-              initiateRazorPayPayment();
-            },
-            child: const Text('Proceed'),
+          Visibility(
+            visible: eligible,
+            child: TextButton(
+              onPressed: () {
+                if (bankDetailsModel == null) {
+                  showToastMessage('Add bank details');
+                  return;
+                }
+                if (selectedIndex == -1) {
+                  showToastMessage('Select diamond');
+                  return;
+                }
+                withdrawl();
+              },
+              child: apiCallProvider.status == ApiStatus.loading
+                  ? ButtonLoader()
+                  : const Text('Proceed'),
+            ),
           ),
         ],
       ),
@@ -153,62 +230,86 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
             borderRadius: BorderRadius.circular(5),
             border: Border.all(color: Colors.grey.shade300),
           ),
-          child: ListTile(
-            onTap: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pushNamed(BankDetails.route);
-            },
-            title: const Text(
-              'Withdraw',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: const Text(
-              'You are expected to receive it in 7 working days',
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-            leading: Image.asset(
-              'assets/image/coins_img.png',
-              width: 40,
-            ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: Colors.grey.shade400,
-            ),
-          ),
+          child: bankDetailsModel == null
+              ? ListTile(
+                  title: const Text(
+                    'Add you bank detail',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  leading: Image.asset(
+                    'assets/image/coins_img.png',
+                    width: 40,
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey.shade400,
+                  ),
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(BankDetails.route)
+                        .then(
+                      (value) {
+                        getBankDetails();
+                      },
+                    );
+                  },
+                )
+              : ListTile(
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(BankDetails.route);
+                  },
+                  title: const Text(
+                    'Withdraw',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text(
+                    'You are expected to receive it in 7 working days',
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                  leading: Image.asset(
+                    'assets/image/coins_img.png',
+                    width: 40,
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Text(
-            'Coin Dealer',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: ListTile(
-            onTap: () {},
-            title: const Text(
-              'Please select the coin seller information',
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: Colors.grey.shade400,
-            ),
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        //   child: Text(
+        //     'Coin Dealer',
+        //     style: TextStyle(color: Colors.grey, fontSize: 16),
+        //   ),
+        // ),
+        // Container(
+        //   margin: const EdgeInsets.all(10),
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.circular(5),
+        //     border: Border.all(color: Colors.grey.shade300),
+        //   ),
+        //   child: ListTile(
+        //     onTap: () {},
+        //     title: const Text(
+        //       'Please select the coin seller information',
+        //       style: TextStyle(
+        //         fontWeight: FontWeight.normal,
+        //         color: Colors.grey,
+        //         fontSize: 14,
+        //       ),
+        //     ),
+        //     trailing: Icon(
+        //       Icons.chevron_right,
+        //       color: Colors.grey.shade400,
+        //     ),
+        //   ),
+        // ),
         GridView.builder(
           padding: const EdgeInsets.all(10),
           primary: true,
@@ -257,9 +358,10 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
   }
 
   void initiateRazorPayPayment() {
+    double amount = int.parse(user?.myDiamond ?? '0') / 1000 * 75;
     var options = {
       'key': 'rzp_test_usEmd5LTJQKCTA',
-      'amount': 100,
+      'amount': amount * 100,
       'name': user?.name ?? '',
       'description': 'Requesting for withdrawl from ${user?.username}',
       'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},

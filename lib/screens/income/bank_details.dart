@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/utils/bank_list.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import '../../utils/helpers.dart';
 
 class BankDetails extends StatefulWidget {
   const BankDetails({super.key});
@@ -25,11 +28,15 @@ class _BankDetailsState extends State<BankDetails> {
   late ApiCallProvider apiCallProvider;
 
   final TextEditingController _accountNoCtrl = TextEditingController();
+  final TextEditingController _confAccountNoCtrl = TextEditingController();
+  final TextEditingController _branchNameCtrl = TextEditingController();
   final TextEditingController _bankNameCtrl = TextEditingController();
   final TextEditingController _cardHolderCtrl = TextEditingController();
+  final TextEditingController _accountType = TextEditingController();
   final TextEditingController _ifscCtrl = TextEditingController();
 
-  String selectedBank = "Select a bank";
+  String selectedBank = 'Select a bank';
+  String accounType = 'savings';
 
   @override
   void initState() {
@@ -48,6 +55,28 @@ class _BankDetailsState extends State<BankDetails> {
         });
       },
     );
+  }
+
+  void saveBankDetails() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = user?.id;
+    reqBody['accHolderName'] = _cardHolderCtrl.text;
+    reqBody['accNumber'] = _accountNoCtrl.text;
+    reqBody['confirmAccNumber'] = _confAccountNoCtrl.text;
+    reqBody['bankName'] = _bankNameCtrl.text;
+    reqBody['branchName'] = _branchNameCtrl.text;
+    reqBody['ifscCode'] = _ifscCtrl.text;
+    reqBody['accountType'] = _accountType.text;
+
+    await apiCallProvider
+        .postRequest(API.addBankAccountDetails, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      showToastMessage(value['message']);
+    });
   }
 
   @override
@@ -110,6 +139,25 @@ class _BankDetailsState extends State<BankDetails> {
                 color: Colors.grey,
               ),
               const Text(
+                'Account Type*',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Account Type*',
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    _showAccountTypeSelectionMenu(context);
+                  },
+                  readOnly: true,
+                  controller: _accountType),
+              Divider(
+                color: Colors.grey,
+              ),
+              const Text(
                 'Bank account*',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
@@ -120,6 +168,34 @@ class _BankDetailsState extends State<BankDetails> {
                     focusedBorder: InputBorder.none,
                   ),
                   controller: _accountNoCtrl),
+              Divider(
+                color: Colors.grey,
+              ),
+              const Text(
+                'Confirm Bank account*',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Confirm Bank account*',
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  controller: _confAccountNoCtrl),
+              Divider(
+                color: Colors.grey,
+              ),
+              const Text(
+                'Branch Name*',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Branch Name*',
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  controller: _branchNameCtrl),
               Divider(
                 color: Colors.grey,
               ),
@@ -151,7 +227,23 @@ class _BankDetailsState extends State<BankDetails> {
         verticalGap(20),
         InkWell(
           onTap: () {
-            Navigator.pop(context);
+            if (user == null ||
+                _cardHolderCtrl.text.isEmpty ||
+                _bankNameCtrl.text.isEmpty ||
+                _accountType.text.isEmpty ||
+                _accountNoCtrl.text.isEmpty ||
+                _confAccountNoCtrl.text.isEmpty ||
+                _branchNameCtrl.text.isEmpty ||
+                _ifscCtrl.text.isEmpty) {
+              showToastMessage('All fields are mandatory');
+              return;
+            }
+            if (_accountNoCtrl.text != _confAccountNoCtrl.text) {
+              showToastMessage(
+                  'Confirm account number is not same as account number');
+              return;
+            }
+            saveBankDetails();
           },
           child: Container(
             height: 50,
@@ -162,13 +254,15 @@ class _BankDetailsState extends State<BankDetails> {
               borderRadius: BorderRadius.circular(30),
               color: const Color(0xFF07C431),
             ),
-            child: const Text(
-              'Save',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
-            ),
+            child: apiCallProvider.status == ApiStatus.loading
+                ? ButtonLoader()
+                : const Text(
+                    'Save',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
           ),
         ),
         verticalGap(40),
@@ -209,6 +303,20 @@ class _BankDetailsState extends State<BankDetails> {
           context: context,
           position: RelativeRect.fromLTRB(100, 100, 100, 100),
           items: bankList.map((String bank) {
+            return PopupMenuItem<String>(
+              value: bank,
+              child: Text(bank),
+            );
+          }).toList(),
+        ) ??
+        '';
+  }
+
+  void _showAccountTypeSelectionMenu(BuildContext context) async {
+    _accountType.text = await showMenu<String>(
+          context: context,
+          position: RelativeRect.fromLTRB(100, 300, 100, 0),
+          items: ['savings', 'current'].map((String bank) {
             return PopupMenuItem<String>(
               value: bank,
               child: Text(bank),
