@@ -75,6 +75,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   List<EmojiModel> emojiList = [];
   String selectedEmoji = '';
   int totalDiamond = 0;
+  
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -101,6 +102,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   AdminLiveRoomControls liveRoomControls = AdminLiveRoomControls();
   AdminLiveRoomControls liveRoomControlsForAdmin = AdminLiveRoomControls();
   Map<String, AdminLiveRoomControls> hotSeatAdminControlMap = {};
+
+  Map<String, String> activeUserEmojis = {};
 
   void _scrollToBottom() {
     // fetchDiamond();
@@ -131,7 +134,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       loadRoomOwnerData();
       initEmojiAnimation();
       loadEmojiList();
-      initializeAgora();
+      // initializeAgora();
     });
   }
 
@@ -372,6 +375,32 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
     LiveRoomFirebase.toggleUserInRoomArray(
         widget.agoraToken.mainId ?? '', user, true);
+
+    database
+        .ref('${FirebaseDbNode.liveRoomEmoji}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value as Map?;
+      if (data != null) {
+        data.entries.forEach((entry) {
+          showEmojiOnUser(entry.key, entry.value);
+        });
+      }
+    });
+  }
+
+  void showEmojiOnUser(String position, String emojiGifUrl) {
+    setState(() {
+      // Show emoji on the user's profile
+      activeUserEmojis[position] = emojiGifUrl;
+    });
+
+    // After 3 seconds, remove the emoji
+    Future.delayed(Duration(seconds: 5), () {
+      setState(() {
+        activeUserEmojis.remove(position);
+      });
+    });
   }
 
   void initializeAgora() async {
@@ -1155,6 +1184,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     CircularImage(
                         imagePath: hotSeatMap[index + 1]?.image ?? '',
                         diameter: 60),
+                    if (activeUserEmojis.containsKey('${index + 1}'))
+                      CircularImage(
+                        imagePath: activeUserEmojis['${index + 1}'] ?? '',
+                        diameter: 60,
+                      ),
                     if (hotSeatAdminControlMap[
                                 hotSeatMap[index + 1]?.id ?? ''] !=
                             null &&
@@ -1173,7 +1207,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             color: Colors.black,
                           ),
                         ),
-                      )
+                      ),
                   ],
                 ),
               ),
@@ -1359,6 +1393,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               imagePath: roomOwner?.image ?? '',
                               diameter: 80,
                             ),
+                            if (activeUserEmojis.containsKey('-1'))
+                              CircularImage(
+                                imagePath: activeUserEmojis['-1'] ?? '',
+                                diameter: 80,
+                              ),
                             if (liveRoomControlsForAdmin.isMicMute ?? false)
                               const Positioned(
                                 right: 1,
@@ -1372,7 +1411,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                     color: Colors.black,
                                   ),
                                 ),
-                              )
+                              ),
                           ],
                         )
                       : AnimatedFramedCircularImage(
@@ -1416,23 +1455,32 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   data: Theme.of(context).copyWith(
                     canvasColor: Colors.black.withOpacity(0.2),
                   ),
-                  child: Chip(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    backgroundColor: Colors.transparent,
-                    label: Text(
-                      '$participantCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
+                  child: Stack(
+                    children: [
+                      Chip(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        backgroundColor: Colors.transparent,
+                        label: Text(
+                          '$participantCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        labelPadding: const EdgeInsets.only(right: 5),
+                        visualDensity: VisualDensity.compact,
+                        avatar: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 15,
+                        ),
                       ),
-                    ),
-                    labelPadding: const EdgeInsets.only(right: 5),
-                    visualDensity: VisualDensity.compact,
-                    avatar: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 15,
-                    ),
+                      if (activeUserEmojis.containsKey('-2'))
+                        CircularImage(
+                          imagePath: activeUserEmojis['-2'] ?? '',
+                          diameter: 30,
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -2133,8 +2181,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   return InkWell(
                     onTap: () {
                       selectedEmoji = emojiList.elementAt(index).frameImg ?? '';
+
+                      // _onImageTap(context);
+                      String emojiPosition = '-2';
+                      hotSeatMap.entries.forEach(
+                        (element) {
+                          if (element.value.id == user?.id) {
+                            emojiPosition = '${element.key}';
+                          }
+                        },
+                      );
+                      if (user?.id == roomOwner?.id) {
+                        emojiPosition = '-1';
+                      }
+
+                      log('emojiPosition = $emojiPosition');
+                      log('selectedEmoji = $selectedEmoji');
+                      LiveRoomFirebase.sendEmoji(widget.agoraToken.mainId ?? '',
+                          emojiPosition, selectedEmoji);
                       Navigator.pop(context);
-                      _onImageTap(context);
                     },
                     child: CachedNetworkImage(
                       imageUrl: emojiList.elementAt(index).frameImg ?? '',

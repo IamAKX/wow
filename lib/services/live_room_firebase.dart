@@ -167,4 +167,15 @@ class LiveRoomFirebase {
     }
     return participants;
   }
+
+  static Future<void> sendEmoji(
+      String chatWindowId, String position, String emojiUrl) async {
+    DatabaseReference messageRef =
+        database.ref('${FirebaseDbNode.liveRoomEmoji}/$chatWindowId');
+    log('${FirebaseDbNode.liveRoomEmoji}/$chatWindowId');
+    Map map = {};
+    map[position] = emojiUrl;
+    log('map = $map');
+    return await messageRef.set(map);
+  }
 }
