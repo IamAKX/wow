@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:worldsocialintegrationapp/screens/income/bank_details.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
@@ -22,6 +24,7 @@ class WithdrawlScreen extends StatefulWidget {
 class _WithdrawlScreenState extends State<WithdrawlScreen> {
   UserProfileDetail? user;
   int selectedIndex = -1;
+  late Razorpay _razorpay;
 
   late ApiCallProvider apiCallProvider;
   List<AmountCard> amountCardList = [
@@ -38,9 +41,32 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
   void initState() {
     super.initState();
 
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
     });
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    showToastMessage('Payment Successful: ${response.paymentId}');
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    showToastMessage('Payment Failed: ${response.code} - ${response.message}');
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    showToastMessage('External Wallet Selected: ${response.walletName}');
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
   }
 
   void loadUserData() async {
@@ -63,6 +89,14 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
           statusBarBrightness: Brightness.light,
         ),
         title: const Text('Withdraw'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              initiateRazorPayPayment();
+            },
+            child: const Text('Proceed'),
+          ),
+        ],
       ),
       body: getBody(context),
     );
@@ -219,6 +253,25 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
         ),
       ],
     );
+  }
+
+  void initiateRazorPayPayment() {
+    var options = {
+      'key': 'rzp_test_usEmd5LTJQKCTA', 
+      'amount': 100, 
+      'name': user?.name ?? '',
+      'description': 'Requesting for withdrawl from ${user?.username}',
+      'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }
 

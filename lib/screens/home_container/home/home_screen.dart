@@ -19,6 +19,7 @@ import '../../../services/location_service.dart';
 import '../../../utils/api.dart';
 import '../../../utils/prefs_key.dart';
 import '../profile/edit_profile.dart';
+import 'live_end_popup.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -70,7 +71,19 @@ class _HomeScreenState extends State<HomeScreen>
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
           (value) {
-            setState(() {});
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  insetPadding:
+                      const EdgeInsets.all(20.0), // Margin around the dialog
+                  child: LiveEndPopup(
+                    roomId: agoraToken.mainId ?? '',
+                    userId: prefs.getString(PrefsKey.userId) ?? '',
+                  ),
+                );
+              },
+            );
           },
         );
       }
@@ -225,4 +238,6 @@ class _HomeScreenState extends State<HomeScreen>
       },
     );
   }
+
+  void showLiveEndPopup() {}
 }
