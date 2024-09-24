@@ -14,6 +14,7 @@ import 'package:pip_view/pip_view.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
+import 'package:worldsocialintegrationapp/models/chat_model.dart';
 import 'package:worldsocialintegrationapp/models/emoji_model.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
@@ -49,9 +50,12 @@ import '../../services/location_service.dart';
 import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
 import '../../widgets/audio_wave_painter.dart';
+import '../../widgets/enum.dart';
 import '../home_container/family/family_screen.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
+import 'get_friend_bottonsheet.dart';
+import 'get_shre_friend_bottonsheet.dart';
 import 'prime_gift_bottom.dart';
 import 'profile_bottomsheet.dart';
 
@@ -436,7 +440,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     });
 
     // After 3 seconds, remove the emoji
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 5), () {
       setState(() {
         activeUserEmojis.remove(position);
       });
@@ -519,9 +523,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   void cleanFirebaseListener() async {
     hotSeatMap.entries.forEach(
-      (element) {
+      (element) async {
         if (element.value.id == user?.id) {
-          LiveRoomFirebase.removeLiveRoomHotSeat(
+          await LiveRoomFirebase.removeLiveRoomHotSeat(
             widget.agoraToken.mainId ?? '',
             element.key,
           );
@@ -745,7 +749,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 ),
               ),
               IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.stop_circle,
                   color: Colors.white,
                   size: 30,
@@ -775,22 +779,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         onTap: () async {
           _isClicked = !_isClicked;
           if (widget.agoraToken.isSelfCreated ?? false) {
-            archiveLiveRoom();
+            await archiveLiveRoom();
           }
-          LiveRoomFirebase.toggleUserInRoomArray(
+          await LiveRoomFirebase.toggleUserInRoomArray(
                   widget.agoraToken.mainId ?? '', user, false)
               .then(
             (value) {
               Navigator.pop(context);
             },
           );
-          hotSeatMap.entries.forEach((entry) {
-            LiveRoomFirebase.updateLiveRoomAdminSettings(
+          hotSeatMap.entries.forEach((entry) async {
+            await LiveRoomFirebase.updateLiveRoomAdminSettings(
                 widget.agoraToken.mainId ?? '',
                 hotSeatMap[entry.key]?.id ?? '',
                 'position',
                 entry.key);
-            LiveRoomFirebase.updateLiveRoomAdminSettings(
+            await LiveRoomFirebase.updateLiveRoomAdminSettings(
                 widget.agoraToken.mainId ?? '',
                 hotSeatMap[entry.key]?.id ?? '',
                 'kickout',
@@ -803,7 +807,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               userId: user?.id,
               userImage: user?.image,
               userName: user?.name);
-          LiveRoomFirebase.sendChat(
+          await LiveRoomFirebase.sendChat(
                   widget.agoraToken.mainId ?? '', liveroomChat)
               .then(
             (value) {
@@ -811,9 +815,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             },
           );
 
-          LiveRoomFirebase.clearChat(
+          await LiveRoomFirebase.clearChat(
               widget.agoraToken.mainId ?? '', LiveroomChat(),
               sendMessage: false);
+          cleanFirebaseListener();
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -865,7 +870,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           });
           //TODO: PIP
           PIPView.of(context)?.presentBelow(
-            HomeContainer(),
+            const HomeContainer(),
           );
         },
         child: Column(
@@ -1047,7 +1052,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       // Navigator.of(context, rootNavigator: true).pushNamed(ChatScreen.route);
                       // TODO
                       PIPView.of(context)?.presentBelow(
-                        ChatScreen(),
+                        const ChatScreen(),
                       );
                     },
                     child: const CircleAvatar(
@@ -2460,7 +2465,79 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                     Expanded(
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Share to',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled:
+                                                  true, // To enable custom height
+                                              builder: (context) =>
+                                                  GetShareFriendBottomsheet(
+                                                roomDetail: roomDetail ??
+                                                    JoinableLiveRoomModel(
+                                                      id: widget
+                                                          .agoraToken.mainId,
+                                                    ),
+                                                chatModel: ChatModel(
+                                                  assetId: '',
+                                                  message:
+                                                      'Join live room by ${roomOwner?.name}',
+                                                  msgType:
+                                                      MessageType.LIVE.name,
+                                                  senderId: user?.id,
+                                                  url:
+                                                      '${roomDetail?.liveimage}',
+                                                  videoThumbnaiil: '',
+                                                  extra1: widget
+                                                      .agoraToken.channelName,
+                                                  extra2:
+                                                      widget.agoraToken.mainId,
+                                                  extra3:
+                                                      widget.agoraToken.token,
+                                                  extra4: widget
+                                                      .agoraToken.roomCreatedBy,
+                                                ),
+                                              ),
+                                            ).then(
+                                              (value) {
+                                                Navigator.pop(context);
+                                              },
+                                            );
+                                          },
+                                          child: getShareOptionButton(
+                                              Icons.group, 'Friends'),
+                                        ),
+                                        InkWell(
+                                          onTap: () {},
+                                          child: getShareOptionButton(
+                                              Icons.more_horiz_rounded, 'More'),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2579,12 +2656,35 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     );
   }
 
-  void archiveLiveRoom() {
+  Future<void> archiveLiveRoom() async {
     Map<String, dynamic> reqBody = {
       'liveId': widget.agoraToken.mainId,
     };
-    apiCallProvider.postRequest(API.archieveLive, reqBody).then((value) async {
+    await apiCallProvider
+        .postRequest(API.archieveLive, reqBody)
+        .then((value) async {
       if (value['success'] == '1') {}
     });
+  }
+
+  Widget getShareOptionButton(IconData icon, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon),
+          ),
+          verticalGap(10),
+          Text(label),
+        ],
+      ),
+    );
   }
 }

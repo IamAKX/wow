@@ -12,6 +12,15 @@ class ChatModel {
   String? assetTypeId;
   bool? isClaimed;
   String? id;
+  String? extra1;
+  String? extra2;
+  String? extra3;
+  String? extra4;
+  String? extra5;
+  String? extra6;
+  String? extra7;
+  String? extra8;
+  String? extra9;
   ChatModel({
     this.senderId,
     this.message,
@@ -24,6 +33,15 @@ class ChatModel {
     this.assetTypeId,
     this.isClaimed,
     this.id,
+    this.extra1,
+    this.extra2,
+    this.extra3,
+    this.extra4,
+    this.extra5,
+    this.extra6,
+    this.extra7,
+    this.extra8,
+    this.extra9,
   });
 
   ChatModel copyWith({
@@ -38,6 +56,15 @@ class ChatModel {
     String? assetTypeId,
     bool? isClaimed,
     String? id,
+    String? extra1,
+    String? extra2,
+    String? extra3,
+    String? extra4,
+    String? extra5,
+    String? extra6,
+    String? extra7,
+    String? extra8,
+    String? extra9,
   }) {
     return ChatModel(
       senderId: senderId ?? this.senderId,
@@ -51,6 +78,15 @@ class ChatModel {
       assetTypeId: assetTypeId ?? this.assetTypeId,
       isClaimed: isClaimed ?? this.isClaimed,
       id: id ?? this.id,
+      extra1: extra1 ?? this.extra1,
+      extra2: extra2 ?? this.extra2,
+      extra3: extra3 ?? this.extra3,
+      extra4: extra4 ?? this.extra4,
+      extra5: extra5 ?? this.extra5,
+      extra6: extra6 ?? this.extra6,
+      extra7: extra7 ?? this.extra7,
+      extra8: extra8 ?? this.extra8,
+      extra9: extra9 ?? this.extra9,
     );
   }
 
@@ -90,6 +126,33 @@ class ChatModel {
     if (id != null) {
       result.addAll({'id': id});
     }
+    if (extra1 != null) {
+      result.addAll({'extra1': extra1});
+    }
+    if (extra2 != null) {
+      result.addAll({'extra2': extra2});
+    }
+    if (extra3 != null) {
+      result.addAll({'extra3': extra3});
+    }
+    if (extra4 != null) {
+      result.addAll({'extra4': extra4});
+    }
+    if (extra5 != null) {
+      result.addAll({'extra5': extra5});
+    }
+    if (extra6 != null) {
+      result.addAll({'extra6': extra6});
+    }
+    if (extra7 != null) {
+      result.addAll({'extra7': extra7});
+    }
+    if (extra8 != null) {
+      result.addAll({'extra8': extra8});
+    }
+    if (extra9 != null) {
+      result.addAll({'extra9': extra9});
+    }
 
     return result;
   }
@@ -107,6 +170,15 @@ class ChatModel {
       assetTypeId: map['assetTypeId'],
       isClaimed: map['isClaimed'],
       id: map['id'],
+      extra1: map['extra1'],
+      extra2: map['extra2'],
+      extra3: map['extra3'],
+      extra4: map['extra4'],
+      extra5: map['extra5'],
+      extra6: map['extra6'],
+      extra7: map['extra7'],
+      extra8: map['extra8'],
+      extra9: map['extra9'],
     );
   }
 
@@ -117,7 +189,7 @@ class ChatModel {
 
   @override
   String toString() {
-    return 'ChatModel(senderId: $senderId, message: $message, msgType: $msgType, url: $url, videoThumbnaiil: $videoThumbnaiil, timestamp: $timestamp, assetId: $assetId, assetTypeName: $assetTypeName, assetTypeId: $assetTypeId, isClaimed: $isClaimed, id: $id)';
+    return 'ChatModel(senderId: $senderId, message: $message, msgType: $msgType, url: $url, videoThumbnaiil: $videoThumbnaiil, timestamp: $timestamp, assetId: $assetId, assetTypeName: $assetTypeName, assetTypeId: $assetTypeId, isClaimed: $isClaimed, id: $id, extra1: $extra1, extra2: $extra2, extra3: $extra3, extra4: $extra4, extra5: $extra5, extra6: $extra6, extra7: $extra7, extra8: $extra8, extra9: $extra9)';
   }
 
   @override
@@ -135,7 +207,16 @@ class ChatModel {
         other.assetTypeName == assetTypeName &&
         other.assetTypeId == assetTypeId &&
         other.isClaimed == isClaimed &&
-        other.id == id;
+        other.id == id &&
+        other.extra1 == extra1 &&
+        other.extra2 == extra2 &&
+        other.extra3 == extra3 &&
+        other.extra4 == extra4 &&
+        other.extra5 == extra5 &&
+        other.extra6 == extra6 &&
+        other.extra7 == extra7 &&
+        other.extra8 == extra8 &&
+        other.extra9 == extra9;
   }
 
   @override
@@ -150,6 +231,15 @@ class ChatModel {
         assetTypeName.hashCode ^
         assetTypeId.hashCode ^
         isClaimed.hashCode ^
-        id.hashCode;
+        id.hashCode ^
+        extra1.hashCode ^
+        extra2.hashCode ^
+        extra3.hashCode ^
+        extra4.hashCode ^
+        extra5.hashCode ^
+        extra6.hashCode ^
+        extra7.hashCode ^
+        extra8.hashCode ^
+        extra9.hashCode;
   }
 }

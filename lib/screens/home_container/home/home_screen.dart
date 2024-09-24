@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/live_room_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/near_by.dart';
@@ -41,14 +42,14 @@ class _HomeScreenState extends State<HomeScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       log('show profile update : ${prefs.getBool(PrefsKey.showProfileUpdatePopup) ?? false}');
-
+      requestPermission();
       if (prefs.getBool(PrefsKey.showProfileUpdatePopup) ?? false) {
         showUpdateProfilePopup();
       }
     });
   }
 
-  void getAgoraToken() async {
+  getAgoraToken(BuildContext context) async {
     CountryContinent? countryContinent =
         await LocationService().getCurrentLocation();
     Map<String, dynamic> reqBody = {
@@ -58,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
       'latitude': countryContinent?.position?.latitude,
       'hostType': '3',
     };
+    log('req = $reqBody');
     await apiCallProvider.postRequest(API.agoraToken, reqBody).then((value) {
       if (value['details'] != null) {
         AgoraToken agoraToken = AgoraToken.fromJson(value['details']);
@@ -203,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen>
                   onPressed: apiCallProvider.status == ApiStatus.loading
                       ? null
                       : () {
-                          getAgoraToken();
+                          getAgoraToken(context);
                         },
                   icon: SvgPicture.asset(
                     'assets/svg/go_live.svg',
@@ -242,4 +244,12 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void showLiveEndPopup() {}
+
+  Future<void> requestPermission() async {
+    await [
+      Permission.location,
+      Permission.microphone,
+      Permission.nearbyWifiDevices
+    ].request();
+  }
 }

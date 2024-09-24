@@ -23,12 +23,14 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:path/path.dart' as p;
 import 'dart:ui' as ui show Gradient;
 
+import '../../../models/live_room_detail_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../services/storage_service.dart';
 import '../../../utils/api.dart';
 import '../../../utils/firebase_db_node.dart';
 import '../../../widgets/enum.dart';
 import '../../../widgets/network_image_preview_fullscreen.dart';
+import '../../live_room/live_room_screen.dart';
 
 class ChatWindow extends StatefulWidget {
   const ChatWindow({super.key, required this.chatWindowDetails});
@@ -350,6 +352,9 @@ class _ChatWindowState extends State<ChatWindow> {
       case 'FRAME':
         return getSVGATypeChat(chat);
 
+      case 'LIVE':
+        return getLiveTypeChat(chat);
+
       default:
         return const SizedBox.shrink();
     }
@@ -481,6 +486,66 @@ class _ChatWindowState extends State<ChatWindow> {
               height: 250,
             ),
           ),
+        ),
+        verticalGap(5),
+        Text(
+          getChatTimesAgo(chat.timestamp ?? 0),
+          style: TextStyle(
+              color: chat.senderId == prefs.getString(PrefsKey.userId)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  Widget getLiveTypeChat(ChatModel chat) {
+    return Column(
+      crossAxisAlignment: chat.senderId == prefs.getString(PrefsKey.userId)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            onTap: () {
+              LiveRoomDetailModel liveRoomDetailModel = LiveRoomDetailModel(
+                channelName: chat.extra1,
+                mainId: chat.extra2,
+                token: chat.extra3,
+                isSelfCreated:
+                    chat.extra4 == widget.chatWindowDetails.currentUser?.id,
+                roomCreatedBy: chat.extra4,
+              );
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(LiveRoomScreen.route,
+                      arguments: liveRoomDetailModel)
+                  .then(
+                    (value) {},
+                  );
+            },
+            child: CachedNetworkImage(
+              imageUrl: chat.url ?? '',
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => Center(
+                child: Text('Error ${error.toString()}'),
+              ),
+              fit: BoxFit.fill,
+              height: 250,
+            ),
+          ),
+        ),
+        verticalGap(5),
+        Text(
+          chat.message ?? '',
+          style: TextStyle(
+              color: chat.senderId == prefs.getString(PrefsKey.userId)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 14),
         ),
         verticalGap(5),
         Text(

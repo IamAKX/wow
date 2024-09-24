@@ -11,9 +11,11 @@ import '../utils/country_continent_map.dart';
 class LocationService {
   Future<CountryContinent?> getCurrentLocation() async {
     bool serviceEnabled;
+    log('Inside getCurrentLocation');
     LocationPermission permission;
     CountryContinent countryContinent = CountryContinent();
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    log('serviceEnabled = $serviceEnabled');
     if (!serviceEnabled) {
       return countryContinent;
     }

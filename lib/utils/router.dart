@@ -315,6 +315,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const WithdrawlScreen());
       case BankDetails.route:
         return MaterialPageRoute(builder: (_) => const BankDetails());
+      case '/invite':
+        return MaterialPageRoute(builder: (_) => const BankDetails());
       default:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
     }

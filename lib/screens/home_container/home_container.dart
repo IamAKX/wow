@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:worldsocialintegrationapp/main.dart';
@@ -20,6 +23,7 @@ class HomeContainer extends StatefulWidget {
 
 class _HomeContainerState extends State<HomeContainer> {
   int _selectedIndex = 0;
+  final appLinks = AppLinks();
 
   static const List<Widget> screenList = <Widget>[
     HomeScreen(),
@@ -39,6 +43,9 @@ class _HomeContainerState extends State<HomeContainer> {
     super.initState();
     FirebaseDbService.updateOnlineStatus(
         prefs.getString(PrefsKey.userId) ?? '', 'Online');
+    appLinks.uriLinkStream.listen((uri) {
+      log('uri deeplink = $uri');
+    });
   }
 
   @override

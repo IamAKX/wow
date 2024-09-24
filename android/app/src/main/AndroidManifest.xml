@@ -57,7 +57,20 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http"/>
+                <data android:host="wows.com"/>
+                <data android:pathPrefix="/invite"/>
+            </intent-filter>
         </activity>
+
+
         <activity
             android:name="com.snap.corekit.SnapKitActivity"
             android:launchMode="singleTask"
@@ -80,6 +93,7 @@
             android:value="2" />
 
         <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
