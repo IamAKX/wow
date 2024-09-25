@@ -313,10 +313,15 @@ class _ChatWindowState extends State<ChatWindow> {
   getChatBubble(ChatModel chat) {
     return chat.senderId == prefs.getString(PrefsKey.userId)
         ? ChatBubble(
-            clipper: ChatBubbleClipper2(type: BubbleType.sendBubble),
+            clipper: ChatBubbleClipper2(
+              type: BubbleType.receiverBubble,
+            ),
             alignment: Alignment.topRight,
-            margin: const EdgeInsets.only(top: 20),
-            backGroundColor: Colors.blue,
+            margin: const EdgeInsets.only(
+              top: 20,
+              right: 10,
+            ),
+            backGroundColor: Color(0xFFFC92BE),
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -325,9 +330,9 @@ class _ChatWindowState extends State<ChatWindow> {
             ),
           )
         : ChatBubble(
-            clipper: ChatBubbleClipper2(type: BubbleType.receiverBubble),
-            backGroundColor: const Color(0xffE7E7ED),
-            margin: const EdgeInsets.only(top: 20),
+            clipper: ChatBubbleClipper2(type: BubbleType.sendBubble),
+            backGroundColor: const Color(0xffCECECE),
+            margin: const EdgeInsets.only(top: 20, left: 10),
             child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -379,7 +384,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 12),
         ),
         Visibility(
@@ -446,7 +451,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 16),
         ),
         verticalGap(5),
@@ -455,7 +460,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 12),
         ),
       ],
@@ -493,7 +498,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 12),
         ),
       ],
@@ -544,7 +549,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 14),
         ),
         verticalGap(5),
@@ -553,7 +558,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 12),
         ),
       ],
@@ -589,7 +594,7 @@ class _ChatWindowState extends State<ChatWindow> {
           style: TextStyle(
               color: chat.senderId == prefs.getString(PrefsKey.userId)
                   ? Colors.white
-                  : Colors.black,
+                  : Colors.white,
               fontSize: 12),
         ),
       ],

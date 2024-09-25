@@ -109,19 +109,35 @@ class LiveRoomFirebase {
     await liveRoomRef.remove();
   }
 
+  static Future<void> removeLiveRoomAllHotSeat(String chatWindowId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomHotSeat}/$chatWindowId');
+    log('Removing all hotseat');
+    await liveRoomRef.remove();
+  }
+
   static Future<void> addLiveRoomAdminSettings(String chatWindowId,
       String userId, AdminLiveRoomControls adminLiveRoomControls) async {
     DatabaseReference liveRoomRef = database
         .ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/$userId');
-    log('updating liveRoomAdminControl : ${userId}');
+    log('updating liveRoomAdminControl : $userId');
     await liveRoomRef.set(adminLiveRoomControls.toMap());
+  }
+
+  static Future<void> removeLiveRoomAdminSettings(
+    String chatWindowId,
+  ) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/');
+    log('removing all liveRoomAdminControl : $chatWindowId');
+    await liveRoomRef.remove();
   }
 
   static Future<void> updateLiveRoomAdminSettings(
       String chatWindowId, String userId, String key, dynamic value) async {
     DatabaseReference liveRoomRef = database
         .ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/$userId');
-    log('updating liveRoomAdminControl : ${userId}');
+    log('updating liveRoomAdminControl : $userId');
     Map<String, Object?> map = {};
     map[key] = value;
 

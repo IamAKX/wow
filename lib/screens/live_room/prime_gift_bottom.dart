@@ -80,7 +80,7 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
                   horizontalGap(10),
                   Image.asset(
                     'assets/image/coins_img.png',
-                    width: 25,
+                    width: 20,
                   ),
                   horizontalGap(10),
                   Expanded(
@@ -88,7 +88,7 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
                       controller: _tabController,
                       labelColor: Colors.black,
                       isScrollable: true,
-                      labelStyle: TextStyle(fontSize: 14),
+                      labelStyle: TextStyle(fontSize: 12),
                       labelPadding: const EdgeInsets.symmetric(
                           horizontal: 5, vertical: 0),
                       indicatorPadding: EdgeInsets.zero,

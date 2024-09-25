@@ -8,6 +8,7 @@ import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../models/bank_detail_model.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
 import '../../utils/api.dart';
@@ -37,6 +38,7 @@ class _BankDetailsState extends State<BankDetails> {
 
   String selectedBank = 'Select a bank';
   String accounType = 'savings';
+  BankDetailsModel? bankDetailsModel;
 
   @override
   void initState() {
@@ -47,12 +49,37 @@ class _BankDetailsState extends State<BankDetails> {
     });
   }
 
+  getBankDetails() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = user?.id;
+
+    await apiCallProvider
+        .postRequest(API.getUserBankDetails, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        bankDetailsModel = BankDetailsModel.fromJson(value['details']);
+
+        _accountNoCtrl.text = bankDetailsModel?.accountNumber ?? '';
+        _confAccountNoCtrl.text = bankDetailsModel?.accountNumber ?? '';
+        _branchNameCtrl.text = bankDetailsModel?.branchName ?? '';
+        _bankNameCtrl.text = bankDetailsModel?.bankName ?? '';
+        _cardHolderCtrl.text = bankDetailsModel?.accountHolderName ?? '';
+        _accountType.text = bankDetailsModel?.accountType ?? '';
+        _ifscCtrl.text = bankDetailsModel?.ifscCode ?? '';
+
+        setState(() {});
+      }
+      showToastMessage(value['message']);
+    });
+  }
+
   void loadUserData() async {
     await getCurrentUser().then(
-      (value) {
-        setState(() {
-          user = value;
-        });
+      (value) async {
+        user = value;
+        await getBankDetails();
+        setState(() {});
       },
     );
   }

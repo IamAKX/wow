@@ -20,8 +20,8 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   List<GamesModel> list = [];
-  List<GamesModel> bettingGames = [];
-  List<GamesModel> nonbettingGames = [];
+  // List<GamesModel> bettingGames = [];
+  // List<GamesModel> nonbettingGames = [];
   late ApiCallProvider apiCallProvider;
 
   @override
@@ -39,10 +39,10 @@ class _GameScreenState extends State<GameScreen> {
       if (value['data'] != null) {
         for (var item in value['data']) {
           list.add(GamesModel.fromJson(item));
-          bettingGames =
-              list.where((item) => item.gameType == 'Betting').toList();
-          nonbettingGames =
-              list.where((item) => item.gameType == 'Nonbetting').toList();
+          // bettingGames =
+          //     list.where((item) => item.gameType == 'Betting').toList();
+          // nonbettingGames =
+          //     list.where((item) => item.gameType == 'Nonbetting').toList();
         }
         setState(() {});
       }
@@ -62,7 +62,7 @@ class _GameScreenState extends State<GameScreen> {
                 const Padding(
                   padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                   child: Text(
-                    'Betting Games',
+                    'Popular Games',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -79,61 +79,17 @@ class _GameScreenState extends State<GameScreen> {
                       crossAxisSpacing: 5,
                       mainAxisSpacing: 5,
                       childAspectRatio: 1),
-                  itemCount: bettingGames.length,
+                  itemCount: list.length,
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () => Navigator.of(context, rootNavigator: true)
                           .pushNamed(CustomWebview.route,
                               arguments:
-                                  '${bettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${bettingGames.elementAt(index).id}'),
+                                  '${list.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${list.elementAt(index).id}'),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         child: CachedNetworkImage(
-                          imageUrl: bettingGames.elementAt(index).image ?? '',
-                          placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                          errorWidget: (context, url, error) => Center(
-                            child: Text('Error ${error.toString()}'),
-                          ),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-                  child: Text(
-                    'Non-Betting Games',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                GridView.builder(
-                  padding: const EdgeInsets.all(10),
-                  primary: true,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 5,
-                      childAspectRatio: 1),
-                  itemCount: nonbettingGames.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () => Navigator.of(context, rootNavigator: true)
-                          .pushNamed(CustomWebview.route,
-                              arguments:
-                                  '${nonbettingGames.elementAt(index).link}${prefs.getString(PrefsKey.userId)}&gameId=${nonbettingGames.elementAt(index).id}'),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        child: CachedNetworkImage(
-                          imageUrl:
-                              nonbettingGames.elementAt(index).image ?? '',
+                          imageUrl: list.elementAt(index).image ?? '',
                           placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(),
                           ),

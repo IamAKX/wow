@@ -49,7 +49,7 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
               ),
               children: [
                 getGridItems('00:00:05', 'Live Duration'),
-                getGridItems('4', 'Diamond'),
+                getGridIconItems('4', 'Diamond'),
                 getGridItems('1', 'Total Audience'),
                 getGridItems('0', 'Minimum Audience'),
                 getGridItems('0', 'New Follows'),
@@ -107,6 +107,7 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
       children: [
         Text(
           heading,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -116,12 +117,37 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
         verticalGap(10),
         Text(
           subheading,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.grey,
             fontWeight: FontWeight.normal,
             fontSize: 10,
           ),
         )
+      ],
+    );
+  }
+
+  getGridIconItems(String heading, String subheading) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          heading,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        verticalGap(10),
+        Image.asset(
+          'assets/image/new_diamond.png',
+          width: 20,
+          height: 20,
+        ),
       ],
     );
   }

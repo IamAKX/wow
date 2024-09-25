@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../main.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import '../../utils/prefs_key.dart';
 
 class LiveRecord extends StatefulWidget {
   const LiveRecord({super.key});
@@ -18,29 +22,37 @@ class LiveRecord extends StatefulWidget {
 
 class _LiveRecordState extends State<LiveRecord> {
   String selectedDate = formatDate(DateTime.now());
-  UserProfileDetail? user;
+  late ApiCallProvider apiCallProvider;
+
+  String diamonds = '0';
+  String validDays = '0';
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadUserData();
+      loadMonthlyRecord();
     });
   }
 
-  void loadUserData() async {
-    await getCurrentUser().then(
-      (value) {
-        setState(() {
-          user = value;
-        });
-      },
-    );
+  void loadMonthlyRecord() async {
+    Map<String, dynamic> reqBody = {};
+    reqBody['userId'] = prefs.getString(PrefsKey.userId);
+    reqBody['date'] = selectedDate;
+
+    await apiCallProvider
+        .postRequest(API.get_user_live_details_by_dates, reqBody)
+        .then((value) async {
+      if (value['status'] == '1') {
+        showToastMessage(value['message']);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -113,13 +125,15 @@ class _LiveRecordState extends State<LiveRecord> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Total Diamonds : ${user?.myDiamond ?? '0'}',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              apiCallProvider.status == ApiStatus.loading
+                  ? ButtonLoader()
+                  : Text(
+                      'Total Diamonds : $diamonds',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
               horizontalGap(10),
               Image.asset(
                 'assets/image/new_diamond.png',
@@ -144,13 +158,15 @@ class _LiveRecordState extends State<LiveRecord> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Total Valid Days : 2',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              apiCallProvider.status == ApiStatus.loading
+                  ? ButtonLoader()
+                  : Text(
+                      'Total Valid Days : $validDays',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ],
           ),
         )

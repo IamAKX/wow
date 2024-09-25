@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/screens/income/diamond_help.dart';
 import 'package:worldsocialintegrationapp/screens/income/live_record.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
 import '../../utils/helpers.dart';
 
@@ -20,11 +24,14 @@ class IncomeScreen extends StatefulWidget {
 }
 
 class _IncomeScreenState extends State<IncomeScreen> {
-  UserProfileDetail? user;
+  // UserProfileDetail? user;
   String exchangedGold = '0';
+  String walletDiamond = '0';
+  String walletCoin = '0';
   final TextEditingController editingController = TextEditingController();
   late ApiCallProvider apiCallProvider;
   late Razorpay _razorpay;
+  bool isHost = false;
 
   @override
   void initState() {
@@ -45,7 +52,9 @@ class _IncomeScreenState extends State<IncomeScreen> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadUserData();
+      // loadUserData();
+      getHost();
+      getWalletDetail();
     });
   }
 
@@ -67,34 +76,48 @@ class _IncomeScreenState extends State<IncomeScreen> {
     showToastMessage('External Wallet Selected: ${response.walletName}');
   }
 
-  void initiateRazorPayPayment() {
-    double amount = int.parse(user?.myDiamond ?? '0') / 1000 * 75;
-    var options = {
-      'key': 'rzp_test_usEmd5LTJQKCTA',
-      'amount': 100, // amount * 100,
-      'name': user?.name ?? '',
-      'description': 'Requesting for withdrawl from ${user?.username}',
-      'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
-      'external': {
-        'wallets': ['paytm']
+  // void initiateRazorPayPayment() {
+  //   double amount = int.parse(user?.myDiamond ?? '0') / 1000 * 75;
+  //   var options = {
+  //     'key': 'rzp_test_usEmd5LTJQKCTA',
+  //     'amount': 100, // amount * 100,
+  //     'name': user?.name ?? '',
+  //     'description': 'Requesting for withdrawl from ${user?.username}',
+  //     'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
+  //     'external': {
+  //       'wallets': ['paytm']
+  //     }
+  //   };
+
+  //   try {
+  //     _razorpay.open(options);
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //   }
+  // }
+
+  // void loadUserData() async {
+  //   await getCurrentUser().then(
+  //     (value) {
+  //       user = value;
+  //       setState(() {});
+  //     },
+  //   );
+  // }
+
+  void getHost() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = prefs.getString(PrefsKey.userId);
+
+    await apiCallProvider.postRequest(API.getHost, reqBody).then((value) async {
+      if (value['success'] == '1') {
+        isHost = true;
+      } else {
+        isHost = false;
       }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  void loadUserData() async {
-    await getCurrentUser().then(
-      (value) {
-        setState(() {
-          user = value;
-        });
-      },
-    );
+      setState(() {});
+    });
   }
 
   @override
@@ -108,12 +131,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
         ),
         title: const Text('Income'),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pushNamed(LiveRecord.route);
-            },
-            child: const Text('Live Record'),
+          Visibility(
+            visible: isHost,
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(LiveRecord.route);
+              },
+              child: const Text('Live Record'),
+            ),
           )
         ],
       ),
@@ -149,7 +175,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
               ),
               horizontalGap(10),
               Text(
-                user?.myDiamond ?? '0',
+                walletDiamond,
                 style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -230,7 +256,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                   ),
                   InkWell(
                     onTap: () {
-                      editingController.text = user?.myDiamond ?? '';
+                      editingController.text = walletDiamond;
                     },
                     child: Container(
                       height: 50,
@@ -343,10 +369,15 @@ class _IncomeScreenState extends State<IncomeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    initiateRazorPayPayment();
-                  },
-                  child: Text('EXCHANGE OF GOLDS'),
+                  onPressed: editingController.text.isEmpty
+                      ? null
+                      : () {
+                          // initiateRazorPayPayment();
+                          exchangeDiamond();
+                        },
+                  child: apiCallProvider.status == ApiStatus.loading
+                      ? ButtonLoader()
+                      : Text('EXCHANGE OF GOLDS'),
                 ),
               ),
               Container(
@@ -377,7 +408,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
               ),
               horizontalGap(10),
               Text(
-                user?.myCoin ?? '0',
+                walletCoin,
                 style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -412,5 +443,37 @@ class _IncomeScreenState extends State<IncomeScreen> {
         ),
       ],
     );
+  }
+
+  getWalletDetail() async {
+    Map<String, dynamic> reqBody = {};
+    reqBody['userId'] = prefs.getString(PrefsKey.userId);
+
+    await apiCallProvider
+        .postRequest(API.getWalletDetails, reqBody)
+        .then((value) {
+      if (value['status'] == '1') {
+        walletDiamond = value['details']['myDiamond'];
+        walletCoin = value['details']['myCoin'];
+        setState(() {});
+      }
+    });
+  }
+
+  exchangeDiamond() async {
+    Map<String, dynamic> reqBody = {};
+    reqBody['userId'] = prefs.getString(PrefsKey.userId);
+    reqBody['myDiamond'] = editingController.text;
+
+    await apiCallProvider
+        .postRequest(API.exchangeCoins, reqBody)
+        .then((value) async {
+      if (value['status'] == '1') {
+        showToastMessage(value['message']);
+        editingController.text = '';
+        await getWalletDetail();
+        setState(() {});
+      }
+    });
   }
 }

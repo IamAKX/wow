@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_in_app_pip/picture_in_picture.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pip_view/pip_view.dart';
@@ -386,6 +387,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
     LiveRoomFirebase.toggleUserInRoomArray(
         widget.agoraToken.mainId ?? '', user, true);
+    LiveRoomFirebase.sendAudioSignal(widget.agoraToken.mainId ?? '',
+        prefs.getString(PrefsKey.userId) ?? '', 0);
 
     database
         .ref('${FirebaseDbNode.liveRoomEmoji}/${widget.agoraToken.mainId}')
@@ -483,8 +486,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           for (var speaker in speakers) {
             // The local user has uid 0
             if (speaker.uid == 0) {
-              log('agora listner - ${speaker.volume} ${speaker.uid}');
-              log('agora listner - ${speaker.volume}');
               LiveRoomFirebase.sendAudioSignal(widget.agoraToken.mainId ?? '',
                   prefs.getString(PrefsKey.userId) ?? '', speaker.volume ?? 0);
             } else {}
@@ -493,8 +494,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       ),
     );
 
-    log('token : ${token}');
-    log('channelName : ${channelName}');
     // Join channel
     await agoraEngine.joinChannel(
       token: token,
@@ -572,7 +571,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   }
 
   void loadUserData() async {
-    var status = await Permission.manageExternalStorage.request();
+    await Permission.manageExternalStorage.request();
+    await Permission.microphone.request();
+    await Permission.audio.request();
     await getCurrentUser().then(
       (value) async {
         user = value;
@@ -658,15 +659,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       visible:
           ((widget.agoraToken.isSelfCreated ?? false) && musicUrl.isNotEmpty),
       child: Positioned(
-        right: 20,
+        right: 10,
         bottom: MediaQuery.of(context).size.height * 0.3,
         child: InkWell(
           onTap: () {
             _startGlideAnimation();
           },
-          child: Image.asset(
-            'assets/image/frkst-records.gif',
-            width: 50,
+          child: Lottie.asset(
+            'assets/image/musicplay.json',
+            width: 100,
           ),
         ),
       ),
@@ -778,6 +779,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       child: InkWell(
         onTap: () async {
           _isClicked = !_isClicked;
+
           if (widget.agoraToken.isSelfCreated ?? false) {
             await archiveLiveRoom();
           }
@@ -814,10 +816,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               _scrollToBottom();
             },
           );
-
           await LiveRoomFirebase.clearChat(
               widget.agoraToken.mainId ?? '', LiveroomChat(),
               sendMessage: false);
+          await LiveRoomFirebase.removeLiveRoomAllHotSeat(
+              widget.agoraToken.mainId ?? '');
+          await LiveRoomFirebase.removeLiveRoomAdminSettings(
+              widget.agoraToken.mainId ?? '');
           cleanFirebaseListener();
         },
         child: Column(
@@ -962,11 +967,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
                       log('agora mic : ${!(liveRoomControls.isMicMute ?? true)}');
-                      agoraEngine.muteLocalAudioStream(
+                      await agoraEngine.muteLocalAudioStream(
                           !(liveRoomControls.isMicMute ?? true));
-                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                      await LiveRoomFirebase.sendAudioSignal(
+                          widget.agoraToken.mainId ?? '',
+                          prefs.getString(PrefsKey.userId) ?? '',
+                          0);
+                      await LiveRoomFirebase.updateLiveRoomAdminSettings(
                           widget.agoraToken.mainId ?? '',
                           user?.id ?? '',
                           'isMicMute',
@@ -1022,16 +1031,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                   ),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
                       log('agora speaker : ${!(liveRoomControls.isSpeakerMute ?? true)}');
-                      agoraEngine.setEnableSpeakerphone(
+                      await agoraEngine.setEnableSpeakerphone(
                           !(liveRoomControls.isSpeakerMute ?? true));
-                      agoraEngine.adjustPlaybackSignalVolume(
+                      await agoraEngine.adjustPlaybackSignalVolume(
                           (!(liveRoomControls.isSpeakerMute ?? true))
                               ? 100
                               : 0);
-
-                      LiveRoomFirebase.updateLiveRoomAdminSettings(
+                      await LiveRoomFirebase.sendAudioSignal(
+                          widget.agoraToken.mainId ?? '',
+                          prefs.getString(PrefsKey.userId) ?? '',
+                          0);
+                      await LiveRoomFirebase.updateLiveRoomAdminSettings(
                           widget.agoraToken.mainId ?? '',
                           user?.id ?? '',
                           'isSpeakerMute',
@@ -1137,10 +1149,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-          // gradient: const LinearGradient(
-          //   colors: [Colors.green, Colors.yellow, Colors.deepOrange],
-          // ),
-          color: const Color(0xFF252526),
+          gradient: const LinearGradient(
+            colors: [Colors.green, Colors.yellow, Colors.deepOrange],
+          ),
+          // color: const Color(0xFF252526),
           border: Border.all(color: Colors.red),
           borderRadius: BorderRadius.circular(10)),
       child: Row(
@@ -1272,18 +1284,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     CircularImage(
                         imagePath: hotSeatMap[index + 1]?.image ?? '',
                         diameter: 60),
+                    if (speakingMap
+                            .containsKey(hotSeatMap[index + 1]?.id ?? '') &&
+                        speakingMap[hotSeatMap[index + 1]?.id ?? ''] != 0)
+                      Lottie.asset(
+                        'assets/image/voice_dection_lotttie.json',
+                        width: 60,
+                        height: 60,
+                      ),
                     if (activeUserEmojis.containsKey('${index + 1}'))
                       CircularImage(
                         imagePath: activeUserEmojis['${index + 1}'] ?? '',
                         diameter: 60,
-                      ),
-                    if (speakingMap
-                            .containsKey(hotSeatMap[index + 1]?.id ?? '') &&
-                        speakingMap[hotSeatMap[index + 1]?.id ?? ''] != 0)
-                      Image.asset(
-                        'assets/image/sound_wave.gif',
-                        width: 60,
-                        height: 60,
                       ),
                     if (hotSeatAdminControlMap[
                                 hotSeatMap[index + 1]?.id ?? ''] !=
@@ -1292,8 +1304,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 ?.isMicMute ??
                             false))
                       const Positioned(
-                        top: 1,
-                        right: 1,
+                        bottom: 1,
+                        right: 12.5,
                         child: CircleAvatar(
                           backgroundColor: Colors.white54,
                           radius: 15,
@@ -1479,7 +1491,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 verticalGap(20),
-                SizedBox(
+                Container(
+                  alignment: Alignment.center,
                   width: 80,
                   height: 80,
                   child: frame.isEmpty || true
@@ -1489,22 +1502,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               imagePath: roomOwner?.image ?? '',
                               diameter: 80,
                             ),
+                            if (speakingMap.containsKey(roomOwner?.id ?? '') &&
+                                speakingMap[roomOwner?.id ?? ''] != 0)
+                              Lottie.asset(
+                                'assets/image/voice_dection_lotttie.json',
+                                width: 80,
+                                height: 80,
+                              ),
                             if (activeUserEmojis.containsKey('-1'))
                               CircularImage(
                                 imagePath: activeUserEmojis['-1'] ?? '',
                                 diameter: 80,
                               ),
-                            if (speakingMap.containsKey(roomOwner?.id ?? '') &&
-                                speakingMap[roomOwner?.id ?? ''] != 0)
-                              Image.asset(
-                                'assets/image/sound_wave.gif',
-                                width: 80,
-                                height: 80,
-                              ),
                             if (liveRoomControlsForAdmin.isMicMute ?? false)
-                              const Positioned(
-                                right: 1,
-                                bottom: 1,
+                              const Align(
+                                alignment: Alignment.bottomCenter,
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white54,
                                   radius: 15,
@@ -1818,6 +1830,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       'isMicMute',
                       !(settings?.isMicMute ?? false));
                   Navigator.of(context, rootNavigator: true).pop();
+
                   setState(() {});
                 },
               ),
@@ -2279,7 +2292,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
+                  crossAxisCount: 4,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   childAspectRatio: 1,
@@ -2309,20 +2322,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           emojiPosition, selectedEmoji);
                       Navigator.pop(context);
                     },
-                    child: CachedNetworkImage(
-                      imageUrl: emojiList.elementAt(index).frameImg ?? '',
-                      placeholder: (context, url) => const Center(
-                        child: SizedBox(
-                          width: 15,
-                          height: 15,
-                          child: CircularProgressIndicator(),
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: CachedNetworkImage(
+                        imageUrl: emojiList.elementAt(index).frameImg ?? '',
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Text('Error ${error.toString()}'),
+                        ),
+                        fit: BoxFit.fill,
+                        height: 80,
+                        width: 80,
                       ),
-                      errorWidget: (context, url, error) => Center(
-                        child: Text('Error ${error.toString()}'),
-                      ),
-                      fit: BoxFit.fill,
-                      height: 250,
                     ),
                   );
                 },

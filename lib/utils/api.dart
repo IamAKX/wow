@@ -125,4 +125,7 @@ class API {
   static const String checkWithdrawal = '$baseUrl/checkWithdrawal';
   static const String generateWithdrawalRquest =
       '$baseUrl/generateWithdrawalRquest';
+  static const String getWalletDetails = '$baseUrl/getWalletDetails';
+  static const String exchangeCoins = '$baseUrl/exchangeCoins';
+  static const String get_user_live_details_by_dates = '$baseUrl/get_user_live_details_by_dates';
 }

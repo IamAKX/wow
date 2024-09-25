@@ -55,15 +55,7 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
           statusBarBrightness: Brightness.light,
         ),
         title: const Text('Income'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true)
-                  .pushNamed(LiveRecord.route);
-            },
-            child: const Text('Live Record'),
-          )
-        ],
+        actions: [],
       ),
       body: getBody(context),
     );
@@ -120,7 +112,12 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
           child: InkWell(
             onTap: () {
               Navigator.of(context, rootNavigator: true)
-                  .pushNamed(WithdrawlScreen.route);
+                  .pushNamed(WithdrawlScreen.route)
+                  .then(
+                (value) {
+                  loadUserData();
+                },
+              );
             },
             child: Container(
               alignment: Alignment.center,
@@ -142,7 +139,12 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
           child: InkWell(
             onTap: () {
               Navigator.of(context, rootNavigator: true)
-                  .pushNamed(IncomeScreen.route);
+                  .pushNamed(IncomeScreen.route)
+                  .then(
+                (value) {
+                  loadUserData();
+                },
+              );
             },
             child: Container(
               alignment: Alignment.center,
