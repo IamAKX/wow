@@ -26,7 +26,7 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            verticalGap(80),
+            verticalGap(70),
             Text(
               'Live End',
               style: TextStyle(

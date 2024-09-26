@@ -7,7 +7,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_in_app_pip/picture_in_picture.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,6 +17,7 @@ import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/chat_model.dart';
 import 'package:worldsocialintegrationapp/models/emoji_model.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/models/live_room_music.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
@@ -88,6 +88,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
+  bool isMusicWidgetVisible = false;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   late RtcEngine agoraEngine;
@@ -114,7 +115,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Map<String, String> activeUserEmojis = {};
 
   Map<String, int> speakingMap = {};
-  String musicUrl = '';
+
+  LiveRoomMusic liveRoomMusic = LiveRoomMusic();
 
   void _scrollToBottom() {
     // fetchDiamond();
@@ -413,20 +415,35 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         });
       }
     });
+
     database
         .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
         .onValue
-        .listen((event) {
+        .listen((event) async {
       final dataSnapshot = event.snapshot;
+
       if (dataSnapshot.exists) {
-        setState(() {
-          musicUrl = dataSnapshot.value as String;
-          if (musicUrl.isNotEmpty)
-            _playAudio(musicUrl);
-          else
-            _audioPlayer.stop();
-        });
+        liveRoomMusic = LiveRoomMusic.fromMap(dataSnapshot.value as Map);
+        log('liveRoomMusic : $liveRoomMusic');
+        if ((liveRoomMusic.playingState == MusicState.START.name) &&
+            (liveRoomMusic.musicModel?.isNotEmpty ?? false) &&
+            ((liveRoomMusic.musicModel?.length ?? 0) >
+                (liveRoomMusic.playingIndex ?? 0))) {
+          int idx = liveRoomMusic.playingIndex ?? 0;
+          isMusicWidgetVisible = true;
+          _playAudio(liveRoomMusic.musicModel?.elementAt(idx).link ?? '');
+        } else if (liveRoomMusic.playingState == MusicState.RESUME.name) {
+          isMusicWidgetVisible = true;
+          _audioPlayer.resume();
+        } else if (liveRoomMusic.playingState == MusicState.PAUSE.name) {
+          isMusicWidgetVisible = true;
+          _audioPlayer.pause();
+        }
+      } else {
+        isMusicWidgetVisible = false;
+        _audioPlayer.stop();
       }
+      setState(() {});
     });
   }
 
@@ -657,7 +674,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Visibility musicPlayerButton(BuildContext context) {
     return Visibility(
       visible:
-          ((widget.agoraToken.isSelfCreated ?? false) && musicUrl.isNotEmpty),
+          ((widget.agoraToken.isSelfCreated ?? false) && isMusicWidgetVisible),
       child: Positioned(
         right: 10,
         bottom: MediaQuery.of(context).size.height * 0.3,
@@ -685,82 +702,136 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           padding: const EdgeInsets.only(top: 10, bottom: 10),
           decoration: BoxDecoration(
               color: Colors.black, borderRadius: BorderRadius.circular(10)),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: Icon(
-                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                onPressed: () {
-                  if (_isPlaying) {
-                    _pauseAudio();
-                  } else {
-                    _resumeAudio();
-                  }
-                },
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      _audioPlayer.stop();
+                      _startGlideAnimation();
+                      LiveRoomFirebase.removeMusicSettings(
+                          widget.agoraToken.mainId ?? '');
+                    },
+                  ),
+                  Expanded(
+                    child: Text(
+                      getPlayingMusicName(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        basename(prefs.getString(PrefsKey.musicPlaying) ?? ''),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white),
-                      ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      ((liveRoomMusic.playingState == MusicState.START.name) ||
+                              (liveRoomMusic.playingState ==
+                                  MusicState.RESUME.name))
+                          ? Icons.pause_circle
+                          : Icons.play_circle,
+                      color: Colors.white,
+                      size: 30,
                     ),
-                    Slider(
-                      value: _currentPosition.inSeconds.toDouble(),
-                      min: 0,
-                      thumbColor: Colors.teal,
-                      activeColor: Colors.teal,
-                      inactiveColor: Colors.teal.shade100,
-                      max: _totalDuration.inSeconds.toDouble(),
-                      onChanged: (value) {
-                        final newPosition = Duration(seconds: value.toInt());
-                        _seekAudio(newPosition);
-                      },
-                    ),
-                    Row(
+                    onPressed: () {
+                      if ((liveRoomMusic.playingState ==
+                              MusicState.START.name) ||
+                          (liveRoomMusic.playingState ==
+                              MusicState.RESUME.name)) {
+                        _pauseAudio();
+                        LiveRoomFirebase.updateMusicSettings(
+                            widget.agoraToken.mainId ?? '',
+                            'playingState',
+                            MusicState.PAUSE.name);
+                      } else {
+                        _resumeAudio();
+                        LiveRoomFirebase.updateMusicSettings(
+                            widget.agoraToken.mainId ?? '',
+                            'playingState',
+                            MusicState.RESUME.name);
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
-                            _formatDuration(_currentPosition),
+                            basename(
+                                prefs.getString(PrefsKey.musicPlaying) ?? ''),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Text(
-                            ' ${_formatDuration(_totalDuration)}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                        Slider(
+                          value: _currentPosition.inSeconds.toDouble(),
+                          min: 0,
+                          thumbColor: Colors.teal,
+                          activeColor: Colors.teal,
+                          inactiveColor: Colors.teal.shade100,
+                          max: _totalDuration.inSeconds.toDouble(),
+                          onChanged: (value) {
+                            final newPosition =
+                                Duration(seconds: value.toInt());
+                            _seekAudio(newPosition);
+                          },
                         ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Text(
+                                _formatDuration(_currentPosition),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            const Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: Text(
+                                ' ${_formatDuration(_totalDuration)}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.stop_circle,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                onPressed: () {
-                  _audioPlayer.stop();
-                  _startGlideAnimation();
-                  LiveRoomFirebase.updateLiveRoomMusic(
-                      widget.agoraToken.mainId ?? '', '');
-                },
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.fast_forward_sharp,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      if ((liveRoomMusic.musicModel?.length ?? 0)-1 >
+                          (liveRoomMusic.playingIndex ?? 1)) {
+                        _audioPlayer.stop();
+                        LiveRoomFirebase.updateMusicSettings(
+                            widget.agoraToken.mainId ?? '',
+                            'playingIndex',
+                            (liveRoomMusic.playingIndex ?? -1) + 1);
+
+                        LiveRoomFirebase.updateMusicSettings(
+                            widget.agoraToken.mainId ?? '',
+                            'playingState',
+                            MusicState.START.name);
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -2225,17 +2296,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Future<void> _playAudio(String filePath) async {
     await _audioPlayer.play(UrlSource(filePath));
-    prefs.setString(PrefsKey.musicPlaying, filePath);
   }
 
   Future<void> _pauseAudio() async {
     await _audioPlayer.pause();
-    prefs.remove(PrefsKey.musicPlaying);
   }
 
   Future<void> _resumeAudio() async {
     await _audioPlayer.resume();
-    prefs.remove(PrefsKey.musicPlaying);
   }
 
   Future<void> _seekAudio(Duration position) async {
@@ -2725,5 +2793,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         ],
       ),
     );
+  }
+
+  String getPlayingMusicName() {
+    int idx = liveRoomMusic.playingIndex ?? 0;
+    if (liveRoomMusic.musicModel?.isEmpty ?? true) {
+      return '';
+    }
+    if ((liveRoomMusic.musicModel?.length ?? 0) > idx) {
+      return '';
+    }
+    return (liveRoomMusic.musicModel ?? []).elementAt(idx).name ?? '';
   }
 }

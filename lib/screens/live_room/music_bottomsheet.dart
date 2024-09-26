@@ -9,12 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/live_room_music.dart';
+import 'package:worldsocialintegrationapp/models/music_model.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/load_music_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
 import 'package:worldsocialintegrationapp/services/storage_service.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../widgets/enum.dart';
 
 class MusicBottomsheet extends StatefulWidget {
   const MusicBottomsheet({super.key, required this.roomId});
@@ -31,6 +35,7 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
   bool isUploading = false;
+  LiveRoomMusic? liveRoomMusic;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -108,12 +113,24 @@ class _MusicBottomsheetState extends State<MusicBottomsheet> {
                         isUploading = true;
                       });
                       _pauseAudio();
+                      liveRoomMusic = LiveRoomMusic();
+                      liveRoomMusic?.musicModel = [];
+                      for (String fName in fileList) {
+                        log('Uploading -  $fName');
+                        String downloadUrl = await StorageService.uploadFile(
+                            File(fName),
+                            'liveRoomAudio/${widget.roomId}/${basename(fName)}');
+                        log('Uploaded link - $downloadUrl');
+                        liveRoomMusic?.musicModel?.add(
+                          MusicModel(link: downloadUrl, name: basename(fName)),
+                        );
+                      }
+                      liveRoomMusic?.playingState = MusicState.START.name;
+                      liveRoomMusic?.playingIndex =
+                          playingIndex == -1 ? 0 : playingIndex;
+                      await LiveRoomFirebase.addMusicSettings(
+                          widget.roomId, liveRoomMusic!);
                       Navigator.pop(context);
-                      String downloadUrl = await StorageService.uploadFile(
-                          File(fileList.elementAt(playingIndex)),
-                          'liveRoomAudio/${widget.roomId}/${basename(fileList.elementAt(playingIndex))}');
-                      await LiveRoomFirebase.updateLiveRoomMusic(
-                          widget.roomId, downloadUrl);
                     },
                     child: isUploading
                         ? ButtonLoader(

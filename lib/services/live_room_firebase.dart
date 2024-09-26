@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/models/live_room_music.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
@@ -207,10 +208,50 @@ class LiveRoomFirebase {
     return await messageRef.set(map);
   }
 
-  static Future<void> updateLiveRoomMusic(
-      String roomId, String musicUrl) async {
+  // static Future<void> updateLiveRoomMusic(
+  //     String roomId, String musicUrl) async {
+  //   DatabaseReference liveRoomRef =
+  //       database.ref('${FirebaseDbNode.liveRoomMusic}/$roomId');
+  //   await liveRoomRef.set(musicUrl);
+  // }
+
+  static Future<void> addMusicSettings(
+      String chatWindowId, LiveRoomMusic music) async {
     DatabaseReference liveRoomRef =
-        database.ref('${FirebaseDbNode.liveRoomMusic}/$roomId');
-    await liveRoomRef.set(musicUrl);
+        database.ref('${FirebaseDbNode.liveRoomMusic}/$chatWindowId');
+    log('updating liveRoomMusic : $chatWindowId');
+    await liveRoomRef.set(music.toMap());
+  }
+
+  static Future<void> removeMusicSettings(
+    String chatWindowId,
+  ) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomMusic}/$chatWindowId');
+    log('removing all liveRoomMusic : $chatWindowId');
+    await liveRoomRef.remove();
+  }
+
+  static Future<void> updateMusicSettings(
+      String chatWindowId, String key, dynamic value) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomMusic}/$chatWindowId');
+    log('updating liveRoomMusic : $chatWindowId');
+    Map<String, Object?> map = {};
+    map[key] = value;
+
+    await liveRoomRef.update(map);
+  }
+
+  static Future<LiveRoomMusic?> getMusicSettings(String chatWindowId) async {
+    DatabaseReference liveRoomRef =
+        database.ref(FirebaseDbNode.liveRoomMusic).child(chatWindowId);
+    LiveRoomMusic? settings;
+    DataSnapshot snapshot = await liveRoomRef.get();
+    if (snapshot.exists) {
+      Map map = snapshot.value as Map<dynamic, dynamic>;
+      settings = LiveRoomMusic.fromMap(map);
+    }
+    return settings;
   }
 }
