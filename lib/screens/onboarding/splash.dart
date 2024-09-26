@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 import 'package:worldsocialintegrationapp/main.dart';
@@ -43,6 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    requestPermission();
     fetchLocationInfo();
   }
 
@@ -355,5 +357,16 @@ class _SplashScreenState extends State<SplashScreen> {
     log('Country : ${countryContinent?.country}');
     log('continent : ${countryContinent?.continent}');
     log('LatLong : ${countryContinent?.position?.latitude},${countryContinent?.position?.longitude}');
+  }
+
+  Future<void> requestPermission() async {
+    await [
+      Permission.location,
+      Permission.microphone,
+      Permission.manageExternalStorage,
+      Permission.storage,
+      Permission.audio,
+      Permission.nearbyWifiDevices
+    ].request();
   }
 }

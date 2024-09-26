@@ -77,8 +77,7 @@ class _HomeScreenState extends State<HomeScreen>
               context: context,
               builder: (BuildContext context) {
                 return Dialog(
-                  insetPadding:
-                      const EdgeInsets.all(20.0), // Margin around the dialog
+                  insetPadding: EdgeInsets.zero,
                   child: LiveEndPopup(
                     roomId: agoraToken.mainId ?? '',
                     userId: prefs.getString(PrefsKey.userId) ?? '',
@@ -242,8 +241,6 @@ class _HomeScreenState extends State<HomeScreen>
       },
     );
   }
-
-  void showLiveEndPopup() {}
 
   Future<void> requestPermission() async {
     await [

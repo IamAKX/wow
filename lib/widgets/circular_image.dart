@@ -29,6 +29,7 @@ class CircularImage extends StatelessWidget {
               errorWidget: (context, url, error) =>
                   Image.asset('assets/dummy/demo_user_profile.png'),
               imageBuilder: (context, imageProvider) => CircleAvatar(
+                backgroundColor: Colors.transparent,
                 backgroundImage: imageProvider,
                 radius: diameter / 2,
               ),

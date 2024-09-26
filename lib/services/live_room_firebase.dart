@@ -128,7 +128,7 @@ class LiveRoomFirebase {
     String chatWindowId,
   ) async {
     DatabaseReference liveRoomRef =
-        database.ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId/');
+        database.ref('${FirebaseDbNode.liveRoomAdminControl}/$chatWindowId');
     log('removing all liveRoomAdminControl : $chatWindowId');
     await liveRoomRef.remove();
   }

@@ -920,9 +920,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: CachedNetworkImageProvider(liveRoomTheme.isNotEmpty
-              ? liveRoomTheme
-              : 'https://images.pexels.com/photos/66869/green-leaf-natural-wallpaper-royalty-free-66869.jpeg'),
+          image: liveRoomTheme.isEmpty
+              ? AssetImage('assets/image/black_bg.jpeg')
+              : CachedNetworkImageProvider(
+                  liveRoomTheme.isNotEmpty
+                      ? liveRoomTheme
+                      : 'https://images.unsplash.com/photo-1663601398716-3d40cef5d1fc?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTl8fHxlbnwwfHx8fHw%3D',
+                ),
           fit: BoxFit.fill,
         ),
       ),
@@ -1279,44 +1283,54 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     }
                   }
                 },
-                child: Stack(
-                  children: [
-                    CircularImage(
-                        imagePath: hotSeatMap[index + 1]?.image ?? '',
-                        diameter: 60),
-                    if (speakingMap
-                            .containsKey(hotSeatMap[index + 1]?.id ?? '') &&
-                        speakingMap[hotSeatMap[index + 1]?.id ?? ''] != 0)
-                      Lottie.asset(
-                        'assets/image/voice_dection_lotttie.json',
-                        width: 60,
-                        height: 60,
-                      ),
-                    if (activeUserEmojis.containsKey('${index + 1}'))
-                      CircularImage(
-                        imagePath: activeUserEmojis['${index + 1}'] ?? '',
-                        diameter: 60,
-                      ),
-                    if (hotSeatAdminControlMap[
-                                hotSeatMap[index + 1]?.id ?? ''] !=
-                            null &&
-                        (hotSeatAdminControlMap[hotSeatMap[index + 1]?.id ?? '']
-                                ?.isMicMute ??
-                            false))
-                      const Positioned(
-                        bottom: 1,
-                        right: 12.5,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white54,
-                          radius: 15,
-                          child: Icon(
-                            Icons.mic_off,
-                            size: 15,
-                            color: Colors.black,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: 60,
+                  height: 60,
+                  child: Stack(
+                    children: [
+                      if (speakingMap
+                              .containsKey(hotSeatMap[index + 1]?.id ?? '') &&
+                          speakingMap[hotSeatMap[index + 1]?.id ?? ''] != 0)
+                        Positioned.fill(
+                          child: Lottie.asset(
+                            'assets/image/voice_dection_lotttie.json',
+                            width: 80,
+                            height: 80,
                           ),
                         ),
+                      Center(
+                        child: CircularImage(
+                            imagePath: hotSeatMap[index + 1]?.image ?? '',
+                            diameter: 40),
                       ),
-                  ],
+                      if (activeUserEmojis.containsKey('${index + 1}'))
+                        CircularImage(
+                          imagePath: activeUserEmojis['${index + 1}'] ?? '',
+                          diameter: 80,
+                        ),
+                      if (hotSeatAdminControlMap[
+                                  hotSeatMap[index + 1]?.id ?? ''] !=
+                              null &&
+                          (hotSeatAdminControlMap[
+                                      hotSeatMap[index + 1]?.id ?? '']
+                                  ?.isMicMute ??
+                              false))
+                        const Positioned(
+                          bottom: 1,
+                          right: 12.5,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white54,
+                            radius: 15,
+                            child: Icon(
+                              Icons.mic_off,
+                              size: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             verticalGap(10),
@@ -1498,17 +1512,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   child: frame.isEmpty || true
                       ? Stack(
                           children: [
-                            CircularImage(
-                              imagePath: roomOwner?.image ?? '',
-                              diameter: 80,
-                            ),
                             if (speakingMap.containsKey(roomOwner?.id ?? '') &&
                                 speakingMap[roomOwner?.id ?? ''] != 0)
-                              Lottie.asset(
-                                'assets/image/voice_dection_lotttie.json',
-                                width: 80,
-                                height: 80,
+                              Positioned.fill(
+                                child: Lottie.asset(
+                                  'assets/image/voice_dection_lotttie.json',
+                                  width: 100,
+                                  height: 100,
+                                ),
                               ),
+                            Center(
+                              child: CircularImage(
+                                imagePath: roomOwner?.image ?? '',
+                                diameter: 50,
+                              ),
+                            ),
                             if (activeUserEmojis.containsKey('-1'))
                               CircularImage(
                                 imagePath: activeUserEmojis['-1'] ?? '',
@@ -1519,10 +1537,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 alignment: Alignment.bottomCenter,
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white54,
-                                  radius: 15,
+                                  radius: 12,
                                   child: Icon(
                                     Icons.mic_off,
-                                    size: 15,
+                                    size: 12,
                                     color: Colors.black,
                                   ),
                                 ),
@@ -1599,37 +1617,40 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context, rootNavigator: true).pushNamed(
-                      FamilyScreen.route,
-                      arguments: FamilyIdModel(
-                          userId: roomOwner?.id,
-                          familyId: roomOwner?.familyId));
-                },
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  height: 30,
-                  width: 90,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage(
-                          'assets/image/family_badge_23.webp',
+              Visibility(
+                visible: roomOwner?.familyJoinStatus ?? false,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context, rootNavigator: true).pushNamed(
+                        FamilyScreen.route,
+                        arguments: FamilyIdModel(
+                            userId: roomOwner?.id,
+                            familyId: roomOwner?.familyId));
+                  },
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    height: 30,
+                    width: 90,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(
+                            'assets/image/family_badge_23.webp',
+                          ),
+                          fit: BoxFit.fill),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          roomOwner?.familyName ?? '',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                         ),
-                        fit: BoxFit.fill),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        roomOwner?.familyName ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                      ),
-                      horizontalGap(5),
-                    ],
+                        horizontalGap(5),
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -2273,7 +2294,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   loadEmojiBottomSheet() {
     return FractionallySizedBox(
-      heightFactor: 0.6,
+      heightFactor: 0.4,
       child: SizedBox(
         height: 400,
         child: Column(
