@@ -27,7 +27,7 @@ class WithdrawlScreen extends StatefulWidget {
 class _WithdrawlScreenState extends State<WithdrawlScreen> {
   UserProfileDetail? user;
   int selectedIndex = -1;
-  late Razorpay _razorpay;
+
   bool eligible = false;
 
   late ApiCallProvider apiCallProvider;
@@ -59,32 +59,9 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
   void initState() {
     super.initState();
 
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
     });
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    showToastMessage('Payment Successful: ${response.paymentId}');
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    showToastMessage('Payment Failed: ${response.code} - ${response.message}');
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    showToastMessage('External Wallet Selected: ${response.walletName}');
-  }
-
-  @override
-  void dispose() {
-    _razorpay.clear();
-    super.dispose();
   }
 
   void loadUserData() async {
@@ -119,16 +96,16 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
 
     reqBody['userId'] = user?.id;
     reqBody['diamond'] = amountCardList.elementAt(selectedIndex).diamond;
-    reqBody['accHolderName'] = bankDetailsModel?.accountHolderName ?? '';
-    reqBody['accNumber'] = bankDetailsModel?.accountNumber ?? '';
-    reqBody['confirmAccNumber'] = bankDetailsModel?.accountNumber ?? '';
-    reqBody['bankName'] = bankDetailsModel?.bankName ?? '';
-    reqBody['branchName'] = bankDetailsModel?.branchName ?? '';
-    reqBody['ifscCode'] = bankDetailsModel?.ifscCode ?? '';
-    reqBody['accountType'] = bankDetailsModel?.accountType ?? '';
+    // reqBody['accHolderName'] = bankDetailsModel?.accountHolderName ?? '';
+    // reqBody['accNumber'] = bankDetailsModel?.accountNumber ?? '';
+    // reqBody['confirmAccNumber'] = bankDetailsModel?.accountNumber ?? '';
+    // reqBody['bankName'] = bankDetailsModel?.bankName ?? '';
+    // reqBody['branchName'] = bankDetailsModel?.branchName ?? '';
+    // reqBody['ifscCode'] = bankDetailsModel?.ifscCode ?? '';
+    // reqBody['accountType'] = bankDetailsModel?.accountType ?? '';
 
     await apiCallProvider
-        .postRequest(API.generateWithdrawalRquest, reqBody)
+        .postRequest(API.generateWithdrawalRequest, reqBody)
         .then((value) async {
       showToastMessage(value['message']);
       if (value['success'] == '1') {
@@ -367,26 +344,6 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
         ),
       ],
     );
-  }
-
-  void initiateRazorPayPayment() {
-    double amount = int.parse(user?.myDiamond ?? '0') / 1000 * 75;
-    var options = {
-      'key': 'rzp_test_usEmd5LTJQKCTA',
-      'amount': amount * 100,
-      'name': user?.name ?? '',
-      'description': 'Requesting for withdrawl from ${user?.username}',
-      'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
-      'external': {
-        'wallets': ['paytm']
-      }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
   }
 }
 

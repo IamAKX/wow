@@ -75,7 +75,6 @@ class ApiCallProvider extends ChangeNotifier {
         endpoint,
         data: FormData.fromMap(requestBody),
       );
-      log('resp = ${response.data}');
       debugPrint('Response : ${jsonDecode(response.data)}');
       if (response.statusCode == 200) {
         status = ApiStatus.success;

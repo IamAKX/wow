@@ -123,9 +123,16 @@ class API {
   static const String addBankAccountDetails = '$baseUrl/addBankAccountDetails';
   static const String getUserBankDetails = '$baseUrl/getUserBankDetails';
   static const String checkWithdrawal = '$baseUrl/checkWithdrawal';
-  static const String generateWithdrawalRquest =
-      '$baseUrl/generateWithdrawalRquest';
+  static const String generateWithdrawalRequest =
+      '$baseUrl/generateWithdrawalRequest';
   static const String getWalletDetails = '$baseUrl/getWalletDetails';
   static const String exchangeCoins = '$baseUrl/exchangeCoins';
-  static const String get_user_live_details_by_dates = '$baseUrl/get_user_live_details_by_dates';
+  static const String get_user_live_details_by_dates =
+      '$baseUrl/get_user_live_details_by_dates';
+  static const String getCoinValue = '$baseUrl/getCoinValue';
+  static const String purchaseSilverCoin = '$baseUrl/purchaseSilverCoin';
+  static const String getUserWallet = '$baseUrl/getUserWallet';
+  static const String orderIdGenerate = '$baseUrl/orderIdGenerate';
+  static const String getTotalSilverCoins = '$baseUrl/getTotalSilverCoins';
+  static const String getSilverCoinValue = '$baseUrl/getSilverCoinValue';
 }

@@ -84,6 +84,7 @@ import '../screens/income/income_Screen.dart';
 import '../screens/income/income_screen_choice.dart';
 import '../screens/income/live_record.dart';
 import '../screens/income/withdrawl.dart';
+import '../screens/recharge/recharge.dart';
 
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
@@ -315,6 +316,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const WithdrawlScreen());
       case BankDetails.route:
         return MaterialPageRoute(builder: (_) => const BankDetails());
+      case RechargeScreen.route:
+        return MaterialPageRoute(builder: (_) => const RechargeScreen());
       case '/invite':
         return MaterialPageRoute(builder: (_) => const BankDetails());
       default:
