@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+
 import 'package:worldsocialintegrationapp/models/bank_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/income/bank_details.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/button_loader.dart';
-
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../models/user_profile_detail.dart';
@@ -32,9 +32,21 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
 
   late ApiCallProvider apiCallProvider;
   List<AmountCard> amountCardList = [
-    AmountCard(id: 0, title: '32,000 Diamond', subtitle: 'Rs 2400 (INR)'),
-    AmountCard(id: 1, title: '70,000 Diamond', subtitle: 'Rs 5250 (INR)'),
-    AmountCard(id: 2, title: '2,00,000 Diamond', subtitle: 'Rs 15,000 (INR)'),
+    AmountCard(
+        id: 0,
+        title: '32,000 Diamond',
+        subtitle: 'Rs 2400 (INR)',
+        diamond: '32000'),
+    AmountCard(
+        id: 1,
+        title: '70,000 Diamond',
+        subtitle: 'Rs 5250 (INR)',
+        diamond: '72000'),
+    AmountCard(
+        id: 2,
+        title: '2,00,000 Diamond',
+        subtitle: 'Rs 15,000 (INR)',
+        diamond: '200000'),
     AmountCard(
         id: 3,
         title: 'Custom',
@@ -106,7 +118,7 @@ class _WithdrawlScreenState extends State<WithdrawlScreen> {
     Map<String, dynamic> reqBody = {};
 
     reqBody['userId'] = user?.id;
-    reqBody['diamond'] = user?.myDiamond;
+    reqBody['diamond'] = amountCardList.elementAt(selectedIndex).diamond;
     reqBody['accHolderName'] = bankDetailsModel?.accountHolderName ?? '';
     reqBody['accNumber'] = bankDetailsModel?.accountNumber ?? '';
     reqBody['confirmAccNumber'] = bankDetailsModel?.accountNumber ?? '';
@@ -382,21 +394,25 @@ class AmountCard {
   String? title;
   String? subtitle;
   int? id;
+  String? diamond;
   AmountCard({
     this.title,
     this.subtitle,
     this.id,
+    this.diamond,
   });
 
   AmountCard copyWith({
     String? title,
     String? subtitle,
     int? id,
+    String? diamond,
   }) {
     return AmountCard(
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
       id: id ?? this.id,
+      diamond: diamond ?? this.diamond,
     );
   }
 
@@ -412,6 +428,9 @@ class AmountCard {
     if (id != null) {
       result.addAll({'id': id});
     }
+    if (diamond != null) {
+      result.addAll({'diamond': diamond});
+    }
 
     return result;
   }
@@ -421,6 +440,7 @@ class AmountCard {
       title: map['title'],
       subtitle: map['subtitle'],
       id: map['id']?.toInt(),
+      diamond: map['diamond'],
     );
   }
 
@@ -430,8 +450,9 @@ class AmountCard {
       AmountCard.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'AmountCard(title: $title, subtitle: $subtitle, id: $id)';
+  String toString() {
+    return 'AmountCard(title: $title, subtitle: $subtitle, id: $id, diamond: $diamond)';
+  }
 
   @override
   bool operator ==(Object other) {
@@ -440,9 +461,12 @@ class AmountCard {
     return other is AmountCard &&
         other.title == title &&
         other.subtitle == subtitle &&
-        other.id == id;
+        other.id == id &&
+        other.diamond == diamond;
   }
 
   @override
-  int get hashCode => title.hashCode ^ subtitle.hashCode ^ id.hashCode;
+  int get hashCode {
+    return title.hashCode ^ subtitle.hashCode ^ id.hashCode ^ diamond.hashCode;
+  }
 }

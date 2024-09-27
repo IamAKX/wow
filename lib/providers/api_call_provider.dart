@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -45,7 +46,7 @@ class ApiCallProvider extends ChangeNotifier {
         notifyListeners();
         return jsonDecode(response.data);
       }
-     } on DioException catch (e) {
+    } on DioException catch (e) {
       status = ApiStatus.failed;
       var resBody = e.response?.data ?? {};
       notifyListeners();
@@ -74,6 +75,7 @@ class ApiCallProvider extends ChangeNotifier {
         endpoint,
         data: FormData.fromMap(requestBody),
       );
+      log('resp = ${response.data}');
       debugPrint('Response : ${jsonDecode(response.data)}');
       if (response.statusCode == 200) {
         status = ApiStatus.success;

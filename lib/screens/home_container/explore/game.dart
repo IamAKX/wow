@@ -34,7 +34,13 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   loadData() async {
-    await apiCallProvider.getRequest(API.listGameSectionDetails).then((value) {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'sectionType': 'gameSection',
+    };
+    await apiCallProvider
+        .postRequest(API.listGameSectionDetails, reqBody)
+        .then((value) {
       list.clear();
       if (value['data'] != null) {
         for (var item in value['data']) {
