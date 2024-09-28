@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
+import 'package:worldsocialintegrationapp/models/live_gift_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_music.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
@@ -253,5 +254,22 @@ class LiveRoomFirebase {
       settings = LiveRoomMusic.fromMap(map);
     }
     return settings;
+  }
+
+
+  static Future<void> addGift(
+      String chatWindowId, LiveGiftModel gift) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomGift}/$chatWindowId');
+    log('add liveRoomGift : $chatWindowId');
+    await liveRoomRef.set(gift.toMap());
+  }
+
+  static Future<void> removeGift(
+      String chatWindowId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomGift}/$chatWindowId');
+    log('remove liveRoomGift : $chatWindowId');
+    await liveRoomRef.remove();
   }
 }

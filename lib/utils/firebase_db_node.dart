@@ -13,4 +13,5 @@ class FirebaseDbNode {
   static const String liveRoomEmoji = 'liveRoomEmoji';
   static const String liveRoomMusic = 'liveRoomMusic';
   static const String currentSpeaker = 'currentSpeaker';
+  static const String liveRoomGift = 'liveRoomGift';
 }

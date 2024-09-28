@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:svgaplayer_flutter_rhr/svgaplayer_flutter.dart';
+import 'package:worldsocialintegrationapp/models/live_gift_model.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
@@ -187,7 +188,10 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
     );
   }
 
-  Future<void> sendPrimeGift(String otherId, LiveRoomUserModel friend) async {
+  Future<void> sendPrimeGift(
+    String otherId,
+    LiveRoomUserModel friend,
+  ) async {
     Map<String, dynamic> reqBody = {
       'senderId': prefs.getString(PrefsKey.userId),
       'receiverId': otherId,
@@ -195,6 +199,11 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
       'diamond': widget.permissionId,
       'liveId': widget.roomDetail.id
     };
+    LiveGiftModel liveGiftModel = LiveGiftModel(
+        senderId: prefs.getString(PrefsKey.userId),
+        receiverId: otherId,
+        url: widget.imageLink,
+        position: -1);
     await apiCallProvider
         .postRequest(API.sendGift, reqBody)
         .then((value) async {
@@ -211,7 +220,12 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
             .then(
           (value) {},
         );
-        _showSnackbarWithImage();
+        if (widget.isSvga == false) {
+          LiveRoomFirebase.addGift(widget.roomDetail.id ?? '', liveGiftModel);
+        }
+        if (widget.isSvga ?? false) {
+          _showSnackbarWithImage();
+        }
       }
     });
   }
@@ -250,7 +264,9 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
   }
 
   Future<void> sendGalleryTheme(
-      String otherId, LiveRoomUserModel friend) async {
+    String otherId,
+    LiveRoomUserModel friend,
+  ) async {
     showToastMessage('Uploading, please wait');
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),

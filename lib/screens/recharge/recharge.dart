@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:worldsocialintegrationapp/screens/recharge/billing_record.dart';
 import 'package:worldsocialintegrationapp/screens/recharge/coins.dart';
 import 'package:worldsocialintegrationapp/screens/recharge/silver_coins.dart';
 
@@ -51,7 +52,10 @@ class _RechargeScreenState extends State<RechargeScreen>
           IconButton(
             icon: Icon(Icons.receipt_long_rounded),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(BillingRecord.route);
+            },
           ),
         ],
         title: const Text(

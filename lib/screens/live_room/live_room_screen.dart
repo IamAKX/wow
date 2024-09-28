@@ -84,6 +84,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   List<EmojiModel> emojiList = [];
   String selectedEmoji = '';
   int totalDiamond = 0;
+  String selectedGift = '';
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -445,6 +446,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       }
       setState(() {});
     });
+
+    database
+        .ref('${FirebaseDbNode.liveRoomGift}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.exists) {
+        Map giftMap = dataSnapshot.value as Map;
+        if (giftMap['url'] != null) {
+          selectedGift = giftMap['url'];
+          _onImageTap(navigatorKey.currentContext!);
+          LiveRoomFirebase.removeGift(widget.agoraToken.mainId ?? '');
+        }
+      } else {}
+    });
   }
 
   void showAudioSignal(String userID, int volume) {
@@ -649,14 +666,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 .value, // Smoothly animate the top position
                             left: MediaQuery.of(context).size.width / 2 - 50,
                             child: CachedNetworkImage(
-                              imageUrl: selectedEmoji,
+                              imageUrl: selectedGift,
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(),
                               ),
                               errorWidget: (context, url, error) => Center(
                                 child: Text('Error ${error.toString()}'),
                               ),
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fitWidth,
                               height: 100,
                               width: 100,
                             ),
@@ -816,7 +833,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       size: 30,
                     ),
                     onPressed: () {
-                      if ((liveRoomMusic.musicModel?.length ?? 0)-1 >
+                      if ((liveRoomMusic.musicModel?.length ?? 0) - 1 >
                           (liveRoomMusic.playingIndex ?? 1)) {
                         _audioPlayer.stop();
                         LiveRoomFirebase.updateMusicSettings(
@@ -1210,7 +1227,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             controller: _scrollController,
             itemCount: messageList.length,
             itemBuilder: (context, index) {
-              return getChatItem(context, messageList.elementAt(index));
+              return SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                          getChatItem(context, messageList.elementAt(index))));
             },
           );
         },
@@ -1220,7 +1242,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Container getChatItem(BuildContext context, LiveroomChat chatContent) {
     return Container(
-      width: MediaQuery.of(context).size.width - 30,
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -1231,6 +1254,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           border: Border.all(color: Colors.red),
           borderRadius: BorderRadius.circular(10)),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           BorderedCircularImage(
@@ -1240,17 +1264,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             borderThickness: 1,
           ),
           horizontalGap(5),
-          Text(
-            chatContent.userName ?? '',
-            style: const TextStyle(color: Colors.white),
-          ),
-          const Text(
-            ': ',
-            style: TextStyle(color: Colors.white),
-          ),
-          Flexible(
+          Container(
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.55),
             child: Text(
-              chatContent.message ?? '',
+              '${chatContent.userName} : ${chatContent.message}',
               style: const TextStyle(color: Colors.white),
             ),
           ),
@@ -1303,6 +1321,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   }
                 },
                 child: Container(
+                  margin: EdgeInsets.all(10),
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
@@ -1327,6 +1346,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   } else {}
                 },
                 child: Container(
+                  margin: EdgeInsets.all(10),
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
@@ -1356,8 +1376,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 },
                 child: Container(
                   alignment: Alignment.center,
-                  width: 60,
-                  height: 60,
+                  width: 80,
+                  height: 80,
                   child: Stack(
                     children: [
                       if (speakingMap
@@ -1366,14 +1386,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                         Positioned.fill(
                           child: Lottie.asset(
                             'assets/image/voice_dection_lotttie.json',
-                            width: 80,
-                            height: 80,
+                            width: 100,
+                            height: 100,
                           ),
                         ),
                       Center(
                         child: CircularImage(
                             imagePath: hotSeatMap[index + 1]?.image ?? '',
-                            diameter: 40),
+                            diameter: 60),
                       ),
                       if (activeUserEmojis.containsKey('${index + 1}'))
                         CircularImage(
@@ -1404,7 +1424,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   ),
                 ),
               ),
-            verticalGap(10),
             Text(
               '${hotSeatMap[index + 1] == null ? (index + 1) : (hotSeatMap[index + 1]?.username == null) ? (index + 1) : hotSeatMap[index + 1]?.username}',
               style: const TextStyle(
@@ -1575,11 +1594,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                verticalGap(20),
                 Container(
                   alignment: Alignment.center,
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   child: frame.isEmpty || true
                       ? Stack(
                           children: [
@@ -1595,7 +1613,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             Center(
                               child: CircularImage(
                                 imagePath: roomOwner?.image ?? '',
-                                diameter: 50,
+                                diameter: 80,
                               ),
                             ),
                             if (activeUserEmojis.containsKey('-1'))
@@ -1623,7 +1641,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           imageSize: 80,
                           framePath: frame),
                 ),
-                verticalGap(10),
                 Text(
                   roomOwner?.name ?? '',
                   style: const TextStyle(
@@ -1766,20 +1783,26 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 CircularImage(
                     imagePath: roomDetail?.liveimage ?? '', diameter: 40),
                 horizontalGap(10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      roomDetail?.imageTitle ?? '',
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'ID : ${user?.username ?? ''}',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        roomDetail?.imageTitle ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        'ID : ${user?.username ?? ''}',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),

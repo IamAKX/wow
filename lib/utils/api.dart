@@ -135,4 +135,6 @@ class API {
   static const String orderIdGenerate = '$baseUrl/orderIdGenerate';
   static const String getTotalSilverCoins = '$baseUrl/getTotalSilverCoins';
   static const String getSilverCoinValue = '$baseUrl/getSilverCoinValue';
+  static const String userBillingRecords = '$baseUrl/userBillingRecords';
+  static const String getSilverCoinHistory = '$baseUrl/getSilverCoinHistory';
 }

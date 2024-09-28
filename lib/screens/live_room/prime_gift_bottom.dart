@@ -60,7 +60,7 @@ class _PrimeGiftBottomState extends State<PrimeGiftBottom>
     apiCallProvider = Provider.of<ApiCallProvider>(context);
 
     return FractionallySizedBox(
-      heightFactor: 0.6, // Set height to 60% of screen height
+      heightFactor: 0.4, // Set height to 60% of screen height
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),

@@ -104,8 +104,7 @@ class FeedVideoPlayerState extends State<FeedVideoPlayer> {
             },
           ),
           if (_controller.value.isInitialized && _showControls)
-            Align(
-              alignment: Alignment.center,
+            Center(
               child: IconButton(
                 onPressed: _togglePlayPause,
                 icon: Icon(
