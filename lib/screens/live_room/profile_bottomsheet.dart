@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pip_view/pip_view.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
@@ -17,6 +18,7 @@ import '../../utils/helpers.dart';
 import '../../utils/prefs_key.dart';
 import '../../widgets/animated_framed_circular_image.dart';
 import '../../widgets/circular_image.dart';
+import '../home_container/chat/chat_screen.dart';
 
 class ProfileBottomsheet extends StatefulWidget {
   const ProfileBottomsheet({
@@ -234,12 +236,15 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.admin_panel_settings),
-                          Text('Admin')
+                          Text('${addRemove}Admin')
                         ],
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context, rootNavigator: true)
+                            .pushNamed(ChatScreen.route);
+                      },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -406,7 +411,21 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
         setState(() {});
       }
     });
+    LiveRoomFirebase.isAdmin(
+            widget.roomDetail.id ?? '', widget.liveRoomUserModel.id ?? '')
+        .then(
+      (value) {
+        if (value) {
+          addRemove = 'Remove ';
+        } else {
+          addRemove = 'Add ';
+        }
+        setState(() {});
+      },
+    );
   }
+
+  String addRemove = '';
 
   Future<dynamic> sendLiveRoomMessage(BuildContext context) {
     final TextEditingController messageCtrl =

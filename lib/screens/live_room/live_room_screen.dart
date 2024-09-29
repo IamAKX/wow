@@ -12,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pip_view/pip_view.dart';
 import 'package:provider/provider.dart';
+import 'package:svgaplayer_flutter_rhr/player.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/admin_live_room_controls.dart';
 import 'package:worldsocialintegrationapp/models/chat_model.dart';
@@ -469,8 +470,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         Map giftMap = dataSnapshot.value as Map;
         if (giftMap['url'] != null) {
           selectedGift = giftMap['url'];
-          String receiverId = giftMap['receiverId'];
-          _onImageTap(navigatorKey.currentContext!, receiverId);
+          log('url = $url');
+          if (selectedGift.endsWith('.svga')) {
+            _showSoundGiftImage();
+          } else {
+            String receiverId = giftMap['receiverId'];
+            _onImageTap(navigatorKey.currentContext!, receiverId);
+          }
           LiveRoomFirebase.removeGift(widget.agoraToken.mainId ?? '');
         }
       } else {}
@@ -483,8 +489,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       final dataSnapshot = event.snapshot;
 
       if (dataSnapshot.exists) {
-        Map giftMap = dataSnapshot.value as Map;
-      } else {}
+        List list = dataSnapshot.value as List;
+        log('list $list');
+        adminList.clear();
+        for (String id in list) adminList.add(id);
+
+        log('adminList = $adminList');
+        if (mounted) setState(() {});
+      } else {
+        adminList.clear();
+        if (mounted) setState(() {});
+      }
     });
   }
 
@@ -737,6 +752,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             ),
                           );
                         },
+                      ),
+                    if (_isSoundGiftVisible)
+                      AnimatedOpacity(
+                        opacity: _soundGiftOpacity,
+                        duration: const Duration(
+                            milliseconds: 500), // Fade-out duration
+                        child: Positioned(
+                          top: 1,
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: MediaQuery.of(context).size.height,
+                            child: SVGASimpleImage(
+                              resUrl: selectedGift,
+                            ),
+                          ),
+                        ),
                       ),
                   ],
                 ),
@@ -1175,27 +1206,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true, // To enable custom height
-                        builder: (context) => PrimeGiftBottom(
-                          roomDetail: roomDetail ??
-                              JoinableLiveRoomModel(
-                                id: widget.agoraToken.mainId,
-                              ),
-                          myCoins: user?.myCoin ?? '',
-                        ),
-                      ).then(
-                        (value) {
-                          _scrollToBottom();
-                        },
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/image/giftlive.png',
-                      width: 50,
+                  Visibility(
+                    visible: user?.lavelInfomation?.sendLevel != '0' && user?.lavelInfomation?.reciveLevel != '0',
+                    child: InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, // To enable custom height
+                          builder: (context) => PrimeGiftBottom(
+                            roomDetail: roomDetail ??
+                                JoinableLiveRoomModel(
+                                  id: widget.agoraToken.mainId,
+                                ),
+                            myCoins: user?.myCoin ?? '',
+                          ),
+                        ).then(
+                          (value) {
+                            _scrollToBottom();
+                          },
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/image/giftlive.png',
+                        width: 50,
+                      ),
                     ),
                   ),
                   InkWell(
@@ -1894,7 +1928,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         ),
         const Spacer(),
         Visibility(
-          visible: widget.agoraToken.isSelfCreated ?? false,
+          visible: (widget.agoraToken.isSelfCreated ?? false) ||
+              (adminList.contains(user?.id)),
           child: InkWell(
             onTap: () {
               showAllMenu(context);
@@ -2949,4 +2984,49 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     }
     return (liveRoomMusic.musicModel ?? []).elementAt(idx).name ?? '';
   }
+
+  bool _isSoundGiftVisible = false; // Start with the image not visible
+  double _soundGiftOpacity = 0.0; // Start with opacity 0
+
+  void _showSoundGiftImage() {
+    setState(() {
+      _isSoundGiftVisible = true; // Set image visibility to true
+      _soundGiftOpacity = 1.0; // Set opacity to fully visible
+    });
+
+    // Start the timer to hide the image after 5 seconds
+    Timer(Duration(seconds: 5), () {
+      // Change the opacity to start the fade-out effect
+      setState(() {
+        _soundGiftOpacity = 0.0; // Start fade-out
+      });
+
+      // After fade-out completes, set the visibility to false
+      Timer(Duration(milliseconds: 500), () {
+        setState(() {
+          _isSoundGiftVisible = false; // Hide the image from the widget tree
+        });
+      });
+    });
+  }
+
+  // void _showSnackbarWithImage(String imageLink) {
+  //   log('img = ${imageLink}');
+  //   final snackBar = SnackBar(
+  //     content: SizedBox(
+  //       width: MediaQuery.of(navigatorKey.currentContext!).size.width,
+  //       child: SVGASimpleImage(
+  //         resUrl: imageLink,
+  //       ),
+  //     ),
+  //     duration: Duration(seconds: 5), // Show for 5 seconds
+  //     backgroundColor: Colors
+  //         .transparent, // Transparent background for better image visibility
+  //     behavior: SnackBarBehavior.floating, // Floating Snackbar at the bottom
+  //     elevation: 0, // Remove shadow to focus on the image
+  //   );
+
+  //   // Show the SnackBar
+  //   ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackBar);
+  // }
 }

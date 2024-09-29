@@ -63,6 +63,9 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
   getFriends() async {
     friendList = await LiveRoomFirebase.getLiveRoomParticipants(
         widget.roomDetail.id ?? '');
+    friendList.removeWhere(
+      (element) => element.sendLevel == '0' || element.reciveLevel == '0',
+    );
     setState(() {});
     //   Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
     //   await apiCallProvider
@@ -220,11 +223,11 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
             .then(
           (value) {},
         );
-        if (widget.isSvga == false) {
-          LiveRoomFirebase.addGift(widget.roomDetail.id ?? '', liveGiftModel);
-        }
+
+        LiveRoomFirebase.addGift(widget.roomDetail.id ?? '', liveGiftModel);
+
         if (widget.isSvga ?? false) {
-          _showSnackbarWithImage();
+          // _showSnackbarWithImage();
         }
       }
     });
@@ -297,30 +300,5 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
         );
       }
     });
-  }
-
-  void _showSnackbarWithImage() {
-    log('img = ${widget.imageLink}');
-    final snackBar = SnackBar(
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 300,
-            child: SVGASimpleImage(
-              resUrl: widget.imageLink,
-            ),
-          )
-        ],
-      ),
-      duration: Duration(seconds: 5), // Show for 5 seconds
-      backgroundColor: Colors
-          .transparent, // Transparent background for better image visibility
-      behavior: SnackBarBehavior.floating, // Floating Snackbar at the bottom
-      elevation: 0, // Remove shadow to focus on the image
-    );
-
-    // Show the SnackBar
-    ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackBar);
   }
 }

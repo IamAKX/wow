@@ -287,4 +287,19 @@ class LiveRoomFirebase {
     // Update the list in Firebase
     await liveRoomRef.set(adminList).then((_) {}).catchError((error) {});
   }
+
+  static Future<bool> isAdmin(String chatWindowId, String id) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomAdmin}/$chatWindowId');
+
+    DataSnapshot snapshot = await liveRoomRef.get();
+    List<dynamic> adminList =
+        snapshot.value != null ? List.from(snapshot.value as List) : [];
+
+    if (adminList.contains(id)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
