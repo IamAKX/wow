@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:svgaplayer_flutter_rhr/player.dart';
@@ -47,6 +48,7 @@ class _ChatWindowState extends State<ChatWindow> {
   final ScrollController _scrollController = ScrollController();
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  CroppedFile? croppedFile;
   late final RecorderController recorderController;
   PlayerController controller = PlayerController();
   late ApiCallProvider apiCallProvider;
@@ -238,14 +240,17 @@ class _ChatWindowState extends State<ChatWindow> {
                   onPressed: () async {
                     final pickedFile =
                         await _picker.pickImage(source: ImageSource.gallery);
-                    setState(() {
-                      if (pickedFile != null) {
-                        _image = File(pickedFile.path);
+
+                    if (pickedFile != null) {
+                      _image =
+                          await getCroppedImage(File(pickedFile.path), context);
+                      if (_image != null) {
                         showSendImagePopup(_image, context);
-                      } else {
-                        log('No image selected.');
                       }
-                    });
+                    } else {
+                      log('No image selected.');
+                    }
+                    setState(() {});
                   },
                 ),
               if (!recorderController.isRecording)

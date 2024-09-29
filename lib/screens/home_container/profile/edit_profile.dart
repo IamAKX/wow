@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -46,6 +47,7 @@ class _EditProfileState extends State<EditProfile> {
   UserProfileDetail? user;
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  CroppedFile? croppedFile;
 
   @override
   void initState() {
@@ -163,13 +165,14 @@ class _EditProfileState extends State<EditProfile> {
             onTap: () async {
               final pickedFile =
                   await _picker.pickImage(source: ImageSource.gallery);
-              setState(() {
-                if (pickedFile != null) {
-                  _image = File(pickedFile.path);
-                } else {
-                  log('No image selected.');
-                }
-              });
+
+              if (pickedFile != null) {
+                _image = await getCroppedImage(File(pickedFile.path), context);
+              } else {
+                _image = null;
+              }
+
+              setState(() {});
             },
             child: Container(
               margin: const EdgeInsets.all(pagePadding),

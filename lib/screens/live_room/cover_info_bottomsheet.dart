@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ class CoverInfoBottomsheet extends StatefulWidget {
 class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
+    CroppedFile? croppedFile;
   final TextEditingController _titleCtrl = TextEditingController();
   late ApiCallProvider apiCallProvider;
 

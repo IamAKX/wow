@@ -25,11 +25,13 @@ class ProfileBottomsheet extends StatefulWidget {
     required this.liveRoomUserModel,
     required this.myCoins,
     required this.user,
+    required this.position,
   }) : super(key: key);
   final JoinableLiveRoomModel roomDetail;
   final LiveRoomUserModel liveRoomUserModel;
   final String myCoins;
   final UserProfileDetail? user;
+  final String position;
 
   @override
   State<ProfileBottomsheet> createState() => _ProfileBottomsheetState();
@@ -73,7 +75,7 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
 
     return FractionallySizedBox(
-      heightFactor: 0.4, // Set height to 60% of screen height
+      heightFactor: 0.5, // Set height to 60% of screen height
       child: ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),
@@ -210,6 +212,63 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                       ),
                     ),
                 ],
+              ),
+              verticalGap(10),
+              Visibility(
+                visible: widget.roomDetail.userId ==
+                        prefs.getString(PrefsKey.userId) &&
+                    widget.liveRoomUserModel.id !=
+                        prefs.getString(PrefsKey.userId),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        LiveRoomFirebase.addRemoveAdmin(
+                            widget.roomDetail.id ?? '',
+                            widget.liveRoomUserModel.id ?? '');
+                        Navigator.pop(context);
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.admin_panel_settings),
+                          Text('Admin')
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {},
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [Icon(Icons.message), Text('Message')],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        kickoutUser();
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [Icon(Icons.logout), Text('Kick out')],
+                      ),
+                    ),
+                    // InkWell(
+                    //   onTap: () {},
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     children: [
+                    //       Icon(Icons.admin_panel_settings_rounded),
+                    //       Text('Invite')
+                    //     ],
+                    //   ),
+                    // ),
+                  ],
+                ),
               ),
               verticalGap(20),
               SizedBox(
@@ -423,5 +482,37 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
         ],
       ),
     );
+  }
+
+  kickoutUser() async {
+    if (widget.position == '-1') return;
+    Map<String, dynamic> reqBody = {
+      'kickToId': widget.liveRoomUserModel.id,
+      'liveId': widget.roomDetail.id,
+      'kickById': prefs.getString(PrefsKey.userId)
+    };
+    apiCallProvider
+        .postRequest(API.kickOutLiveUser, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        LiveroomChat liveroomChat = LiveroomChat(
+            message:
+                '${widget.user?.name} kicked out ${widget.liveRoomUserModel.username}',
+            timeStamp: DateTime.now().millisecondsSinceEpoch,
+            userId: widget.user?.id,
+            userImage: widget.user?.image,
+            userName: widget.user?.name);
+        LiveRoomFirebase.sendChat(widget.roomDetail.id ?? '', liveroomChat);
+
+        LiveRoomFirebase.updateLiveRoomAdminSettings(
+            widget.roomDetail.id ?? '',
+            widget.liveRoomUserModel.id ?? '',
+            'position',
+            int.parse(widget.position) - 1);
+        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
+            widget.liveRoomUserModel.id ?? '', 'kickout', true);
+        Navigator.pop(context);
+      }
+    });
   }
 }

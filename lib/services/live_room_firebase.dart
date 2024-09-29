@@ -256,20 +256,35 @@ class LiveRoomFirebase {
     return settings;
   }
 
-
-  static Future<void> addGift(
-      String chatWindowId, LiveGiftModel gift) async {
+  static Future<void> addGift(String chatWindowId, LiveGiftModel gift) async {
     DatabaseReference liveRoomRef =
         database.ref('${FirebaseDbNode.liveRoomGift}/$chatWindowId');
     log('add liveRoomGift : $chatWindowId');
     await liveRoomRef.set(gift.toMap());
   }
 
-  static Future<void> removeGift(
-      String chatWindowId) async {
+  static Future<void> removeGift(String chatWindowId) async {
     DatabaseReference liveRoomRef =
         database.ref('${FirebaseDbNode.liveRoomGift}/$chatWindowId');
     log('remove liveRoomGift : $chatWindowId');
     await liveRoomRef.remove();
+  }
+
+  static Future<void> addRemoveAdmin(String chatWindowId, String id) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomAdmin}/$chatWindowId');
+
+    DataSnapshot snapshot = await liveRoomRef.get();
+    List<dynamic> adminList =
+        snapshot.value != null ? List.from(snapshot.value as List) : [];
+
+    if (adminList.contains(id)) {
+      adminList.remove(id);
+    } else {
+      adminList.add(id);
+    }
+
+    // Update the list in Firebase
+    await liveRoomRef.set(adminList).then((_) {}).catchError((error) {});
   }
 }

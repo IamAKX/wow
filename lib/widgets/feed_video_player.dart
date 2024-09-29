@@ -78,10 +78,11 @@ class FeedVideoPlayerState extends State<FeedVideoPlayer> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _showControls = !_showControls;
-        });
-        _resetHideControlsTimer();
+        _togglePlayPause();
+        // setState(() {
+        //   _showControls = !_showControls;
+        // });
+        // _resetHideControlsTimer();
       },
       child: Stack(
         alignment: Alignment.bottomCenter,
@@ -99,21 +100,23 @@ class FeedVideoPlayerState extends State<FeedVideoPlayer> {
                   child: VideoPlayer(_controller),
                 );
               } else {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               }
             },
           ),
-          if (_controller.value.isInitialized && _showControls)
-            Center(
-              child: IconButton(
-                onPressed: _togglePlayPause,
-                icon: Icon(
-                  isPlaying ? Icons.pause : Icons.play_arrow,
-                  size: 60,
-                  color: Colors.black.withOpacity(0.5),
-                ),
-              ),
-            ),
+          // if (_controller.value.isInitialized && _showControls)
+          // Center(
+          //   child: IconButton(
+          //     onPressed: _togglePlayPause,
+          //     icon: Icon(
+          //       isPlaying ? Icons.pause : Icons.play_arrow,
+          //       size: 60,
+          //       color: Colors.black.withOpacity(0.5),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,7 @@ class _CreateEventTwoState extends State<CreateEventTwo> {
   UserProfileDetail? user;
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  CroppedFile? croppedFile;
   late ApiCallProvider apiCallProvider;
 
   @override
@@ -133,13 +135,14 @@ class _CreateEventTwoState extends State<CreateEventTwo> {
               onTap: () async {
                 final pickedFile =
                     await _picker.pickImage(source: ImageSource.gallery);
-                setState(() {
-                  if (pickedFile != null) {
-                    _image = File(pickedFile.path);
-                  } else {
-                    _image = null;
-                  }
-                });
+
+                if (pickedFile != null) {
+                  _image =
+                      await getCroppedImage(File(pickedFile.path), context);
+                } else {
+                  _image = null;
+                }
+                setState(() {});
               },
               child: Container(
                 margin: const EdgeInsets.all(pagePadding),

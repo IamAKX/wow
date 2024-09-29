@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,7 @@ class _EditFamilyState extends State<EditFamily> {
 
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  CroppedFile? croppedFile;
 
   @override
   void initState() {
@@ -93,13 +95,13 @@ class _EditFamilyState extends State<EditFamily> {
           onTap: () async {
             final pickedFile =
                 await _picker.pickImage(source: ImageSource.gallery);
-            setState(() {
-              if (pickedFile != null) {
-                _image = File(pickedFile.path);
-              } else {
-                log('No image selected.');
-              }
-            });
+
+            if (pickedFile != null) {
+              _image = await getCroppedImage(File(pickedFile.path), context);
+            } else {
+              _image = null;
+            }
+            setState(() {});
           },
           child: Align(
             alignment: Alignment.center,

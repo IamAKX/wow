@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -26,7 +27,7 @@ Future<void> openInBrowser(String url) async {
 void showToastMessage(String message) {
   Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_LONG,
+      toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
       backgroundColor: const Color(0xFFF8F9FC),
@@ -243,4 +244,41 @@ Future<String?> showPasswordDialog(
       );
     },
   );
+}
+
+Future<File?> getCroppedImage(File pickedFile, BuildContext context) async {
+  File image = File(pickedFile.path);
+  CroppedFile? croppedFile = await ImageCropper().cropImage(
+    sourcePath: image.path,
+    uiSettings: [
+      AndroidUiSettings(
+        toolbarTitle: 'Edit Photo',
+        toolbarColor: Colors.deepOrange,
+        toolbarWidgetColor: Colors.white,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio5x4,
+          CropAspectRatioPreset.ratio7x5
+        ],
+      ),
+      IOSUiSettings(
+        title: 'Edit Photo',
+        aspectRatioPresets: [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio16x9,
+          CropAspectRatioPreset.ratio7x5
+        ],
+      ),
+      WebUiSettings(
+        context: context,
+      ),
+    ],
+  );
+  if (croppedFile != null) {
+    return File(croppedFile!.path);
+  } else {
+    return null;
+  }
 }

@@ -102,7 +102,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   late Animation<Offset> _musicplayerOffsetAnimation;
 
   late AnimationController _emojiAnimationController;
-  late Animation<double> _emojiAnimation;
+  late Animation<Offset> _emojiAnimation;
   bool _isImageVisible = false;
   Timer? _timer;
   Timer? _diamondtimer;
@@ -118,6 +118,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Map<String, int> speakingMap = {};
 
   LiveRoomMusic liveRoomMusic = LiveRoomMusic();
+
+  List<String> adminList = [];
 
   void _scrollToBottom() {
     // fetchDiamond();
@@ -147,7 +149,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       loadRoomOwnerData();
-      initEmojiAnimation();
+
       loadEmojiList();
       initializeAgora();
     });
@@ -176,24 +178,28 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     ).animate(_musicplayerAnimationController);
 
     _audioPlayer.onDurationChanged.listen((duration) {
-      setState(() {
-        _totalDuration = duration;
-      });
+      if (mounted)
+        setState(() {
+          _totalDuration = duration;
+        });
     });
 
     _audioPlayer.onPositionChanged.listen((position) {
-      setState(() {
-        _currentPosition = position;
-      });
+      if (mounted)
+        setState(() {
+          _currentPosition = position;
+        });
     });
 
     _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      setState(() {
-        _isPlaying = state == PlayerState.playing;
-      });
+      if (mounted)
+        setState(() {
+          _isPlaying = state == PlayerState.playing;
+        });
     });
   }
 
+  late StreamSubscription<DatabaseEvent> fbAudAudioSubs;
   void firebaseDetailListners() async {
     database
         .ref('${FirebaseDbNode.liveRoom}/${widget.agoraToken.mainId}')
@@ -201,10 +207,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .listen((event) {
       final dataSnapshot = event.snapshot;
       if (dataSnapshot.exists) {
-        setState(() {
-          roomDetail =
-              JoinableLiveRoomModel.fromJson(dataSnapshot.value as Map);
-        });
+        if (mounted)
+          setState(() {
+            roomDetail =
+                JoinableLiveRoomModel.fromJson(dataSnapshot.value as Map);
+          });
       }
     });
     database
@@ -230,10 +237,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             participants.add(LiveRoomUserModel.fromMap(element));
           },
         );
-
-        setState(() {
-          participantCount = participants.length;
-        });
+        if (mounted)
+          setState(() {
+            participantCount = participants.length;
+          });
       }
     });
 
@@ -244,9 +251,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .listen((event) {
       final dataSnapshot = event.snapshot;
       if (dataSnapshot.exists) {
-        setState(() {
-          announcementMessage = dataSnapshot.value as String;
-        });
+        if (mounted)
+          setState(() {
+            announcementMessage = dataSnapshot.value as String;
+          });
       }
     });
 
@@ -256,9 +264,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .listen((event) {
       final dataSnapshot = event.snapshot;
       if (dataSnapshot.exists) {
-        setState(() {
-          liveRoomTheme = dataSnapshot.value as String;
-        });
+        if (mounted)
+          setState(() {
+            liveRoomTheme = dataSnapshot.value as String;
+          });
       }
     });
 
@@ -286,10 +295,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           },
         );
         log(hotSeatMap.toString());
-        setState(() {});
+        if (mounted) setState(() {});
       } else {
         hotSeatMap = {};
-        setState(() {});
+        if (mounted) setState(() {});
       }
     });
 
@@ -304,7 +313,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         liveRoomControls =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
         setState(() {});
-        log('updating ${liveRoomControls.giftVisiualEffect}');
+        if (mounted) log('updating ${liveRoomControls.giftVisiualEffect}');
 
         agoraEngine.muteLocalAudioStream(liveRoomControls.isMicMute ?? true);
         agoraEngine
@@ -314,7 +323,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         }
 
         if (liveRoomControls.kickout ?? false) {
-          Navigator.pop(currentContex);
+          exitCurrentUser(currentContex);
         }
       } else {
         liveRoomControls = AdminLiveRoomControls(
@@ -342,7 +351,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       if (dataSnapshot.exists) {
         liveRoomControlsForAdmin =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
-        setState(() {});
+        if (mounted) setState(() {});
       } else {
         liveRoomControlsForAdmin = AdminLiveRoomControls(
             giftSound: false,
@@ -383,8 +392,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 AdminLiveRoomControls.fromMap(element.value);
           },
         );
-
-        setState(() {});
+        if (mounted) setState(() {});
       }
     });
 
@@ -405,15 +413,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       }
     });
 
-    database
+    fbAudAudioSubs = await database
         .ref('${FirebaseDbNode.currentSpeaker}/${widget.agoraToken.mainId}')
         .onValue
         .listen((event) {
       final data = event.snapshot.value as Map?;
-      if (data != null) {
-        data.entries.forEach((entry) {
-          showAudioSignal(entry.key, entry.value);
-        });
+      try {
+        if (data != null) {
+          data.entries.forEach((entry) {
+            if (mounted) showAudioSignal(entry.key, entry.value);
+          });
+        }
+      } catch (e) {
+        log('Mic : $e');
       }
     });
 
@@ -444,7 +456,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         isMusicWidgetVisible = false;
         _audioPlayer.stop();
       }
-      setState(() {});
+      if (mounted) setState(() {});
     });
 
     database
@@ -457,17 +469,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         Map giftMap = dataSnapshot.value as Map;
         if (giftMap['url'] != null) {
           selectedGift = giftMap['url'];
-          _onImageTap(navigatorKey.currentContext!);
+          String receiverId = giftMap['receiverId'];
+          _onImageTap(navigatorKey.currentContext!, receiverId);
           LiveRoomFirebase.removeGift(widget.agoraToken.mainId ?? '');
         }
+      } else {}
+    });
+
+    database
+        .ref('${FirebaseDbNode.liveRoomAdmin}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.exists) {
+        Map giftMap = dataSnapshot.value as Map;
       } else {}
     });
   }
 
   void showAudioSignal(String userID, int volume) {
-    setState(() {
-      speakingMap[userID] = volume;
-    });
+    if (mounted)
+      setState(() {
+        speakingMap[userID] = volume;
+      });
   }
 
   void showEmojiOnUser(String position, String emojiGifUrl) {
@@ -543,14 +568,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   @override
   void dispose() {
     // _receivePort.close();
-    _timer?.cancel();
-    _diamondtimer?.cancel();
-    _musicplayerAnimationController.dispose();
-    agoraEngine.leaveChannel();
-    agoraEngine.release();
-    cleanFirebaseListener();
-    _audioPlayer.dispose();
-    _emojiAnimationController.dispose();
+
     super.dispose();
   }
 
@@ -587,7 +605,43 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .onValue
         .drain();
     await database
+        .ref('${FirebaseDbNode.liveRoomTheme}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref('${FirebaseDbNode.liveRoomHotSeat}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}/${user?.id}')
+        .onValue
+        .drain();
+    await database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}/${widget.agoraToken.roomCreatedBy}')
+        .onValue
+        .drain();
+    await database
+        .ref(
+            '${FirebaseDbNode.liveRoomAdminControl}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref('${FirebaseDbNode.liveRoomEmoji}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    fbAudAudioSubs.cancel();
+    await database
         .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref('${FirebaseDbNode.liveRoomGift}/${widget.agoraToken.mainId}')
+        .onValue
+        .drain();
+    await database
+        .ref('${FirebaseDbNode.liveRoomAdmin}/${widget.agoraToken.mainId}')
         .onValue
         .drain();
   }
@@ -623,6 +677,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             .then(
           (value) {},
         );
+
         setState(() {
           _scrollToBottom();
         });
@@ -661,10 +716,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       AnimatedBuilder(
                         animation: _emojiAnimation,
                         builder: (context, child) {
-                          return Positioned(
-                            top: _emojiAnimation
-                                .value, // Smoothly animate the top position
-                            left: MediaQuery.of(context).size.width / 2 - 50,
+                          return Transform.translate(
+                            offset: Offset(
+                                MediaQuery.of(context).size.width *
+                                        _emojiAnimation.value.dx -
+                                    30,
+                                MediaQuery.of(context).size.height *
+                                    _emojiAnimation.value.dy),
                             child: CachedNetworkImage(
                               imageUrl: selectedGift,
                               placeholder: (context, url) => const Center(
@@ -674,8 +732,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 child: Text('Error ${error.toString()}'),
                               ),
                               fit: BoxFit.fitWidth,
-                              height: 100,
-                              width: 100,
+                              height: 60,
+                              width: 60,
                             ),
                           );
                         },
@@ -867,51 +925,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       child: InkWell(
         onTap: () async {
           _isClicked = !_isClicked;
+          setState(() {});
 
-          if (widget.agoraToken.isSelfCreated ?? false) {
-            await archiveLiveRoom();
-          }
-          await LiveRoomFirebase.toggleUserInRoomArray(
-                  widget.agoraToken.mainId ?? '', user, false)
-              .then(
-            (value) {
-              Navigator.pop(context);
-            },
-          );
-          hotSeatMap.entries.forEach((entry) async {
-            await LiveRoomFirebase.updateLiveRoomAdminSettings(
-                widget.agoraToken.mainId ?? '',
-                hotSeatMap[entry.key]?.id ?? '',
-                'position',
-                entry.key);
-            await LiveRoomFirebase.updateLiveRoomAdminSettings(
-                widget.agoraToken.mainId ?? '',
-                hotSeatMap[entry.key]?.id ?? '',
-                'kickout',
-                true);
-          });
-
-          LiveroomChat liveroomChat = LiveroomChat(
-              message: 'left Stream',
-              timeStamp: DateTime.now().millisecondsSinceEpoch,
-              userId: user?.id,
-              userImage: user?.image,
-              userName: user?.name);
-          await LiveRoomFirebase.sendChat(
-                  widget.agoraToken.mainId ?? '', liveroomChat)
-              .then(
-            (value) {
-              _scrollToBottom();
-            },
-          );
-          await LiveRoomFirebase.clearChat(
-              widget.agoraToken.mainId ?? '', LiveroomChat(),
-              sendMessage: false);
-          await LiveRoomFirebase.removeLiveRoomAllHotSeat(
-              widget.agoraToken.mainId ?? '');
-          await LiveRoomFirebase.removeLiveRoomAdminSettings(
-              widget.agoraToken.mainId ?? '');
-          cleanFirebaseListener();
+          await exitCurrentUser(context);
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -947,6 +963,66 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         ),
       ),
     );
+  }
+
+  Future<void> exitCurrentUser(BuildContext context) async {
+    if (widget.agoraToken.isSelfCreated ?? false) {
+      await archiveLiveRoom();
+    }
+
+    hotSeatMap.entries.forEach((entry) async {
+      await LiveRoomFirebase.updateLiveRoomAdminSettings(
+          widget.agoraToken.mainId ?? '',
+          hotSeatMap[entry.key]?.id ?? '',
+          'position',
+          entry.key);
+      await LiveRoomFirebase.updateLiveRoomAdminSettings(
+          widget.agoraToken.mainId ?? '',
+          hotSeatMap[entry.key]?.id ?? '',
+          'kickout',
+          true);
+    });
+
+    LiveroomChat liveroomChat = LiveroomChat(
+        message: 'left Stream',
+        timeStamp: DateTime.now().millisecondsSinceEpoch,
+        userId: user?.id,
+        userImage: user?.image,
+        userName: user?.name);
+    await LiveRoomFirebase.sendChat(
+            widget.agoraToken.mainId ?? '', liveroomChat)
+        .then(
+      (value) {
+        _scrollToBottom();
+      },
+    );
+    // await LiveRoomFirebase.clearChat(
+    //     widget.agoraToken.mainId ?? '', LiveroomChat(),
+    //     sendMessage: false);
+    _timer?.cancel();
+    _diamondtimer?.cancel();
+
+    // _musicplayerAnimationController.dispose();
+    agoraEngine.leaveChannel();
+    agoraEngine.release();
+
+    if (_audioPlayer != null) _audioPlayer.dispose();
+    // _emojiAnimationController.dispose();
+    await LiveRoomFirebase.removeLiveRoomAllHotSeat(
+        widget.agoraToken.mainId ?? '');
+    await LiveRoomFirebase.removeLiveRoomAdminSettings(
+        widget.agoraToken.mainId ?? '');
+    await LiveRoomFirebase.toggleUserInRoomArray(
+            widget.agoraToken.mainId ?? '', user, false)
+        .then(
+      (value) {},
+    );
+
+    cleanFirebaseListener();
+    if (navigatorKey.currentContext != null &&
+        Navigator.canPop(navigatorKey.currentContext!)) {
+      Navigator.of(navigatorKey.currentContext!, rootNavigator: true).pop();
+    }
   }
 
   AnimatedPositioned buildExistSwitchTop(BuildContext context) {
@@ -1009,7 +1085,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       decoration: BoxDecoration(
         image: DecorationImage(
           image: liveRoomTheme.isEmpty
-              ? AssetImage('assets/image/black_bg.jpeg')
+              ? const AssetImage('assets/image/black_bg.jpeg')
               : CachedNetworkImageProvider(
                   liveRoomTheme.isNotEmpty
                       ? liveRoomTheme
@@ -1321,9 +1397,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   }
                 },
                 child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 60,
-                  height: 60,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(60),
@@ -1346,9 +1421,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   } else {}
                 },
                 child: Container(
-                  margin: EdgeInsets.all(10),
-                  width: 60,
-                  height: 60,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(60),
@@ -1393,12 +1467,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       Center(
                         child: CircularImage(
                             imagePath: hotSeatMap[index + 1]?.image ?? '',
-                            diameter: 60),
+                            diameter: 70),
                       ),
                       if (activeUserEmojis.containsKey('${index + 1}'))
-                        CircularImage(
-                          imagePath: activeUserEmojis['${index + 1}'] ?? '',
-                          diameter: 80,
+                        Center(
+                          child: CircularImage(
+                            imagePath: activeUserEmojis['${index + 1}'] ?? '',
+                            diameter: 80,
+                          ),
                         ),
                       if (hotSeatAdminControlMap[
                                   hotSeatMap[index + 1]?.id ?? ''] !=
@@ -1409,7 +1485,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               false))
                         const Positioned(
                           bottom: 1,
-                          right: 12.5,
+                          right: 25,
                           child: CircleAvatar(
                             backgroundColor: Colors.white54,
                             radius: 15,
@@ -1426,9 +1502,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               ),
             Text(
               '${hotSeatMap[index + 1] == null ? (index + 1) : (hotSeatMap[index + 1]?.username == null) ? (index + 1) : hotSeatMap[index + 1]?.username}',
+              maxLines: 1,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
+                overflow: TextOverflow.ellipsis,
                 fontWeight: FontWeight.bold,
               ),
             )
@@ -1587,6 +1665,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   liveRoomUserModel: convertUserToLiveUser(roomOwner),
                   myCoins: user?.myCoin ?? '',
                   user: user,
+                  position: '-1',
                 ),
               );
             },
@@ -1596,8 +1675,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               children: [
                 Container(
                   alignment: Alignment.center,
-                  width: 100,
-                  height: 100,
+                  width: 90,
+                  height: 90,
                   child: frame.isEmpty || true
                       ? Stack(
                           children: [
@@ -1613,23 +1692,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             Center(
                               child: CircularImage(
                                 imagePath: roomOwner?.image ?? '',
-                                diameter: 80,
+                                diameter: 70,
                               ),
                             ),
                             if (activeUserEmojis.containsKey('-1'))
-                              CircularImage(
-                                imagePath: activeUserEmojis['-1'] ?? '',
-                                diameter: 80,
+                              Center(
+                                child: CircularImage(
+                                  imagePath: activeUserEmojis['-1'] ?? '',
+                                  diameter: 90,
+                                ),
                               ),
                             if (liveRoomControlsForAdmin.isMicMute ?? false)
                               const Align(
                                 alignment: Alignment.bottomCenter,
                                 child: CircleAvatar(
                                   backgroundColor: Colors.white54,
-                                  radius: 12,
+                                  radius: 10,
                                   child: Icon(
                                     Icons.mic_off,
-                                    size: 12,
+                                    size: 10,
                                     color: Colors.black,
                                   ),
                                 ),
@@ -1643,8 +1724,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 ),
                 Text(
                   roomOwner?.name ?? '',
+                  maxLines: 1,
                   style: const TextStyle(
                     color: Colors.white,
+                    overflow: TextOverflow.ellipsis,
                     fontSize: 18,
                   ),
                 )
@@ -1765,6 +1848,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 liveRoomUserModel: convertUserToLiveUser(roomOwner),
                 myCoins: user?.myCoin ?? '',
                 user: user,
+                position: '-1',
               ),
             );
           },
@@ -1961,6 +2045,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       .postRequest(API.kickOutLiveUser, reqBody)
                       .then((value) async {
                     if (value['success'] == '1') {
+                      await agoraEngine.muteLocalAudioStream(true);
+                      await LiveRoomFirebase.sendAudioSignal(
+                          widget.agoraToken.mainId ?? '',
+                          prefs.getString(PrefsKey.userId) ?? '',
+                          0);
+                      await LiveRoomFirebase.updateLiveRoomAdminSettings(
+                          widget.agoraToken.mainId ?? '',
+                          user?.id ?? '',
+                          'isMicMute',
+                          true);
+                      //
+
                       LiveroomChat liveroomChat = LiveroomChat(
                           message:
                               '${user?.name} kicked out ${hotSeatMap[position + 1]?.username}',
@@ -2001,6 +2097,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       liveRoomUserModel: hotSeatMap[position + 1]!,
                       myCoins: user?.myCoin ?? '',
                       user: user,
+                      position: '${position + 1}',
                     ),
                   );
                 },
@@ -2050,6 +2147,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       liveRoomUserModel: hotSeatMap[position + 1]!,
                       myCoins: user?.myCoin ?? '',
                       user: user,
+                      position: '${position + 1}',
                     ),
                   );
                 },
@@ -2349,7 +2447,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     }
   }
 
-  initEmojiAnimation() {
+  initEmojiAnimation(String receiverId) {
+    Map<int, Offset> offsetMap = {
+      1: const Offset(0.15, 0.3),
+      2: const Offset(0.35, 0.3),
+      3: const Offset(0.6, 0.3),
+      4: const Offset(0.85, 0.3),
+      5: const Offset(0.15, 0.45),
+      6: const Offset(0.35, 0.45),
+      7: const Offset(0.6, 0.45),
+      8: const Offset(0.85, 0.45),
+      0: const Offset(0.45, 0.1),
+      -1: const Offset(0.9, 0.1)
+    };
+    Offset endOffset = Offset(0.9, 0.2);
+    hotSeatMap.entries.forEach((entry) {
+      if (entry.value.id == receiverId) {
+        endOffset = offsetMap[entry.key] ?? Offset(0.9, 0.1);
+      }
+    });
+    if (roomOwner?.id == receiverId) {
+      endOffset = const Offset(0.5, 0.15);
+    }
+
     // Initialize the AnimationController
     _emojiAnimationController = AnimationController(
       duration: const Duration(seconds: 2),
@@ -2357,16 +2477,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     );
 
     // Tween to move from bottom of the screen to 90% height
-    _emojiAnimation = Tween<double>(
-      begin: 1000,
-      end: 100,
+    _emojiAnimation = Tween<Offset>(
+      begin: const Offset(0.5, 1),
+      end: endOffset,
     ).animate(CurvedAnimation(
       parent: _emojiAnimationController,
       curve: Curves.easeInOut,
     ));
   }
 
-  void _onImageTap(BuildContext context) {
+  void _onImageTap(BuildContext context, String receiverId) {
+    initEmojiAnimation(receiverId);
     setState(() {
       _isImageVisible = true; // Make the image visible
     });
