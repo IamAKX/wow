@@ -131,7 +131,7 @@ class _SpinwheelWinnerPopupState extends State<SpinwheelWinnerPopup> {
                   ),
                 ),
                 child: Text(
-                  '${widget.spinDataModel.header ?? ''} ${widget.spinDataModel.subtitle ?? ''}',
+                  '    ${widget.spinDataModel.header ?? ''} ${widget.spinDataModel.subtitle ?? ''}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

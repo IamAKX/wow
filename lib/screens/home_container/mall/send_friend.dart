@@ -115,7 +115,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                 ),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: const Text(  
                 'Send',
                 style: TextStyle(
                   fontSize: 12,
@@ -132,66 +132,92 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                 decoration: const BoxDecoration(
                     color: Color(0xFF0FDEA5),
                     borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      true ? Icons.male : Icons.female,
+                      friendList.elementAt(index).gender == 'Male'
+                          ? Icons.male
+                          : Icons.female,
                       color: Colors.white,
                       size: 12,
                     ),
                     Text(
-                      '22',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                      friendList.elementAt(index).age ?? '',
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
                     )
                   ],
                 ),
               ),
               horizontalGap(10),
-              if ((friendList.elementAt(index).lavelInformation?.reciveLevel ??
+              if ((friendList.elementAt(index).lavelInformation?.sendLevel ??
                       '0') !=
                   '0')
                 Container(
-                  constraints: const BoxConstraints(minWidth: 50),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFFEE9DA8),
-                        const Color(0xFFEE9DA8).withOpacity(0.5),
-                        const Color(0xFFEE9DA8).withOpacity(0.2)
-                      ],
-                    ),
+                  width: 60,
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(
+                          'assets/image/level_1.png',
+                        ),
+                        fit: BoxFit.fill),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        'assets/image/starlevel.png',
-                        width: 10,
+                        'assets/image/coins_img.png',
+                        width: 12,
                       ),
                       horizontalGap(5),
                       Text(
-                        friendList
+                        (friendList
                                 .elementAt(index)
                                 .lavelInformation
-                                ?.reciveLevel ??
-                            '',
+                                ?.sendLevel ??
+                            '0'),
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 10),
+                            const TextStyle(color: Colors.white, fontSize: 12),
                       )
                     ],
                   ),
                 ),
               horizontalGap(5),
-              if ((friendList.elementAt(index).lavelInformation?.sendLevel ??
-                      0) !=
+              if ((friendList.elementAt(index).lavelInformation?.reciveLevel ??
+                      '0') !=
                   '0')
-                Image.asset(
-                  'assets/image/money.png',
-                  width: 15,
+                Container(
+                  width: 60,
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(
+                          'assets/image/level_9.png',
+                        ),
+                        fit: BoxFit.fill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/image/coins_img.png',
+                        width: 12,
+                      ),
+                      horizontalGap(5),
+                      Text(
+                        (friendList
+                                .elementAt(index)
+                                .lavelInformation
+                                ?.reciveLevel ??
+                            '0'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -220,7 +246,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     horizontalGap(5),
                     Text(
                       '${widget.sendFriendModel.validity}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
                       ),
@@ -240,7 +266,8 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                   ),
                   Text(
                     '${widget.sendFriendModel.price}',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   )
                 ],
               ),

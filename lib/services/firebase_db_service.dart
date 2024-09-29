@@ -136,4 +136,19 @@ class FirebaseDbService {
         database.ref('${FirebaseDbNode.onlineStatus}/$userId');
     await liveRoomRef.set(onlineStatus);
   }
+
+  static Future<bool> getOnlineStatus(String userId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.onlineStatus}/$userId');
+    DataSnapshot snapshot = await liveRoomRef.get();
+    if (snapshot.exists) {
+      if ((snapshot.value as String) == 'Online') {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }

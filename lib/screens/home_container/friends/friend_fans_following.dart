@@ -79,15 +79,13 @@ class _FriendFansFollowingState extends State<FriendFansFollowing>
   }
 
   getBody(BuildContext context) {
-    return Expanded(
-      child: TabBarView(
-        controller: _tabController,
-        children: [
-          FriendScreen(userId: widget.friendNavigatorModel.userId),
-          FollowingScreen(userId: widget.friendNavigatorModel.userId),
-          FollowerScreen(userId: widget.friendNavigatorModel.userId)
-        ],
-      ),
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        FriendScreen(userId: widget.friendNavigatorModel.userId),
+        FollowingScreen(userId: widget.friendNavigatorModel.userId),
+        FollowerScreen(userId: widget.friendNavigatorModel.userId)
+      ],
     );
   }
 }

@@ -64,7 +64,8 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
     friendList = await LiveRoomFirebase.getLiveRoomParticipants(
         widget.roomDetail.id ?? '');
     friendList.removeWhere(
-      (element) => element.sendLevel == '0' || element.reciveLevel == '0',
+      (element) => element.sendLevel == '0' || element.reciveLevel 
+      == '0',
     );
     setState(() {});
     //   Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};

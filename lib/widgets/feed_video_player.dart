@@ -78,13 +78,17 @@ class FeedVideoPlayerState extends State<FeedVideoPlayer> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        _togglePlayPause();
-        // setState(() {
-        //   _showControls = !_showControls;
-        // });
-        // _resetHideControlsTimer();
+        // _togglePlayPause();
+        setState(() {
+          _showControls = !_showControls;
+        });
+        _resetHideControlsTimer();
       },
-      child: Stack(
+      child:
+
+          // constraints: BoxConstraints(maxHeight: 200),
+          // height: 250,
+          Stack(
         alignment: Alignment.bottomCenter,
         children: [
           FutureBuilder(
@@ -106,17 +110,23 @@ class FeedVideoPlayerState extends State<FeedVideoPlayer> {
               }
             },
           ),
-          // if (_controller.value.isInitialized && _showControls)
-          // Center(
-          //   child: IconButton(
-          //     onPressed: _togglePlayPause,
-          //     icon: Icon(
-          //       isPlaying ? Icons.pause : Icons.play_arrow,
-          //       size: 60,
-          //       color: Colors.black.withOpacity(0.5),
-          //     ),
-          //   ),
-          // ),
+          if (_controller.value.isInitialized && _showControls)
+            Positioned.fill(
+              child: Center(
+                child: InkWell(
+                  onTap: _togglePlayPause,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.black,
+                    child: Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

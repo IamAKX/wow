@@ -735,7 +735,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             offset: Offset(
                                 MediaQuery.of(context).size.width *
                                         _emojiAnimation.value.dx -
-                                    30,
+                                    40,
                                 MediaQuery.of(context).size.height *
                                     _emojiAnimation.value.dy),
                             child: CachedNetworkImage(
@@ -747,28 +747,37 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 child: Text('Error ${error.toString()}'),
                               ),
                               fit: BoxFit.fitWidth,
-                              height: 60,
-                              width: 60,
+                              height: 80,
+                              width: 80,
                             ),
                           );
                         },
                       ),
                     if (_isSoundGiftVisible)
-                      AnimatedOpacity(
-                        opacity: _soundGiftOpacity,
-                        duration: const Duration(
-                            milliseconds: 500), // Fade-out duration
-                        child: Positioned(
-                          top: 1,
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: MediaQuery.of(context).size.height,
-                            child: SVGASimpleImage(
-                              resUrl: selectedGift,
-                            ),
-                          ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height,
+                        child: SVGASimpleImage(
+                          resUrl: selectedGift,
                         ),
                       ),
+                    // AnimatedOpacity(
+                    //   opacity: _soundGiftOpacity,
+                    //   duration: const Duration(
+                    //       milliseconds: 500), // Fade-out duration
+                    //   child: Positioned(
+                    //     top: 1,
+                    //     child: Container(
+                    //       width: MediaQuery.of(context).size.width,
+                    //       alignment: Alignment.center,
+                    //       height: MediaQuery.of(context).size.height,
+                    //       child: SVGASimpleImage(
+                    //         resUrl: selectedGift,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -1206,30 +1215,27 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: user?.lavelInfomation?.sendLevel != '0' && user?.lavelInfomation?.reciveLevel != '0',
-                    child: InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true, // To enable custom height
-                          builder: (context) => PrimeGiftBottom(
-                            roomDetail: roomDetail ??
-                                JoinableLiveRoomModel(
-                                  id: widget.agoraToken.mainId,
-                                ),
-                            myCoins: user?.myCoin ?? '',
-                          ),
-                        ).then(
-                          (value) {
-                            _scrollToBottom();
-                          },
-                        );
-                      },
-                      child: Image.asset(
-                        'assets/image/giftlive.png',
-                        width: 50,
-                      ),
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true, // To enable custom height
+                        builder: (context) => PrimeGiftBottom(
+                          roomDetail: roomDetail ??
+                              JoinableLiveRoomModel(
+                                id: widget.agoraToken.mainId,
+                              ),
+                          myCoins: user?.myCoin ?? '',
+                        ),
+                      ).then(
+                        (value) {
+                          _scrollToBottom();
+                        },
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/image/giftlive.png',
+                      width: 50,
                     ),
                   ),
                   InkWell(
