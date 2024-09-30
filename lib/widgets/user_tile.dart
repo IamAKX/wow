@@ -37,14 +37,14 @@ class UserTile extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.male,
+                 Icon(
+                 visitorModel.gender == 'Male'? Icons.male : Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                const Text(
-                  '27',
+                 Text(
+                  '${visitorModel.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],
@@ -55,10 +55,11 @@ class UserTile extends StatelessWidget {
             Container(
               width: 60,
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image/level_1.png',
+                    image: NetworkImage(
+                      visitorModel.sandBgImage ?? '',
                     ),
                     fit: BoxFit.fill),
               ),
@@ -78,14 +79,15 @@ class UserTile extends StatelessWidget {
               ),
             ),
           horizontalGap(5),
-          if ((visitorModel.receivingLevel ?? '0') != '0')
+          if ((visitorModel.reciveLevel ?? '0') != '0')
             Container(
               width: 60,
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image/level_9.png',
+                    image: NetworkImage(
+                      visitorModel.reciveBgImage ?? '',
                     ),
                     fit: BoxFit.fill),
               ),
@@ -98,7 +100,7 @@ class UserTile extends StatelessWidget {
                   ),
                   horizontalGap(5),
                   Text(
-                    '${visitorModel.receivingLevel}',
+                    '${visitorModel.reciveLevel}',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,

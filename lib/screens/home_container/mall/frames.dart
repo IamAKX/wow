@@ -176,7 +176,8 @@ class _FramesScreenState extends State<FramesScreen> {
                             price: frameList.elementAt(index).price,
                             validity: frameList.elementAt(index).validity,
                             url: frameList.elementAt(index).frameImg);
-                        Navigator.pushNamed(context, SendFriendScreen.route,
+                        Navigator.of(context, rootNavigator: true).pushNamed(
+                            SendFriendScreen.route,
                             arguments: model);
                       },
                       child: Container(

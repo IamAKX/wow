@@ -122,8 +122,8 @@ class _GiftStatsHistoryState extends State<GiftStatsHistory> {
                                         size: 12,
                                       ),
                                       horizontalGap(5),
-                                      const Text(
-                                        '27',
+                                      Text(
+                                        '${list.elementAt(index).senderAge}',
                                         style: TextStyle(
                                             color: Colors.white, fontSize: 10),
                                       )

@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  DateTime? startTime;
   getAgoraToken(BuildContext context) async {
     CountryContinent? countryContinent =
         await LocationService().getCurrentLocation();
@@ -69,10 +70,17 @@ class _HomeScreenState extends State<HomeScreen>
             token: agoraToken.toke,
             isSelfCreated: true,
             roomCreatedBy: prefs.getString(PrefsKey.userId));
+        startTime = DateTime.now();
         Navigator.of(context, rootNavigator: true)
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
-          (value) {
+          (result) {
+            int differenceInSeconds = 0;
+            if (result != null && result is DateTime) {
+              final endTime = result;
+              differenceInSeconds = endTime.difference(startTime!).inSeconds;
+              print('Time difference: $differenceInSeconds seconds');
+            }
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -81,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: LiveEndPopup(
                     roomId: agoraToken.mainId ?? '',
                     userId: prefs.getString(PrefsKey.userId) ?? '',
+                    liveTimeInSec: differenceInSeconds,
                   ),
                 );
               },

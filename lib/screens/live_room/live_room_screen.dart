@@ -86,6 +86,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   String selectedEmoji = '';
   int totalDiamond = 0;
   String selectedGift = '';
+  int friendRequestCount = 0;
+  late StreamSubscription<DatabaseEvent> friendRequestListner;
 
   Duration _totalDuration = Duration.zero;
   Duration _currentPosition = Duration.zero;
@@ -109,6 +111,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Timer? _diamondtimer;
   final ReceivePort _receivePort = ReceivePort();
   Map<int, LiveRoomUserModel> hotSeatMap = {};
+  int liveTimeInSec = 0;
 
   AdminLiveRoomControls liveRoomControls = AdminLiveRoomControls();
   AdminLiveRoomControls liveRoomControlsForAdmin = AdminLiveRoomControls();
@@ -142,6 +145,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       }
     });
     _timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      liveTimeInSec += 30;
       fetchDiamond();
     });
 
@@ -313,8 +317,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       if (dataSnapshot.exists) {
         liveRoomControls =
             AdminLiveRoomControls.fromMap(dataSnapshot.value as Map);
-        setState(() {});
-        if (mounted) log('updating ${liveRoomControls.giftVisiualEffect}');
+        if (mounted) setState(() {});
+        log('updating ${liveRoomControls.giftVisiualEffect}');
 
         agoraEngine.muteLocalAudioStream(liveRoomControls.isMicMute ?? true);
         agoraEngine
@@ -501,6 +505,23 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         if (mounted) setState(() {});
       }
     });
+
+    friendRequestListner = database
+        .ref(
+            '${FirebaseDbNode.friendRequestList}/${prefs.getString(PrefsKey.userId)}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.exists) {
+        log('dataSnapshot.children = ${dataSnapshot.children.length}');
+        friendRequestCount = dataSnapshot.children.length;
+        if (mounted) setState(() {});
+      } else {
+        friendRequestCount = 0;
+        if (mounted) setState(() {});
+      }
+    });
   }
 
   void showAudioSignal(String userID, int volume) {
@@ -659,6 +680,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .ref('${FirebaseDbNode.liveRoomAdmin}/${widget.agoraToken.mainId}')
         .onValue
         .drain();
+    friendRequestListner.cancel();
   }
 
   void loadRoomOwnerData() async {
@@ -680,10 +702,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     await getCurrentUser().then(
       (value) async {
         user = value;
+        if (widget.agoraToken.isSelfCreated ?? false) cleanUpFirebaseData();
         firebaseDetailListners();
-
+        LiveRoomFirebase.updateOnlineStatus(user?.id ?? '', 'Online');
         LiveroomChat liveroomChat = LiveroomChat(
-            message: 'joined Stream',
+            message: (widget.agoraToken.isSelfCreated ?? false)
+                ? 'created Stream'
+                : 'joined Stream',
             timeStamp: DateTime.now().millisecondsSinceEpoch,
             userId: user?.id,
             userImage: user?.image,
@@ -838,7 +863,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   Expanded(
                     child: Text(
                       getPlayingMusicName(),
-                      style: const TextStyle(color: Colors.white),
+                      maxLines: 1,
+                      style: const TextStyle(
+                          color: Colors.white, overflow: TextOverflow.ellipsis),
                     ),
                   ),
                 ],
@@ -873,6 +900,44 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             MusicState.RESUME.name);
                       }
                     },
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        child: const Icon(
+                          Icons.fast_rewind,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          if ((liveRoomMusic.playingIndex ?? 1) >= 1) {
+                            _audioPlayer.stop();
+                            LiveRoomFirebase.updateMusicSettings(
+                                widget.agoraToken.mainId ?? '',
+                                'playingIndex',
+                                (liveRoomMusic.playingIndex ?? 1) - 1);
+
+                            LiveRoomFirebase.updateMusicSettings(
+                                widget.agoraToken.mainId ?? '',
+                                'playingState',
+                                MusicState.START.name);
+                          }
+                        },
+                      ),
+                      verticalGap(10),
+                      InkWell(
+                        child: const Icon(
+                          Icons.volume_down,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          double vol = _audioPlayer.volume;
+                          if (vol > 0) _audioPlayer.setVolume(vol - 0.1);
+                        },
+                      ),
+                    ],
                   ),
                   Expanded(
                     child: Column(
@@ -924,28 +989,47 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.fast_forward_sharp,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      if ((liveRoomMusic.musicModel?.length ?? 0) - 1 >
-                          (liveRoomMusic.playingIndex ?? 1)) {
-                        _audioPlayer.stop();
-                        LiveRoomFirebase.updateMusicSettings(
-                            widget.agoraToken.mainId ?? '',
-                            'playingIndex',
-                            (liveRoomMusic.playingIndex ?? -1) + 1);
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        child: const Icon(
+                          Icons.fast_forward_sharp,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          if ((liveRoomMusic.musicModel?.length ?? 0) - 1 >
+                              (liveRoomMusic.playingIndex ?? 1)) {
+                            _audioPlayer.stop();
 
-                        LiveRoomFirebase.updateMusicSettings(
-                            widget.agoraToken.mainId ?? '',
-                            'playingState',
-                            MusicState.START.name);
-                      }
-                    },
+                            LiveRoomFirebase.updateMusicSettings(
+                                widget.agoraToken.mainId ?? '',
+                                'playingIndex',
+                                (liveRoomMusic.playingIndex ?? -1) + 1);
+
+                            LiveRoomFirebase.updateMusicSettings(
+                                widget.agoraToken.mainId ?? '',
+                                'playingState',
+                                MusicState.START.name);
+                          }
+                        },
+                      ),
+                      verticalGap(10),
+                      InkWell(
+                        child: const Icon(
+                          Icons.volume_up,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          double vol = _audioPlayer.volume;
+                          if (vol < 1) _audioPlayer.setVolume(vol + 0.1);
+                        },
+                      ),
+                    ],
                   ),
+                  horizontalGap(5),
                 ],
               ),
             ],
@@ -1007,9 +1091,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Future<void> exitCurrentUser(BuildContext context) async {
     if (widget.agoraToken.isSelfCreated ?? false) {
+      cleanUpFirebaseData();
       await archiveLiveRoom();
     }
-
+    LiveRoomFirebase.updateOnlineStatus(user?.id ?? '', 'Offline');
     hotSeatMap.entries.forEach((entry) async {
       await LiveRoomFirebase.updateLiveRoomAdminSettings(
           widget.agoraToken.mainId ?? '',
@@ -1061,7 +1146,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     cleanFirebaseListener();
     if (navigatorKey.currentContext != null &&
         Navigator.canPop(navigatorKey.currentContext!)) {
-      Navigator.of(navigatorKey.currentContext!, rootNavigator: true).pop();
+      Navigator.of(navigatorKey.currentContext!, rootNavigator: true)
+          .pop(DateTime.now());
     }
   }
 
@@ -1226,6 +1312,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 id: widget.agoraToken.mainId,
                               ),
                           myCoins: user?.myCoin ?? '',
+                          participants: List.from(participants),
                         ),
                       ).then(
                         (value) {
@@ -1275,11 +1362,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                         const ChatScreen(),
                       );
                     },
-                    child: const CircleAvatar(
-                      backgroundColor: Colors.white38,
-                      child: Icon(
-                        Icons.mail_outline_outlined,
-                        color: Colors.white,
+                    child: Badge(
+                      isLabelVisible: friendRequestCount > 0,
+                      label: Text('${friendRequestCount}'),
+                      offset: const Offset(0, -5),
+                      backgroundColor: Colors.red,
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.white38,
+                        child: Icon(
+                          Icons.mail_outline_outlined,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -1507,7 +1600,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       Center(
                         child: CircularImage(
                             imagePath: hotSeatMap[index + 1]?.image ?? '',
-                            diameter: 70),
+                            diameter:
+                                (activeUserEmojis.containsKey('${index + 1}'))
+                                    ? 50
+                                    : 70),
                       ),
                       if (activeUserEmojis.containsKey('${index + 1}'))
                         Center(
@@ -1524,15 +1620,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                   ?.isMicMute ??
                               false))
                         const Positioned(
-                          bottom: 1,
-                          right: 25,
+                          right: 5,
+                          bottom: 5,
                           child: CircleAvatar(
-                            backgroundColor: Colors.white54,
-                            radius: 15,
+                            backgroundColor: Colors.white,
+                            radius: 12,
                             child: Icon(
                               Icons.mic_off,
                               size: 15,
-                              color: Colors.black,
+                              color: Colors.pink,
                             ),
                           ),
                         ),
@@ -1705,6 +1801,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   liveRoomUserModel: convertUserToLiveUser(roomOwner),
                   myCoins: user?.myCoin ?? '',
                   user: user,
+                  participants: List.from(participants),
                   position: '-1',
                 ),
               );
@@ -1732,26 +1829,29 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             Center(
                               child: CircularImage(
                                 imagePath: roomOwner?.image ?? '',
-                                diameter: 70,
+                                diameter: (activeUserEmojis.containsKey('-1'))
+                                    ? 50
+                                    : 70,
                               ),
                             ),
                             if (activeUserEmojis.containsKey('-1'))
                               Center(
                                 child: CircularImage(
                                   imagePath: activeUserEmojis['-1'] ?? '',
-                                  diameter: 90,
+                                  diameter: 100,
                                 ),
                               ),
                             if (liveRoomControlsForAdmin.isMicMute ?? false)
-                              const Align(
-                                alignment: Alignment.bottomCenter,
+                              const Positioned(
+                                right: 10,
+                                bottom: 10,
                                 child: CircleAvatar(
-                                  backgroundColor: Colors.white54,
-                                  radius: 10,
+                                  backgroundColor: Colors.white,
+                                  radius: 12,
                                   child: Icon(
                                     Icons.mic_off,
-                                    size: 10,
-                                    color: Colors.black,
+                                    size: 15,
+                                    color: Colors.pink,
                                   ),
                                 ),
                               ),
@@ -1887,6 +1987,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     ),
                 liveRoomUserModel: convertUserToLiveUser(roomOwner),
                 myCoins: user?.myCoin ?? '',
+                participants: List.from(participants),
                 user: user,
                 position: '-1',
               ),
@@ -2137,6 +2238,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           ),
                       liveRoomUserModel: hotSeatMap[position + 1]!,
                       myCoins: user?.myCoin ?? '',
+                      participants: List.from(participants),
                       user: user,
                       position: '${position + 1}',
                     ),
@@ -2188,6 +2290,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       liveRoomUserModel: hotSeatMap[position + 1]!,
                       myCoins: user?.myCoin ?? '',
                       user: user,
+                      participants: List.from(participants),
                       position: '${position + 1}',
                     ),
                   );
@@ -2330,6 +2433,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                   JoinableLiveRoomModel(
                                     id: widget.agoraToken.mainId,
                                   ),
+                              participants: List.from(participants),
                             ),
                           );
                         },
@@ -2458,6 +2562,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Future<void> _playAudio(String filePath) async {
     await _audioPlayer.play(UrlSource(filePath));
+    await _audioPlayer.setVolume(1);
   }
 
   Future<void> _pauseAudio() async {
@@ -2466,6 +2571,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Future<void> _resumeAudio() async {
     await _audioPlayer.resume();
+    await _audioPlayer.setVolume(1);
   }
 
   Future<void> _seekAudio(Duration position) async {
@@ -2985,9 +3091,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     if (liveRoomMusic.musicModel?.isEmpty ?? true) {
       return '';
     }
-    if ((liveRoomMusic.musicModel?.length ?? 0) > idx) {
-      return '';
-    }
+
     return (liveRoomMusic.musicModel ?? []).elementAt(idx).name ?? '';
   }
 
@@ -3014,6 +3118,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         });
       });
     });
+  }
+
+  void cleanUpFirebaseData() async {
+    await LiveRoomFirebase.clearChat(
+        widget.agoraToken.mainId ?? '', LiveroomChat(),
+        sendMessage: false);
+    await LiveRoomFirebase.clearEmoji(widget.agoraToken.mainId ?? '');
   }
 
   // void _showSnackbarWithImage(String imageLink) {

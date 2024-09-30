@@ -513,10 +513,11 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             Container(
                               constraints: BoxConstraints(minWidth: 70),
                               padding: const EdgeInsets.all(5),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
                                 image: DecorationImage(
-                                    image: AssetImage(
-                                      'assets/image/level_1.png',
+                                    image: NetworkImage(
+                                      user?.lavelInfomation?.sandBgImage ?? '',
                                     ),
                                     fit: BoxFit.fill),
                               ),
@@ -542,10 +543,12 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             Container(
                               constraints: BoxConstraints(minWidth: 70),
                               padding: const EdgeInsets.all(5),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
                                 image: DecorationImage(
-                                    image: AssetImage(
-                                      'assets/image/level_9.png',
+                                    image: NetworkImage(
+                                      user?.lavelInfomation?.reciveBgImage ??
+                                          '',
                                     ),
                                     fit: BoxFit.fill),
                               ),
@@ -588,14 +591,16 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.male,
+                                Icon(
+                                  user?.gender == 'Male'
+                                      ? Icons.male
+                                      : Icons.female,
                                   color: Colors.white,
                                   size: 10,
                                 ),
                                 horizontalGap(5),
-                                const Text(
-                                  '22',
+                                Text(
+                                  '${user?.age}',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 10),
                                 )

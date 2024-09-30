@@ -124,18 +124,16 @@ class _GetShareFriendBottomsheetState extends State<GetShareFriendBottomsheet> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: apiCallProvider.status == ApiStatus.loading
-                              ? null
-                              : () async {
-                                  await FirebaseDbService.sendChat(
-                                      getChatRoomId(
-                                          friendList.elementAt(index).id ?? '0',
-                                          prefs.getString(PrefsKey.userId)!),
-                                      widget.chatModel);
+                          onPressed: () async {
+                            await FirebaseDbService.sendChat(
+                                getChatRoomId(
+                                    friendList.elementAt(index).id ?? '0',
+                                    prefs.getString(PrefsKey.userId)!),
+                                widget.chatModel);
 
-                                  showToastMessage(
-                                      'Invite sent to ${friendList.elementAt(index).name}');
-                                },
+                            showToastMessage(
+                                'Invite sent to ${friendList.elementAt(index).name}');
+                          },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
                             backgroundColor: Colors.red,

@@ -102,14 +102,14 @@ class _BlockedUserScreenState extends State<BlockedUserScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.male,
+                 Icon(
+                  blockedUser?.gender =='Male'? Icons.male:Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                const Text(
-                  '27',
+                 Text(
+                  '${blockedUser.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],

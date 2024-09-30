@@ -72,9 +72,8 @@ class _SendingScreenState extends State<SendingScreen> {
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: ((widget.levelModel.requiredExperience ?? 1) -
-                        (widget.levelModel.sendExp ?? 1)) /
-                    (widget.levelModel.sendEnd ?? 1),
+                value: (widget.levelModel.sendingExpNumerator ?? 1) /
+                    (widget.levelModel.sendingExpDenominator ?? 1),
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
@@ -92,7 +91,7 @@ class _SendingScreenState extends State<SendingScreen> {
         ),
         verticalGap(5),
         Text(
-          '${((widget.levelModel.requiredExperience ?? 1) - (widget.levelModel.sendExp ?? 1))} / ${(widget.levelModel.sendEnd ?? 1)}',
+          '${(widget.levelModel.sendingExpNumerator ?? 1)} / ${(widget.levelModel.sendingExpDenominator ?? 1)}',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,
@@ -260,7 +259,8 @@ class _SendingScreenState extends State<SendingScreen> {
         Padding(
           padding: const EdgeInsets.all(pagePadding),
           child: InkWell(
-            onTap: () => Navigator.pushNamed(context, HowToLevelUp.route),
+            onTap: () => Navigator.of(context, rootNavigator: true)
+                .pushNamed(HowToLevelUp.route),
             child: Container(
               width: double.infinity,
               height: 50,

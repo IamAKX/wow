@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
+import 'package:worldsocialintegrationapp/services/live_room_firebase.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
+import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 
@@ -10,6 +13,7 @@ import '../../../models/search_user_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
+import '../profile/profile_detail_screen.dart';
 import '../user_detail_screen/other_user_detail_screen.dart';
 
 class SearchMember extends StatefulWidget {
@@ -27,6 +31,7 @@ class _SearchMemberState extends State<SearchMember> {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   List<SearchUserModel> searchList = [];
+  Map<String, bool> onlineMap = {};
 
   @override
   void initState() {
@@ -53,11 +58,23 @@ class _SearchMemberState extends State<SearchMember> {
       showToastMessage(value['message']);
       if (value['details'] != null) {
         for (var item in value['details']) {
-          searchList.add(SearchUserModel.fromJson(item));
+          SearchUserModel searchUserModel = SearchUserModel.fromJson(item);
+          searchList.add(searchUserModel);
+          onlineMap[searchUserModel.id ?? ''] = false;
         }
         setState(() {});
+        getOnlineStatus();
       }
     });
+  }
+
+  Future<void> getOnlineStatus() async {
+    for (String key in onlineMap.keys) {
+      bool status = await LiveRoomFirebase.getOnlineStatus(key);
+      onlineMap[key] = status;
+    }
+
+    setState(() {});
   }
 
   void inviteUser(String userId, String familyId) {
@@ -139,9 +156,30 @@ class _SearchMemberState extends State<SearchMember> {
                   itemCount: searchList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      onTap: () => Navigator.of(context, rootNavigator: true)
-                          .pushNamed(OtherUserDeatilScreen.route,
-                              arguments: searchList.elementAt(index).id),
+                      onTap: () {
+                        if (searchList.elementAt(index).id ==
+                            prefs.getString(PrefsKey.userId)) {
+                          Navigator.of(context, rootNavigator: true)
+                              .pushNamed(ProfileDeatilScreen.route);
+                        } else {
+                          Navigator.of(context, rootNavigator: true).pushNamed(
+                              OtherUserDeatilScreen.route,
+                              arguments: searchList.elementAt(index).id);
+                        }
+                      },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (onlineMap[searchList.elementAt(index).id] ??
+                              false)
+                            const Icon(
+                              Icons.circle,
+                              color: Colors.green,
+                              size: 10,
+                            ),
+                          // const Icon(Icons.chevron_right),
+                        ],
+                      ),
                       leading: CircularImage(
                           imagePath: searchList.elementAt(index).image ?? '',
                           diameter: 50),

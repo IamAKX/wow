@@ -28,12 +28,14 @@ class ProfileBottomsheet extends StatefulWidget {
     required this.myCoins,
     required this.user,
     required this.position,
+    required this.participants,
   }) : super(key: key);
   final JoinableLiveRoomModel roomDetail;
   final LiveRoomUserModel liveRoomUserModel;
   final String myCoins;
   final UserProfileDetail? user;
   final String position;
+  final List<LiveRoomUserModel> participants;
 
   @override
   State<ProfileBottomsheet> createState() => _ProfileBottomsheetState();
@@ -140,14 +142,16 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.male,
+                        Icon(
+                          widget.liveRoomUserModel.gender == 'Male'
+                              ? Icons.male
+                              : Icons.female,
                           color: Colors.white,
                           size: 12,
                         ),
                         horizontalGap(5),
-                        const Text(
-                          '27',
+                        Text(
+                          '${widget.liveRoomUserModel.age}',
                           style: TextStyle(color: Colors.white, fontSize: 10),
                         )
                       ],
@@ -316,8 +320,10 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                             context: context,
                             isScrollControlled: true, // To enable custom height
                             builder: (context) => PrimeGiftBottom(
-                                roomDetail: widget.roomDetail,
-                                myCoins: widget.myCoins),
+                              roomDetail: widget.roomDetail,
+                              myCoins: widget.myCoins,
+                              participants: widget.participants,
+                            ),
                           ).then(
                             (value) {
                               Navigator.pop(context);
@@ -344,32 +350,36 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          String type = 'follow';
-                          followUnfollow(type);
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 35,
-                            ),
-                            Text(
-                              (otherUser?.followStatus ?? false)
-                                  ? 'Following'
-                                  : 'Follow',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                    Visibility(
+                      visible: widget.liveRoomUserModel.id !=
+                          prefs.getString(PrefsKey.userId),
+                      child: Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            String type = 'follow';
+                            followUnfollow(type);
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 35,
                               ),
-                            )
-                          ],
+                              Text(
+                                (otherUser?.followStatus ?? false)
+                                    ? 'Following'
+                                    : 'Follow',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     )

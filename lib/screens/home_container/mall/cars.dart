@@ -71,7 +71,7 @@ class _CarsScreenState extends State<CarsScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 10.0,
         mainAxisSpacing: 10.0,
-        childAspectRatio: 0.95,
+        childAspectRatio: 0.85,
       ),
       itemCount: carList.length,
       itemBuilder: (BuildContext context, int index) {
@@ -132,64 +132,72 @@ class _CarsScreenState extends State<CarsScreen> {
                     )
                   ],
                 ),
-                verticalGap(10),
+                Spacer(),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
-                      onTap: carList.elementAt(index).isMy ?? false
-                          ? null
-                          : () {
-                              showBuyPopUp(carList.elementAt(index).id!, index);
-                            },
-                      child: Container(
-                        width: 70,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xffFE3400),
-                              Color(0xffFBC108),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                    Expanded(
+                      child: InkWell(
+                        onTap: carList.elementAt(index).isMy ?? false
+                            ? null
+                            : () {
+                                showBuyPopUp(
+                                    carList.elementAt(index).id!, index);
+                              },
+                        child: Container(
+                          // width: 70,
+                          // height: 30,
+                          padding: EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xffFE3400),
+                                Color(0xffFBC108),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: Text(
-                          carList.elementAt(index).isMy ?? false
-                              ? 'Bought'
-                              : 'Buy',
-                          style: const TextStyle(color: Colors.white),
+                          child: Text(
+                            carList.elementAt(index).isMy ?? false
+                                ? 'Bought'
+                                : 'Buy',
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
                     horizontalGap(10),
-                    InkWell(
-                      onTap: () {
-                        SendFriendModel model = SendFriendModel(
-                            isCar: true,
-                            id: carList.elementAt(index).id,
-                            price: carList.elementAt(index).price,
-                            validity: carList.elementAt(index).validity,
-                            url: carList.elementAt(index).image);
-                        Navigator.pushNamed(context, SendFriendScreen.route,
-                            arguments: model);
-                      },
-                      child: Container(
-                        width: 70,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xffFE3400),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          SendFriendModel model = SendFriendModel(
+                              isCar: true,
+                              id: carList.elementAt(index).id,
+                              price: carList.elementAt(index).price,
+                              validity: carList.elementAt(index).validity,
+                              url: carList.elementAt(index).image);
+                          Navigator.of(context, rootNavigator: true).pushNamed(
+                              SendFriendScreen.route,
+                              arguments: model);
+                        },
+                        child: Container(
+                          // width: 70,
+                          // height: 30,
+                          padding: EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color(0xffFE3400),
+                            ),
+                            borderRadius: BorderRadius.circular(5.0),
                           ),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: const Text(
-                          'Send',
-                          style: TextStyle(color: Color(0xffFE3400)),
+                          child: const Text(
+                            'Send',
+                            style: TextStyle(color: Color(0xffFE3400)),
+                          ),
                         ),
                       ),
                     )

@@ -412,7 +412,8 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                     margin: const EdgeInsets.all(pagePadding),
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, PromptCreateFamily.route,
+                        Navigator.of(context, rootNavigator: true).pushNamed(
+                            PromptCreateFamily.route,
                             arguments: user);
                       },
                       style: ElevatedButton.styleFrom(

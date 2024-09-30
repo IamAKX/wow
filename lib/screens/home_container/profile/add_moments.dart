@@ -112,6 +112,14 @@ class _AddMomentsState extends State<AddMoments> {
 
                             if (result != null) {
                               file = File(result.files.single.path!);
+                              String fileExtension = extension(file!.path)
+                                  .toLowerCase()
+                                  .replaceAll('.', '');
+                              log(fileExtension);
+
+                              if (imageExtensions.contains(fileExtension)) {
+                                file = await getCroppedImage(file!, context);
+                              }
                               log('File : ${file!.path}');
                               setState(() {});
                             }

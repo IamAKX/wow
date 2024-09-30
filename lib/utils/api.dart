@@ -137,4 +137,5 @@ class API {
   static const String getSilverCoinValue = '$baseUrl/getSilverCoinValue';
   static const String userBillingRecords = '$baseUrl/userBillingRecords';
   static const String getSilverCoinHistory = '$baseUrl/getSilverCoinHistory';
+  static const String getLiveGiftingRecord = '$baseUrl/getLiveGiftingRecord';
 }

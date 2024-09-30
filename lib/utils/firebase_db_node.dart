@@ -15,4 +15,5 @@ class FirebaseDbNode {
   static const String currentSpeaker = 'currentSpeaker';
   static const String liveRoomGift = 'liveRoomGift';
   static const String liveRoomAdmin = 'liveRoomAdmin';
+  static const String liveOnlineStatus = 'liveOnlineStatus';
 }

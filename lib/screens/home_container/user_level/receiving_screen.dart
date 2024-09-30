@@ -37,9 +37,8 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
             SizedBox(
               width: 200,
               child: LinearProgressIndicator(
-                value: ((widget.levelModel.receiveRequiredExperience ?? 1) -
-                        (widget.levelModel.reciveExp ?? 1)) /
-                    (widget.levelModel.reciveEnd ?? 1),
+                value: (widget.levelModel.recievingExpNumerator ?? 1) /
+                    (widget.levelModel.recievingExpDenominator ?? 1),
                 color: Colors.red,
                 minHeight: 10,
                 backgroundColor: Colors.red.withOpacity(0.4),
@@ -57,7 +56,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         ),
         verticalGap(5),
         Text(
-          '${((widget.levelModel.receiveRequiredExperience ?? 1) - (widget.levelModel.reciveExp ?? 1))} / ${(widget.levelModel.reciveEnd ?? 1)}',
+          '${(widget.levelModel.recievingExpNumerator ?? 1)} / ${(widget.levelModel.recievingExpDenominator ?? 1)}',
           style: const TextStyle(
             fontSize: 12,
             color: Colors.white70,

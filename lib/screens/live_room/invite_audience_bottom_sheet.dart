@@ -115,8 +115,8 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
         //     widget.roomDetail.id ?? '', widget.position + 1, visitorModel);
         LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
             visitorModel.id ?? '', 'position', widget.position);
-        LiveRoomFirebase.updateLiveRoomAdminSettings(widget.roomDetail.id ?? '',
-            visitorModel.id ?? '', 'invite', true);
+        LiveRoomFirebase.updateLiveRoomAdminSettings(
+            widget.roomDetail.id ?? '', visitorModel.id ?? '', 'invite', true);
         Navigator.pop(context);
       },
       subtitle: Row(
@@ -130,14 +130,14 @@ class _InviteAudienceBottomSheetState extends State<InviteAudienceBottomSheet> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.male,
+                Icon(
+                  visitorModel.gender == 'Male' ? Icons.male : Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                const Text(
-                  '27',
+                Text(
+                  '${visitorModel.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],

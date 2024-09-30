@@ -198,6 +198,13 @@ class LiveRoomFirebase {
     return await messageRef.set(map);
   }
 
+  static Future<void> clearEmoji(String chatWindowId) async {
+    DatabaseReference messageRef =
+        database.ref('${FirebaseDbNode.liveRoomEmoji}/$chatWindowId');
+
+    return await messageRef.remove();
+  }
+
   static Future<void> sendAudioSignal(
       String chatWindowId, String userId, int volume) async {
     DatabaseReference messageRef =
@@ -298,6 +305,28 @@ class LiveRoomFirebase {
 
     if (adminList.contains(id)) {
       return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<void> updateOnlineStatus(
+      String userId, String onlineStatus) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveOnlineStatus}/$userId');
+    await liveRoomRef.set(onlineStatus);
+  }
+
+  static Future<bool> getOnlineStatus(String userId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveOnlineStatus}/$userId');
+    DataSnapshot snapshot = await liveRoomRef.get();
+    if (snapshot.exists) {
+      if ((snapshot.value as String) == 'Online') {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }

@@ -110,10 +110,8 @@ class _EventScreenState extends State<EventScreen>
               ),
             ),
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                CreateEventOne.route,
-              );
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed(CreateEventOne.route);
             },
             child: const Text('I wanna party!'),
           ),

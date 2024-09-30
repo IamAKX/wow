@@ -33,11 +33,13 @@ class GetFriendBottomsheet extends StatefulWidget {
       required this.image,
       required this.giftType,
       this.isSvga,
-      this.imageLink});
+      this.imageLink,
+      required this.friendList});
   final JoinableLiveRoomModel roomDetail;
   final String permissionId;
   final String themeId;
   final File image;
+  final List<LiveRoomUserModel> friendList;
   final GiftType giftType;
   bool? isSvga;
   String? imageLink;
@@ -49,7 +51,7 @@ class GetFriendBottomsheet extends StatefulWidget {
 class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
   late ApiCallProvider apiCallProvider;
   // List<FriendModel> friendList = [];
-  List<LiveRoomUserModel> friendList = [];
+  // List<LiveRoomUserModel> friendList = [];
   UserProfileDetail? user;
 
   void loadUserData() async {
@@ -60,27 +62,26 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
     );
   }
 
-  getFriends() async {
-    friendList = await LiveRoomFirebase.getLiveRoomParticipants(
-        widget.roomDetail.id ?? '');
-    friendList.removeWhere(
-      (element) => element.sendLevel == '0' || element.reciveLevel 
-      == '0',
-    );
-    setState(() {});
-    //   Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
-    //   await apiCallProvider
-    //       .postRequest(API.getFriendsDetails, reqBody)
-    //       .then((value) {
-    //     if (value['details'] != null) {
-    //       for (var item in value['details']) {
-    //         friendList.add(FriendModel.fromJson(item));
-    //       }
-    //       log(friendList.length.toString());
-    //       setState(() {});
-    //     }
-    //   });
-  }
+  // getFriends() async {
+  //   friendList = await LiveRoomFirebase.getLiveRoomParticipants(
+  //       widget.roomDetail.id ?? '');
+  //   friendList.removeWhere(
+  //     (element) => element.sendLevel == '0' || element.reciveLevel == '0',
+  //   );
+  //   setState(() {});
+  //   //   Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+  //   //   await apiCallProvider
+  //   //       .postRequest(API.getFriendsDetails, reqBody)
+  //   //       .then((value) {
+  //   //     if (value['details'] != null) {
+  //   //       for (var item in value['details']) {
+  //   //         friendList.add(FriendModel.fromJson(item));
+  //   //       }
+  //   //       log(friendList.length.toString());
+  //   //       setState(() {});
+  //   //     }
+  //   //   });
+  // }
 
   @override
   void initState() {
@@ -88,7 +89,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
-      getFriends();
+      // getFriends();
     });
   }
 
@@ -136,39 +137,37 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
                         children: [
                           CircularImage(
                               imagePath:
-                                  friendList.elementAt(index).image ?? '',
+                                  widget.friendList.elementAt(index).image ??
+                                      '',
                               diameter: 50),
                           horizontalGap(10),
                           Expanded(
                             child: Text(
-                              friendList.elementAt(index).username ?? '',
+                              widget.friendList.elementAt(index).username ?? '',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: apiCallProvider.status ==
-                                    ApiStatus.loading
-                                ? null
-                                : () async {
-                                    if (widget.giftType == GiftType.STORE) {
-                                      await sendStoreTheme(
-                                          friendList.elementAt(index).id ?? '',
-                                          friendList.elementAt(index));
-                                    }
-                                    if (widget.giftType == GiftType.GALLERY) {
-                                      await sendGalleryTheme(
-                                          friendList.elementAt(index).id ?? '',
-                                          friendList.elementAt(index));
-                                    }
-                                    if (widget.giftType == GiftType.PRIME) {
-                                      await sendPrimeGift(
-                                          friendList.elementAt(index).id ?? '',
-                                          friendList.elementAt(index));
-                                    }
-                                    Navigator.pop(context);
-                                  },
+                            onPressed: () async {
+                              if (widget.giftType == GiftType.STORE) {
+                                await sendStoreTheme(
+                                    widget.friendList.elementAt(index).id ?? '',
+                                    widget.friendList.elementAt(index));
+                              }
+                              if (widget.giftType == GiftType.GALLERY) {
+                                await sendGalleryTheme(
+                                    widget.friendList.elementAt(index).id ?? '',
+                                    widget.friendList.elementAt(index));
+                              }
+                              if (widget.giftType == GiftType.PRIME) {
+                                await sendPrimeGift(
+                                    widget.friendList.elementAt(index).id ?? '',
+                                    widget.friendList.elementAt(index));
+                              }
+                              // Navigator.pop(context);
+                            },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.red,
@@ -183,7 +182,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
                         color: Colors.grey,
                       );
                     },
-                    itemCount: friendList.length),
+                    itemCount: widget.friendList.length),
               ),
             ],
           ),

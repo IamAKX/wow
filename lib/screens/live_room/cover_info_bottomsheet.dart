@@ -29,7 +29,7 @@ class CoverInfoBottomsheet extends StatefulWidget {
 class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
-    CroppedFile? croppedFile;
+  CroppedFile? croppedFile;
   final TextEditingController _titleCtrl = TextEditingController();
   late ApiCallProvider apiCallProvider;
 
@@ -86,56 +86,71 @@ class _CoverInfoBottomsheetState extends State<CoverInfoBottomsheet> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         child: _image != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.file(
-                                  _image!,
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
+                            ? InkWell(
+                                onTap: () async {
+                                  final pickedFile = await _picker.pickImage(
+                                      source: ImageSource.gallery);
+
+                                  if (pickedFile != null) {
+                                    _image = await getCroppedImage(
+                                        File(pickedFile.path), context);
+                                  } else {
+                                    log('No image selected.');
+                                  }
+                                  setState(() async {});
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.file(
+                                    _image!,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               )
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  imageUrl: widget.roomDetail.liveimage ?? '',
-                                  placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                    color: Colors.grey,
+                            : InkWell(
+                                onTap: () async {
+                                  final pickedFile = await _picker.pickImage(
+                                      source: ImageSource.gallery);
+
+                                  if (pickedFile != null) {
+                                    _image = await getCroppedImage(
+                                        File(pickedFile.path), context);
+                                  } else {
+                                    log('No image selected.');
+                                  }
+                                  setState(() async {});
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: CachedNetworkImage(
+                                    imageUrl: widget.roomDetail.liveimage ?? '',
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                      color: Colors.grey,
+                                      width: 80,
+                                      height: 80,
+                                    ),
+                                    fit: BoxFit.fill,
                                     width: 80,
                                     height: 80,
                                   ),
-                                  fit: BoxFit.fill,
-                                  width: 80,
-                                  height: 80,
                                 ),
                               ),
                       ),
                       Positioned(
                         bottom: 1,
                         right: 1,
-                        child: InkWell(
-                          onTap: () async {
-                            final pickedFile = await _picker.pickImage(
-                                source: ImageSource.gallery);
-                            setState(() {
-                              if (pickedFile != null) {
-                                _image = File(pickedFile.path);
-                              } else {
-                                log('No image selected.');
-                              }
-                            });
-                          },
-                          child: const CircleAvatar(
-                            backgroundColor: Colors.red,
-                            radius: 12,
-                            child: Icon(
-                              Icons.add,
-                              size: 20,
-                            ),
+                        child: const CircleAvatar(
+                          backgroundColor: Colors.red,
+                          radius: 12,
+                          child: Icon(
+                            Icons.add,
+                            size: 20,
                           ),
                         ),
                       )

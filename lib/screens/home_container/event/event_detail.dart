@@ -255,7 +255,7 @@ class _EventDetailState extends State<EventDetail> {
                               size: 10,
                             ),
                             horizontalGap(5),
-                            const Text(
+                             Text(
                               '22',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 10),

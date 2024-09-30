@@ -40,14 +40,14 @@ class UserTileWithAction extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.male,
+                Icon(
+                  visitorModel.gender == 'Male' ? Icons.male : Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                const Text(
-                  '27',
+                Text(
+                  '${visitorModel.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],
@@ -58,10 +58,11 @@ class UserTileWithAction extends StatelessWidget {
             Container(
               width: 60,
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image/level_1.png',
+                    image: NetworkImage(
+                      visitorModel.sandBgImage ?? '',
                     ),
                     fit: BoxFit.fill),
               ),
@@ -69,13 +70,13 @@ class UserTileWithAction extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
-                    'assets/image/coins_img.png',
+                    'assets/image/starlevel.png',
                     width: 12,
                   ),
                   horizontalGap(5),
                   Text(
-                    (visitorModel.sendLevel ?? '0'),
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    '${visitorModel.sendLevel}',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
                   )
                 ],
               ),
@@ -85,10 +86,11 @@ class UserTileWithAction extends StatelessWidget {
             Container(
               width: 60,
               padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image/level_9.png',
+                    image: NetworkImage(
+                      visitorModel.reciveBgImage ?? '',
                     ),
                     fit: BoxFit.fill),
               ),
@@ -101,8 +103,8 @@ class UserTileWithAction extends StatelessWidget {
                   ),
                   horizontalGap(5),
                   Text(
-                    (visitorModel.reciveLevel ?? '0'),
-                    style: const TextStyle(
+                    '${visitorModel.reciveLevel}',
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                     ),

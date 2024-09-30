@@ -13,6 +13,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../main.dart';
 import '../../models/joinable_live_room_model.dart';
+import '../../models/live_room_user_model.dart';
 import '../../models/theme_free_image_model.dart';
 import '../../models/theme_paid_image_model.dart';
 import '../../providers/api_call_provider.dart';
@@ -24,8 +25,10 @@ class ThemeBottomsheet extends StatefulWidget {
   const ThemeBottomsheet({
     Key? key,
     required this.roomDetail,
+    required this.participants,
   }) : super(key: key);
   final JoinableLiveRoomModel roomDetail;
+  final List<LiveRoomUserModel> participants;
 
   @override
   State<ThemeBottomsheet> createState() => _ThemeBottomsheetState();
@@ -157,7 +160,9 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                         context: context,
                         isScrollControlled: true, // To enable custom height
                         builder: (context) => PurchaseGalleryBottomsheet(
-                            roomDetail: widget.roomDetail),
+                          roomDetail: widget.roomDetail,
+                          participants: widget.participants,
+                        ),
                       );
                     },
                     icon: const Icon(
@@ -365,6 +370,7 @@ class _ThemeBottomsheetState extends State<ThemeBottomsheet>
                                                         .id ??
                                                     '',
                                                 image: File(''),
+                                                friendList: widget.participants,
                                                 giftType: GiftType.STORE),
                                       ).then(
                                         (value) {

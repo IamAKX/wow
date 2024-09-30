@@ -13,6 +13,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../main.dart';
 import '../../models/joinable_live_room_model.dart';
+import '../../models/live_room_user_model.dart';
 import '../../providers/api_call_provider.dart';
 import '../../services/live_room_firebase.dart';
 import '../../utils/api.dart';
@@ -20,8 +21,10 @@ import '../../utils/prefs_key.dart';
 import '../../widgets/enum.dart';
 
 class PurchaseGalleryBottomsheet extends StatefulWidget {
-  const PurchaseGalleryBottomsheet({super.key, required this.roomDetail});
+  const PurchaseGalleryBottomsheet(
+      {super.key, required this.roomDetail, required this.participants});
   final JoinableLiveRoomModel roomDetail;
+  final List<LiveRoomUserModel> participants;
 
   @override
   State<PurchaseGalleryBottomsheet> createState() =>
@@ -302,6 +305,7 @@ class _PurchaseGalleryBottomsheetState
                                                       '',
                                                   themeId: '',
                                                   image: _image!,
+                                                  friendList: widget.participants,
                                                   giftType: GiftType.GALLERY),
                                         ).then(
                                           (value) {

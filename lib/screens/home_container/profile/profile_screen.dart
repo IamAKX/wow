@@ -302,7 +302,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, MallScreen.route);
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(MallScreen.route);
                 },
               ),
               ListTile(
@@ -320,12 +321,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    MyLookScreen.route,
-                  ).then(
-                    (value) => loadUserData(),
-                  );
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(
+                        MyLookScreen.route,
+                      )
+                      .then(
+                        (value) => loadUserData(),
+                      );
                 },
               ),
               Divider(

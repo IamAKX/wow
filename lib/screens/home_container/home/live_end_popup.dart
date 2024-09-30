@@ -1,18 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../main.dart';
+import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
+import '../../../utils/helpers.dart';
+import '../../../utils/prefs_key.dart';
+
 class LiveEndPopup extends StatefulWidget {
-  const LiveEndPopup({super.key, required this.roomId, required this.userId});
+  const LiveEndPopup(
+      {super.key,
+      required this.roomId,
+      required this.userId,
+      required this.liveTimeInSec});
   final String roomId;
   final String userId;
+  final int liveTimeInSec;
 
   @override
   State<LiveEndPopup> createState() => _LiveEndPopupState();
 }
 
 class _LiveEndPopupState extends State<LiveEndPopup> {
+  late ApiCallProvider apiCallProvider;
+  int total = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadGiftingRecord();
+    });
+  }
+
+  loadGiftingRecord() async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+    };
+    apiCallProvider
+        .postRequest(API.getLiveGiftingRecord, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        total = value['total'];
+        setState(() {});
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: getBody(context),
@@ -48,12 +87,13 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
                 childAspectRatio: 1,
               ),
               children: [
-                getGridItems('00:00:05', 'Live Duration'),
-                getGridIconItems('4', 'Diamond'),
-                getGridItems('1', 'Total Audience'),
+                getGridItems(
+                    formatDuration(widget.liveTimeInSec), 'Live Duration'),
+                getGridIconItems('$total', 'Diamond'),
+                getGridItems('0', 'Total Audience'),
                 getGridItems('0', 'Minimum Audience'),
                 getGridItems('0', 'New Follows'),
-                getGridItems('8', 'Share Number'),
+                getGridItems('0', 'Share Number'),
               ],
             ),
             verticalGap(20),

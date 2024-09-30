@@ -106,14 +106,14 @@ class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.male,
+                Icon(
+                  visitorModel.gender == 'Male' ? Icons.male : Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                const Text(
-                  '27',
+                Text(
+                  '${visitorModel.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],

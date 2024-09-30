@@ -19,6 +19,7 @@ Future<UserProfileDetail?> getCurrentUser() async {
       .then((value) {
     if (value['details'] != null) {
       user = UserProfileDetail.fromMap(value['details']);
+      log('user level = ${user?.lavelInfomation?.toMap()}');
     }
   });
   return user;

@@ -495,76 +495,81 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.male,
+                          Icon(
+                            otherUser?.gender == 'Male'
+                                ? Icons.male
+                                : Icons.female,
                             color: Colors.white,
                             size: 12,
                           ),
                           horizontalGap(5),
-                          const Text(
-                            '27',
+                          Text(
+                            '${otherUser?.age}',
                             style: TextStyle(color: Colors.white, fontSize: 10),
                           )
                         ],
                       ),
                     ),
                     horizontalGap(5),
-                    Container(
-                      width: 60,
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                            image: NetworkImage(
-                              user?.lavelInfomation?.sandBgImage ?? '',
+                    if ((otherUser?.lavelInfomation?.sendLevel ?? '0') != '0')
+                      Container(
+                        constraints: BoxConstraints(minWidth: 70),
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                otherUser?.lavelInfomation?.sandBgImage ?? '',
+                              ),
+                              fit: BoxFit.fill),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/image/starlevel.png',
+                              width: 12,
                             ),
-                            fit: BoxFit.fill),
+                            horizontalGap(5),
+                            Text(
+                              '${otherUser?.lavelInfomation?.sendLevel}',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            )
+                          ],
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'assets/image/starlevel.png',
-                            width: 12,
-                          ),
-                          horizontalGap(5),
-                          Text(
-                            user?.lavelInfomation?.sendLevel ?? '0',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          )
-                        ],
-                      ),
-                    ),
                     horizontalGap(10),
-                    Container(
-                      width: 60,
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                            image: NetworkImage(
-                              user?.lavelInfomation?.reciveBgImage ?? '',
+                    if ((otherUser?.lavelInfomation?.reciveLevel ?? '0') != '0')
+                      Container(
+                        constraints: BoxConstraints(minWidth: 70),
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                otherUser?.lavelInfomation?.reciveBgImage ?? '',
+                              ),
+                              fit: BoxFit.fill),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/image/coins_img.png',
+                              width: 12,
                             ),
-                            fit: BoxFit.fill),
+                            horizontalGap(5),
+                            Text(
+                              otherUser?.lavelInfomation?.reciveLevel ?? '0',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            'assets/image/coins_img.png',
-                            width: 12,
-                          ),
-                          horizontalGap(5),
-                          Text(
-                            user?.lavelInfomation?.reciveLevel ?? '0',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
                     Spacer(),
                     Container(
                       alignment: Alignment.centerRight,

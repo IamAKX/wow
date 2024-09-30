@@ -143,7 +143,8 @@ class _UserLevelCarsState extends State<UserLevelCars> {
           ),
         ),
         InkWell(
-          onTap: () => Navigator.pushNamed(context, HowToLevelUp.route),
+          onTap: () => Navigator.of(context, rootNavigator: true)
+              .pushNamed(HowToLevelUp.route),
           child: Container(
             alignment: Alignment.center,
             margin: const EdgeInsets.all(pagePadding),

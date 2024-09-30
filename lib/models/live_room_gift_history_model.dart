@@ -14,23 +14,28 @@ class LiveRoomGiftHistoryModel {
   String? receiverGender;
   String? receiverImg;
   String? senderImg;
+  String? senderAge;
+  String? receiverAge;
 
-  LiveRoomGiftHistoryModel(
-      {this.diamond,
-      this.senderId,
-      this.giftId,
-      this.giftType,
-      this.senderName,
-      this.senderUsername,
-      this.senderDob,
-      this.senderGender,
-      this.receiverId,
-      this.receiverName,
-      this.receiverUsername,
-      this.receiverDob,
-      this.receiverGender,
-      this.receiverImg,
-      this.senderImg});
+  LiveRoomGiftHistoryModel({
+    this.diamond,
+    this.senderId,
+    this.giftId,
+    this.giftType,
+    this.senderName,
+    this.senderUsername,
+    this.senderDob,
+    this.senderGender,
+    this.receiverId,
+    this.receiverName,
+    this.receiverUsername,
+    this.receiverDob,
+    this.receiverGender,
+    this.receiverImg,
+    this.senderImg,
+    this.senderAge,
+    this.receiverAge,
+  });
 
   LiveRoomGiftHistoryModel.fromJson(Map<String, dynamic> json) {
     diamond = json['diamond'];
@@ -48,6 +53,8 @@ class LiveRoomGiftHistoryModel {
     receiverGender = json['receiver_gender'];
     receiverImg = json['receiver_img'];
     senderImg = json['sender_img'];
+    senderAge = json['senderAge'];
+    receiverAge = json['receiverAge'];
   }
 
   Map<String, dynamic> toJson() {
@@ -67,6 +74,8 @@ class LiveRoomGiftHistoryModel {
     data['receiver_gender'] = receiverGender;
     data['receiver_img'] = receiverImg;
     data['sender_img'] = senderImg;
+    data['receiverAge'] = receiverAge;
+    data['senderAge'] = senderAge;
     return data;
   }
 }

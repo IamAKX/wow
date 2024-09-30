@@ -13,6 +13,10 @@ class LevelModel {
   int? reciveStart;
   int? reciveEnd;
   int? receiveRequiredExperience;
+  int? sendingExpNumerator;
+  int? sendingExpDenominator;
+  int? recievingExpNumerator;
+  int? recievingExpDenominator;
 
   LevelModel(
       {this.sandColor,
@@ -28,7 +32,11 @@ class LevelModel {
       this.reciveExp,
       this.reciveStart,
       this.reciveEnd,
-      this.receiveRequiredExperience});
+      this.receiveRequiredExperience,
+      this.sendingExpNumerator,
+      this.sendingExpDenominator,
+      this.recievingExpNumerator,
+      this.recievingExpDenominator});
 
   LevelModel.fromJson(Map<String, dynamic> json) {
     sandColor = json['sandColor'];
@@ -45,6 +53,10 @@ class LevelModel {
     reciveStart = json['reciveStart'];
     reciveEnd = json['reciveEnd'];
     receiveRequiredExperience = json['receiveRequiredExperience'];
+    sendingExpNumerator = json['sendingExpNumerator'];
+    sendingExpDenominator = json['sendingExpDenominator'];
+    recievingExpNumerator = json['recievingExpNumerator'];
+    recievingExpDenominator = json['recievingExpDenominator'];
   }
 
   Map<String, dynamic> toJson() {
@@ -63,6 +75,10 @@ class LevelModel {
     data['reciveStart'] = reciveStart;
     data['reciveEnd'] = reciveEnd;
     data['receiveRequiredExperience'] = receiveRequiredExperience;
+    data['sendingExpNumerator'] = sendingExpNumerator;
+    data['sendingExpDenominator'] = sendingExpDenominator;
+    data['recievingExpNumerator'] = recievingExpNumerator;
+    data['recievingExpDenominator'] = recievingExpDenominator;
     return data;
   }
 }

@@ -262,7 +262,8 @@ class _PopularScreenState extends State<PopularScreen> {
           Expanded(
             child: InkWell(
               onTap: () {
-                Navigator.pushNamed(context, FamilyLeaderboard.route);
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(FamilyLeaderboard.route);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
@@ -309,7 +310,8 @@ class _PopularScreenState extends State<PopularScreen> {
           Expanded(
             child: InkWell(
               onTap: () {
-                Navigator.pushNamed(context, EventScreen.route);
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(EventScreen.route);
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
