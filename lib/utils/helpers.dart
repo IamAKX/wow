@@ -116,6 +116,14 @@ String formatDate(DateTime dateTime) {
   }
 }
 
+String formatDBDate(DateTime dateTime) {
+  try {
+    return DateFormat('yyyy-MM-dd hh:mm:ss').format(dateTime);
+  } catch (e) {
+    return '';
+  }
+}
+
 Future<File> getFileFromAssets(String path) async {
   final byteData = await rootBundle.load(path);
 

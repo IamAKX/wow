@@ -25,7 +25,9 @@ import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
+import '../../../models/family_details.dart';
 import '../../../providers/api_call_provider.dart';
+import '../../../utils/api.dart';
 import '../../../utils/prefs_key.dart';
 import '../../../widgets/custom_webview.dart';
 import '../family/family_medal.dart';
@@ -40,6 +42,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   UserProfileDetail? user;
   String frame = '';
+  FamilyDetails? familyDetails;
   late ApiCallProvider apiCallProvider;
 
   @override
@@ -339,6 +342,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'assets/svg/family.svg',
                   width: 20,
                 ),
+                trailing: Visibility(
+                  visible: (familyDetails?.requestCount ?? 0) > 0,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.red,
+                    radius: 10,
+                    child: Text(
+                      '${familyDetails?.requestCount ?? 0}',
+                      style: TextStyle(color: Colors.white, fontSize: 10),
+                    ),
+                  ),
+                ),
                 title: const Text(
                   'Family',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -512,6 +526,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> loadFamilyDeatilsData() async {
+    Map<String, dynamic> reqBody = {
+      'userId': user?.id,
+      'familyId': user?.familyId
+    };
+    apiCallProvider.postRequest(API.getFamiliesDetails, reqBody).then((value) {
+      if (value['details'] != null) {
+        familyDetails = FamilyDetails.fromJson(value['details']);
+
+        setState(() {});
+      }
+    });
+  }
+
   void loadUserData() async {
     await getCurrentUser().then(
       (value) {
@@ -520,8 +548,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       },
     );
+    loadFamilyDeatilsData();
     frame = await loadFrame();
     setState(() {});
+
     log('frame = ${frame}');
   }
 }

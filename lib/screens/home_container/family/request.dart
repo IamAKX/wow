@@ -34,10 +34,9 @@ class _RequestState extends State<Request> {
 
   loadRequests() async {
     Map<String, dynamic> reqBody = {'leaderId': widget.familyDetails.leaderId};
-
+    list.clear();
     apiCallProvider.postRequest(API.getJoinRequest, reqBody).then((value) {
       if (value['details'] != null) {
-        list.clear();
         for (var item in value['details']) {
           list.add(FamilyJoinRequest.fromJson(item));
         }
@@ -135,9 +134,9 @@ class _RequestState extends State<Request> {
     await apiCallProvider
         .postRequest(API.responseJoinRequest, reqBody)
         .then((value) async {
+      await loadRequests();
       if (value['message'] != null) {
         showToastMessage(value['message']);
-        await loadRequests();
       }
     });
   }

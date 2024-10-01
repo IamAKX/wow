@@ -115,7 +115,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                 ),
               ),
               alignment: Alignment.center,
-              child: const Text(  
+              child: const Text(
                 'Send',
                 style: TextStyle(
                   fontSize: 12,
@@ -281,8 +281,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: 120,
+                  Expanded(
                     child: OutlinedButton(
                       onPressed: () {
                         Navigator.of(context, rootNavigator: true).pop();
@@ -301,8 +300,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                     ),
                   ),
                   horizontalGap(20),
-                  SizedBox(
-                    width: 120,
+                  Expanded(
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context, rootNavigator: true).pop();

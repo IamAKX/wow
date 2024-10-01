@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worldsocialintegrationapp/models/live_room_exit_model.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
@@ -13,10 +14,12 @@ class LiveEndPopup extends StatefulWidget {
       {super.key,
       required this.roomId,
       required this.userId,
-      required this.liveTimeInSec});
+      required this.startTime,
+      required this.liveRoomExitModel});
   final String roomId;
   final String userId;
-  final int liveTimeInSec;
+  final DateTime startTime;
+  final LiveRoomExitModel liveRoomExitModel;
 
   @override
   State<LiveEndPopup> createState() => _LiveEndPopupState();
@@ -25,6 +28,8 @@ class LiveEndPopup extends StatefulWidget {
 class _LiveEndPopupState extends State<LiveEndPopup> {
   late ApiCallProvider apiCallProvider;
   int total = 0;
+  int participants = 0;
+  final endTime = DateTime.now();
 
   @override
   void initState() {
@@ -38,12 +43,15 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
   loadGiftingRecord() async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
+      'startTime': formatDBDate(widget.startTime),
+      'endTime': formatDBDate(endTime)
     };
     apiCallProvider
         .postRequest(API.getLiveGiftingRecord, reqBody)
         .then((value) async {
       if (value['success'] == '1') {
-        total = value['total'];
+        total = value['totalDiamond'];
+        participants = value['totalAudience'];
         setState(() {});
       }
     });
@@ -59,6 +67,9 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
   }
 
   getBody(BuildContext context) {
+    int differenceInSeconds = endTime.difference(widget.startTime).inSeconds;
+    print('Time difference: $differenceInSeconds seconds');
+
     return Padding(
       padding: EdgeInsets.all(40),
       child: SizedBox(
@@ -88,9 +99,9 @@ class _LiveEndPopupState extends State<LiveEndPopup> {
               ),
               children: [
                 getGridItems(
-                    formatDuration(widget.liveTimeInSec), 'Live Duration'),
+                    formatDuration(differenceInSeconds), 'Live Duration'),
                 getGridIconItems('$total', 'Diamond'),
-                getGridItems('0', 'Total Audience'),
+                getGridItems('$participants', 'Total Audience'),
                 getGridItems('0', 'Minimum Audience'),
                 getGridItems('0', 'New Follows'),
                 getGridItems('0', 'Share Number'),

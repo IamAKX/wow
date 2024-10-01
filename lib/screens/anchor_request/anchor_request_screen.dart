@@ -201,7 +201,7 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
               return;
             }
             Map<String, dynamic> reqBody = {
-              'userId': user?.username,
+              'userId': user?.id,
               'agencyId': selectedAgent?.agencyCode ?? '',
               'name': nameCtrl.text,
               'country': country,

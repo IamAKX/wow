@@ -35,10 +35,9 @@ class _InvitationState extends State<Invitation> {
 
   loadRequests() async {
     Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
-
+    list.clear();
     apiCallProvider.postRequest(API.getInvitations, reqBody).then((value) {
       if (value['details'] != null) {
-        list.clear();
         for (var item in value['details']) {
           list.add(FamilyInviteRequest.fromJson(item));
         }
@@ -136,9 +135,9 @@ class _InvitationState extends State<Invitation> {
     await apiCallProvider
         .postRequest(API.responseInvitation, reqBody)
         .then((value) async {
+      await loadRequests();
       if (value['message'] != null) {
         showToastMessage(value['message']);
-        await loadRequests();
       }
     });
   }

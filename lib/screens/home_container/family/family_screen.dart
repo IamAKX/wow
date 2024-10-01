@@ -713,6 +713,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   if (value['message'] != null) {
                     showToastMessage(value['message']);
                     Navigator.pop(context);
+                    Navigator.pop(context);
                   }
                 });
               },

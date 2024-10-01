@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/live_room_detail_model.dart';
+import 'package:worldsocialintegrationapp/models/live_room_exit_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/near_by.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/popular.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home/related.dart';
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ApiCallProvider apiCallProvider;
+  bool isButtonActive = true;
 
   @override
   void initState() {
@@ -51,6 +53,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   DateTime? startTime;
   getAgoraToken(BuildContext context) async {
+    isButtonActive = false;
+
     CountryContinent? countryContinent =
         await LocationService().getCurrentLocation();
     Map<String, dynamic> reqBody = {
@@ -75,12 +79,14 @@ class _HomeScreenState extends State<HomeScreen>
             .pushNamed(LiveRoomScreen.route, arguments: liveRoomDetailModel)
             .then(
           (result) {
-            int differenceInSeconds = 0;
-            if (result != null && result is DateTime) {
-              final endTime = result;
-              differenceInSeconds = endTime.difference(startTime!).inSeconds;
-              print('Time difference: $differenceInSeconds seconds');
-            }
+            // int differenceInSeconds = 0;
+            isButtonActive = true;
+            // if (result != null && result is DateTime) {
+            //   final endTime = result;
+            //   differenceInSeconds = endTime.difference(startTime!).inSeconds;
+            //   print('Time difference: $differenceInSeconds seconds');
+            // }
+            LiveRoomExitModel liveRoomExitModel = result as LiveRoomExitModel;
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -89,7 +95,8 @@ class _HomeScreenState extends State<HomeScreen>
                   child: LiveEndPopup(
                     roomId: agoraToken.mainId ?? '',
                     userId: prefs.getString(PrefsKey.userId) ?? '',
-                    liveTimeInSec: differenceInSeconds,
+                    startTime: startTime ?? DateTime.now(),
+                    liveRoomExitModel: liveRoomExitModel,
                   ),
                 );
               },
@@ -210,7 +217,8 @@ class _HomeScreenState extends State<HomeScreen>
                   child: CircularProgressIndicator(),
                 )
               : IconButton(
-                  onPressed: apiCallProvider.status == ApiStatus.loading
+                  onPressed: apiCallProvider.status == ApiStatus.loading ||
+                          !isButtonActive
                       ? null
                       : () {
                           getAgoraToken(context);

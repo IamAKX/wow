@@ -111,7 +111,9 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        Navigator.pop(context);
+                      },
                       icon: const Icon(
                         Icons.chevron_left,
                         color: Colors.black,

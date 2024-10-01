@@ -36,6 +36,7 @@ class _BackgroundDetectorState extends State<BackgroundDetector>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     log('App closed');
+
     super.dispose();
   }
 

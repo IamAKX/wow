@@ -1,5 +1,6 @@
 package com.live.worldsocialintegrationapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,8 @@ public class MainActivity extends FlutterActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        Intent intent = new Intent(this, AppClearService.class);
+        startService(intent);
     }
 
     @Override

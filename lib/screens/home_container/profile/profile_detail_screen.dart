@@ -579,7 +579,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           horizontalGap(5),
-                          const Text('10188\nindia'),
+                          Text('${user?.username}\n${user?.country}'),
                           horizontalGap(10),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -608,21 +608,22 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             ),
                           ),
                           horizontalGap(5),
-                          Image.asset(
-                            'assets/image/vip1img.png',
-                            width: 40,
-                          ),
-                          horizontalGap(5),
-                          Image.asset(
-                            'assets/image/dollarrr.png',
-                            width: 25,
-                          ),
-                          horizontalGap(10),
-                          Image.asset(
-                            'assets/image/microphoneicon.png',
-                            width: 40,
-                          ),
-                          horizontalGap(10),
+
+                          // Image.asset(
+                          //   'assets/image/vip1img.png',
+                          //   width: 40,
+                          // ),
+                          // horizontalGap(5),
+                          // Image.asset(
+                          //   'assets/image/dollarrr.png',
+                          //   width: 25,
+                          // ),
+                          // horizontalGap(10),
+                          // Image.asset(
+                          //   'assets/image/microphoneicon.png',
+                          //   width: 40,
+                          // ),
+
                           Container(
                             alignment: Alignment.centerRight,
                             height: 40,

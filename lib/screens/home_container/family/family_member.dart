@@ -108,7 +108,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '${member?.myLevel ?? ''}',
+                  '${member?.myExp ?? ''}',
                   style: TextStyle(fontSize: 10),
                 ),
                 horizontalGap(2),
@@ -130,39 +130,41 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
               },
               if ((member?.sendLevel ?? '0') != '0')
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                  decoration: const BoxDecoration(
-                      color: Color(0xFF0FDEA5),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  constraints: BoxConstraints(minWidth: 50),
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    image: DecorationImage(
+                        image: NetworkImage(
+                          member?.sandBgImage ?? '',
+                        ),
+                        fit: BoxFit.fill),
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        member?.gender?.toLowerCase() == 'male'
-                            ? Icons.male
-                            : Icons.female,
-                        color: Colors.white,
-                        size: 10,
+                      Image.asset(
+                        'assets/image/starlevel.png',
+                        width: 12,
                       ),
                       horizontalGap(5),
                       Text(
                         '${member?.sendLevel}',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
+                        style: TextStyle(color: Colors.white, fontSize: 12),
                       )
                     ],
                   ),
                 ),
-              horizontalGap(10),
+              if ((member?.sendLevel ?? '0') != '0') horizontalGap(10),
               if ((member?.reciveLevel ?? '0') != '0')
                 Container(
-                  constraints: const BoxConstraints(minWidth: 50),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                  decoration: const BoxDecoration(
+                  constraints: BoxConstraints(minWidth: 50),
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
                     image: DecorationImage(
-                        image: AssetImage(
-                          'assets/image/level_1.png',
+                        image: NetworkImage(
+                          member?.reciveBgImage ?? '',
                         ),
                         fit: BoxFit.fill),
                   ),
@@ -171,45 +173,20 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                     children: [
                       Image.asset(
                         'assets/image/coins_img.png',
-                        width: 10,
+                        width: 12,
                       ),
                       horizontalGap(5),
                       Text(
-                        '${member?.reciveLevel ?? '0'}',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
+                        member?.reciveLevel ?? '0',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       )
                     ],
                   ),
                 ),
-              horizontalGap(5),
-              Container(
-                constraints: const BoxConstraints(minWidth: 50),
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(
-                        'assets/image/level_9.png',
-                      ),
-                      fit: BoxFit.fill),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/image/coins_img.png',
-                      width: 10,
-                    ),
-                    horizontalGap(5),
-                    const Text(
-                      '22',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
-                    )
-                  ],
-                ),
-              )
+              if ((member?.reciveLevel ?? '0') != '0') horizontalGap(5),
             ],
           ),
         );
