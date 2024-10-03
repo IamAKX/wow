@@ -9,10 +9,12 @@ import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 
+import '../../../models/family_id_model.dart';
 import '../../../models/search_user_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
+import '../family/family_screen.dart';
 import '../profile/profile_detail_screen.dart';
 import '../user_detail_screen/other_user_detail_screen.dart';
 
@@ -157,14 +159,25 @@ class _SearchMemberState extends State<SearchMember> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       onTap: () {
-                        if (searchList.elementAt(index).id ==
-                            prefs.getString(PrefsKey.userId)) {
-                          Navigator.of(context, rootNavigator: true)
-                              .pushNamed(ProfileDeatilScreen.route);
-                        } else {
+                        if ((searchList.elementAt(index).familyId?.isNotEmpty ??
+                                false) &&
+                            (searchList.elementAt(index).username?.isEmpty ??
+                                false)) {
                           Navigator.of(context, rootNavigator: true).pushNamed(
-                              OtherUserDeatilScreen.route,
-                              arguments: searchList.elementAt(index).id);
+                              FamilyScreen.route,
+                              arguments: FamilyIdModel(
+                                  userId: user?.id,
+                                  familyId: searchList.elementAt(index).id));
+                        } else {
+                          if (searchList.elementAt(index).id ==
+                              prefs.getString(PrefsKey.userId)) {
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamed(ProfileDeatilScreen.route);
+                          } else {
+                            Navigator.of(context, rootNavigator: true)
+                                .pushNamed(OtherUserDeatilScreen.route,
+                                    arguments: searchList.elementAt(index).id);
+                          }
                         }
                       },
                       trailing: Row(

@@ -27,8 +27,8 @@ class LiveEndPopup extends StatefulWidget {
 
 class _LiveEndPopupState extends State<LiveEndPopup> {
   late ApiCallProvider apiCallProvider;
-  int total = 0;
-  int participants = 0;
+  String total = '0';
+  String participants = '0';
   final endTime = DateTime.now();
 
   @override

@@ -136,8 +136,10 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: const BoxDecoration(
-                        color: Color(0xFF0FDEA5),
+                    decoration: BoxDecoration(
+                        color: widget.liveRoomUserModel.gender == 'Male'
+                            ? Color(0xFF0FDEA5)
+                            : Color.fromARGB(255, 245, 97, 250),
                         borderRadius: BorderRadius.all(Radius.circular(20))),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -526,7 +528,7 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
       if (value['success'] == '1') {
         LiveroomChat liveroomChat = LiveroomChat(
             message:
-                '${widget.user?.name} kicked out ${widget.liveRoomUserModel.username}',
+                '@${widget.user?.name} kicked out @${widget.liveRoomUserModel.username}',
             timeStamp: DateTime.now().millisecondsSinceEpoch,
             userId: widget.user?.id,
             userImage: widget.user?.image,

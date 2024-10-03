@@ -61,6 +61,9 @@ class _ChatWindowState extends State<ChatWindow> {
     recorderController = RecorderController();
     // FirebaseDbService.updateOnlineStatus(
     //     widget.chatWindowDetails.currentUser?.id ?? '', 'Online');
+    Future.delayed(Duration(seconds: 2), () {
+      _scrollToBottom();
+    });
     database
         .ref(
             '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
@@ -196,7 +199,8 @@ class _ChatWindowState extends State<ChatWindow> {
                   setState(() {});
                   log('Recording file : $path');
                   if (path != null && path.isNotEmpty) {
-                    showSendAudioPopup(path, context);
+                    log('launching popup');
+                    showSendAudioPopup(path, navigatorKey.currentContext!);
                   }
                 },
                 child: IconButton(
@@ -435,9 +439,13 @@ class _ChatWindowState extends State<ChatWindow> {
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  gradient: const LinearGradient(
-                    colors: [Colors.deepOrange, Colors.yellow],
-                  ),
+                  gradient: (chat.isClaimed ?? true)
+                      ? LinearGradient(
+                          colors: [Colors.grey, Colors.grey.withOpacity(0.5)],
+                        )
+                      : const LinearGradient(
+                          colors: [Colors.deepOrange, Colors.yellow],
+                        ),
                 ),
               ),
             ))
@@ -589,7 +597,7 @@ class _ChatWindowState extends State<ChatWindow> {
                           : widget.chatWindowDetails.friendUser?.image ?? '',
                       diameter: 50),
                   horizontalGap(5),
-                  ChatAudioPlayer(url: chat.url ?? ''),
+                  Expanded(child: ChatAudioPlayer(url: chat.url ?? '')),
                 ],
               ),
             )),
@@ -684,7 +692,8 @@ class _ChatWindowState extends State<ChatWindow> {
   }
 
   void showSendAudioPopup(String audioPath, BuildContext context) async {
-    await controller.preparePlayer(
+    PlayerController controllerPopup = PlayerController();
+    await controllerPopup.preparePlayer(
       path: audioPath,
       shouldExtractWaveform: true,
       noOfSamples: 100,
@@ -714,12 +723,12 @@ class _ChatWindowState extends State<ChatWindow> {
                       isPlaying = true;
                     });
 
-                    controller.startPlayer(forceRefresh: true);
+                    controllerPopup.startPlayer(forceRefresh: true);
                   } else {
                     setState(() {
                       isPlaying = false;
                     });
-                    controller.pausePlayer();
+                    controllerPopup.pausePlayer();
                   }
                 },
                 child: isPlaying ? const Text('Pause') : const Text('Play'),
@@ -753,6 +762,7 @@ class _ChatWindowState extends State<ChatWindow> {
                         _scrollToBottom();
                       },
                     );
+                    controllerPopup.dispose();
                     Navigator.pop(context);
                   });
                 },

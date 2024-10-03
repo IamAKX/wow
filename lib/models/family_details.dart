@@ -16,10 +16,13 @@ class FamilyDetails {
   String? leaderImage;
   int? totalContribution;
   int? requestCount;
+  int? invitationCount;
+  int? totalCount;
   List<Joiner>? joiner;
   List<AllMembers>? allMembers;
   Family? family;
   int? totalExp;
+
 
   FamilyDetails(
       {this.id,
@@ -39,6 +42,8 @@ class FamilyDetails {
       this.leaderImage,
       this.totalContribution,
       this.requestCount,
+      this.invitationCount,
+      this.totalCount,
       this.joiner,
       this.allMembers,
       this.family,
@@ -62,6 +67,8 @@ class FamilyDetails {
     leaderImage = json['leaderImage'];
     totalContribution = json['totalContribution'];
     requestCount = json['request_count'];
+    invitationCount = json['invitation_count'];
+    totalCount = json['total_count'];
     if (json['joiner'] != null) {
       joiner = <Joiner>[];
       json['joiner'].forEach((v) {
@@ -97,6 +104,8 @@ class FamilyDetails {
     data['leaderImage'] = leaderImage;
     data['totalContribution'] = totalContribution;
     data['request_count'] = requestCount;
+    data['invitation_count'] = invitationCount;
+    data['total_count'] = totalCount;
     if (joiner != null) {
       data['joiner'] = joiner!.map((v) => v.toJson()).toList();
     }

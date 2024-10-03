@@ -584,8 +584,10 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 7, vertical: 3),
-                            decoration: const BoxDecoration(
-                                color: Color(0xFF0FDEA5),
+                            decoration: BoxDecoration(
+                                color: user?.gender == 'Male'
+                                    ? Color(0xFF0FDEA5)
+                                    : Color.fromARGB(255, 245, 97, 250),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20))),
                             child: Row(
@@ -614,11 +616,14 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           //   width: 40,
                           // ),
                           // horizontalGap(5),
-                          // Image.asset(
-                          //   'assets/image/dollarrr.png',
-                          //   width: 25,
-                          // ),
-                          // horizontalGap(10),
+                          if (user?.coinAgencyCreater ?? false) ...{
+                            Image.asset(
+                              'assets/image/dollarrr.png',
+                              width: 25,
+                              color: Color(0xFFFFD700),
+                            ),
+                            horizontalGap(10),
+                          },
                           // Image.asset(
                           //   'assets/image/microphoneicon.png',
                           //   width: 40,

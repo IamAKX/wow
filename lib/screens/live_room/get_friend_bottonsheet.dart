@@ -216,7 +216,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
       if (value['success'] == '1') {
         LiveroomChat liveroomChat = LiveroomChat(
             message:
-                '${user?.name ?? ''} sent gift to ${friend.username ?? ''}',
+                '@${user?.name ?? ''} sent gift to @${friend.username ?? ''}',
             timeStamp: DateTime.now().millisecondsSinceEpoch,
             userId: user?.id,
             userImage: user?.image,
@@ -253,7 +253,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
           if (value['success'] == '1') {
             LiveroomChat liveroomChat = LiveroomChat(
                 message:
-                    '${user?.name ?? ''} sent theme to ${friend.username ?? ''}',
+                    '@${user?.name ?? ''} sent theme to @${friend.username ?? ''}',
                 timeStamp: DateTime.now().millisecondsSinceEpoch,
                 userId: user?.id,
                 userImage: user?.image,
@@ -291,7 +291,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
       if (value['success'] == '1') {
         LiveroomChat liveroomChat = LiveroomChat(
             message:
-                '${user?.name ?? ''} sent theme to ${friend.username ?? ''}',
+                '@${user?.name ?? ''} sent theme to @${friend.username ?? ''}',
             timeStamp: DateTime.now().millisecondsSinceEpoch,
             userId: user?.id,
             userImage: user?.image,

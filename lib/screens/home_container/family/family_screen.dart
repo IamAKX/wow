@@ -304,8 +304,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         );
                       },
                       icon: Badge(
-                        isLabelVisible: (familyDetails?.requestCount ?? 0) > 0,
-                        label: Text('${familyDetails?.requestCount ?? 0}'),
+                        isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
+                        label: Text('${familyDetails?.totalCount ?? 0}'),
                         offset: const Offset(0, -10),
                         backgroundColor: Colors.red,
                         child: Image.asset(

@@ -286,8 +286,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.grey,
                 ),
                 onTap: () {
-                  Navigator.of(context, rootNavigator: true)
-                      .pushNamed(FamilyMedalScreen.route);
+                  // Navigator.of(context, rootNavigator: true)
+                  //     .pushNamed(FamilyMedalScreen.route);
                 },
               ),
               ListTile(
@@ -343,12 +343,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 20,
                 ),
                 trailing: Visibility(
-                  visible: (familyDetails?.requestCount ?? 0) > 0,
+                  visible: (familyDetails?.totalCount ?? 0) > 0,
                   child: CircleAvatar(
                     backgroundColor: Colors.red,
                     radius: 10,
                     child: Text(
-                      '${familyDetails?.requestCount ?? 0}',
+                      '${familyDetails?.totalCount ?? 0}',
                       style: TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),

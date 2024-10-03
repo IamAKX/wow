@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../utils/helpers.dart';
+
 class FamilyRule extends StatefulWidget {
   const FamilyRule({super.key});
   static const String route = '/familyRule';
@@ -60,16 +62,18 @@ class _FamilyRuleState extends State<FamilyRule> {
   ];
 
   List list = [
-    {'task': 'Login', 'points': '+20 per member per day'},
+    {'task': 'Login', 'points': '20 🔥 per person per day'},
     {
       'task': 'Every 10 minutes of Watching live',
-      'points': '+50 ,upto +250 per member per day'
+      'points': '+50 🔥, +250 🔥 per person per day'
     },
     {
       'task': 'Every 10 minutes of chatting on mic',
-      'points': '+150, upto +750 per member per day'
+      'points': '+150 🔥, +750 🔥 per person per day'
     },
-    {'task': 'Send gifts', 'points': '1 coin=1'},
+    {'task': 'Recharge', 'points': '10 🌕 = 1 🔥'},
+    {'task': 'Send gifts', 'points': '10 🌕 = 1 🔥'},
+    {'task': 'Receive gifts', 'points': '2 💎 = 1 🔥'},
   ];
   @override
   void dispose() {
@@ -131,7 +135,7 @@ class _FamilyRuleState extends State<FamilyRule> {
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Text(
                   'If a user quits a family, their family level remains the same, yet contribution will be reset;',
-                  style: TextStyle(color: Color(0xFFB0AFAF), fontSize: 14),
+                  style: TextStyle(fontSize: 14),
                 ),
               ),
             if (index == 9)
@@ -139,7 +143,7 @@ class _FamilyRuleState extends State<FamilyRule> {
                 padding: EdgeInsets.all(16),
                 child: Text(
                   'Users\' starting contribution level after joining the family is 0.',
-                  style: TextStyle(color: Color(0xFFB0AFAF), fontSize: 14),
+                  style: TextStyle(fontSize: 14),
                 ),
               ),
           ],
@@ -171,8 +175,8 @@ class _FamilyRuleState extends State<FamilyRule> {
                   'Tasks',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black,
                     fontSize: 16,
+                    color: Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -198,16 +202,20 @@ class _FamilyRuleState extends State<FamilyRule> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     '${item['task']}',
-                    style:
-                        const TextStyle(color: Color(0xFFB0AFAF), fontSize: 14),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.green,
+                    ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    '${item['points']}',
-                    style:
-                        const TextStyle(color: Color(0xFFB0AFAF), fontSize: 14),
+                  child: RichText(
+                    text: TextSpan(
+                      children: getPurpleDigitsTextSpans('${item['points']}'),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],

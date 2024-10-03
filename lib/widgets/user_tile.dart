@@ -31,19 +31,21 @@ class UserTile extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: const BoxDecoration(
-                color: Color(0xFF0FDEA5),
+            decoration: BoxDecoration(
+                color: visitorModel.gender == 'Male'
+                    ? Color(0xFF0FDEA5)
+                    : Color.fromARGB(255, 245, 97, 250),
                 borderRadius: BorderRadius.all(Radius.circular(20))),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                 Icon(
-                 visitorModel.gender == 'Male'? Icons.male : Icons.female,
+                Icon(
+                  visitorModel.gender == 'Male' ? Icons.male : Icons.female,
                   color: Colors.white,
                   size: 12,
                 ),
                 horizontalGap(5),
-                 Text(
+                Text(
                   '${visitorModel.age}',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )

@@ -136,9 +136,10 @@ class _CreateEventOneState extends State<CreateEventOne> {
           minLines: 3,
           maxLines: 3,
           textInputAction: TextInputAction.done,
-          enabled: createEvent.event_Type == 'Themed',
+          readOnly: createEvent.event_Type != 'Themed',
           textAlign: TextAlign.center,
           textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(color: Colors.black),
           decoration: InputDecoration(
             hintText: createEvent.event_Type,
             border: InputBorder.none,

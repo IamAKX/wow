@@ -191,7 +191,7 @@ Map<int, LiveRoomUserModel?> convertToHotSeat(Map<String, Object?> inputMap) {
   });
 }
 
-String formatDiamondNumber(int number) {
+String formatDiamondNumber(double number) {
   if (number >= 1000000) {
     // Format numbers in millions
     return (number / 1000000).toStringAsFixed(1) + 'M';
@@ -300,4 +300,79 @@ String formatDuration(int seconds) {
   String secs = twoDigits(duration.inSeconds.remainder(60));
 
   return '$hours:$minutes:$secs';
+}
+
+List<TextSpan> getMentionTextSpans(String text) {
+  List<TextSpan> spans = [];
+  RegExp mentionRegExp = RegExp(r'@\w+');
+  final matches = mentionRegExp.allMatches(text);
+
+  int lastMatchEnd = 0;
+  for (var match in matches) {
+    // Add non-mentioned text
+    if (match.start > lastMatchEnd) {
+      spans.add(TextSpan(
+        text: text.substring(lastMatchEnd, match.start),
+        style: TextStyle(color: Colors.white),
+      ));
+    }
+
+    // Add the mentioned text
+    spans.add(
+      TextSpan(
+        text: match.group(0), // the @username
+        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+      ),
+    );
+
+    lastMatchEnd = match.end;
+  }
+
+  // Add any remaining text after the last match
+  if (lastMatchEnd < text.length) {
+    spans.add(TextSpan(
+      text: text.substring(lastMatchEnd),
+      style: TextStyle(color: Colors.white),
+    ));
+  }
+
+  return spans;
+}
+
+// Function to find and style digits in purple
+List<TextSpan> getPurpleDigitsTextSpans(String text) {
+  List<TextSpan> spans = [];
+  RegExp digitRegExp = RegExp(r'\d'); // Regular expression to match digits
+  final matches = digitRegExp.allMatches(text);
+
+  int lastMatchEnd = 0;
+  for (var match in matches) {
+    // Add non-digit text before the digit
+    if (match.start > lastMatchEnd) {
+      spans.add(TextSpan(
+        text: text.substring(lastMatchEnd, match.start),
+        style: TextStyle(color: Colors.black, fontSize: 14),
+      ));
+    }
+
+    // Add the digit with purple color
+    spans.add(TextSpan(
+      text: match.group(0), // the digit
+
+      style: TextStyle(
+          color: Colors.purple, fontSize: 14, fontWeight: FontWeight.bold),
+    ));
+
+    lastMatchEnd = match.end;
+  }
+
+  // Add remaining non-digit text after the last match
+  if (lastMatchEnd < text.length) {
+    spans.add(TextSpan(
+      text: text.substring(lastMatchEnd),
+      style: TextStyle(color: Colors.black, fontSize: 14),
+    ));
+  }
+
+  return spans;
 }

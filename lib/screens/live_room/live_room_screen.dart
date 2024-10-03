@@ -834,8 +834,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   Visibility musicPlayerButton(BuildContext context) {
     return Visibility(
-      visible:
-          ((widget.agoraToken.isSelfCreated ?? false) && isMusicWidgetVisible),
+      visible: ((widget.agoraToken.isSelfCreated ?? false) &&
+              isMusicWidgetVisible) ||
+          ((adminList.contains(user?.id)) && isMusicWidgetVisible),
       child: Positioned(
         right: 10,
         bottom: MediaQuery.of(context).size.height * 0.3,
@@ -1497,10 +1498,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           Container(
             constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.55),
-            child: Text(
-              '${chatContent.userName} : ${chatContent.message}',
-              style: const TextStyle(color: Colors.white),
-            ),
+            child: RichText(
+                text: TextSpan(
+                    children: getMentionTextSpans(
+                        '${chatContent.userName} : ${chatContent.message}'))),
           ),
         ],
       ),
@@ -1791,7 +1792,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     padding: const EdgeInsets.all(0),
                     backgroundColor: Colors.transparent,
                     label: Text(
-                      '${formatDiamondNumber(totalDiamond)}',
+                      '${formatDiamondNumber(double.parse('$totalDiamond'))}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -1908,13 +1909,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     context: context,
                     isScrollControlled: true,
                     builder: (context) => LiveUserBottomSheet(
-                      roomDetail: roomDetail ??
-                          JoinableLiveRoomModel(
-                            id: widget.agoraToken.mainId,
-                          ),
-                      participants: List.from(participants),
-                      hotSeatMap: hotSeatMap,
-                    ),
+                        roomDetail: roomDetail ??
+                            JoinableLiveRoomModel(
+                              id: widget.agoraToken.mainId,
+                            ),
+                        participants: List.from(participants),
+                        hotSeatMap: hotSeatMap,
+                        adminList: adminList),
                   );
                 },
                 child: Theme(
@@ -2061,7 +2062,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
               (adminList.contains(user?.id)),
           child: InkWell(
             onTap: () {
-              showAllMenu(context);
+              if (adminList.contains(user?.id)) {
+                showAllMenuForSecondaryAdmin(context);
+              } else {
+                showAllMenu(context);
+              }
             },
             child: const CircleAvatar(
               backgroundColor: Colors.black,
@@ -2156,8 +2161,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     );
   }
 
-  void showPositionForHostKickoutPopup(
-      BuildContext context, int position, bool isLocked) {
+  Future<void> showPositionForHostKickoutPopup(
+      BuildContext context, int position, bool isLocked) async {
+    AdminLiveRoomControls? joinerSettings =
+        await LiveRoomFirebase.getLiveRoomAdminSettings(
+            widget.agoraToken.mainId ?? '', hotSeatMap[position + 1]?.id ?? '');
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -2180,7 +2188,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 },
               ),
               ListTile(
-                title: const Text('Toggle Mic Mute'),
+                title: Text(
+                    (joinerSettings?.isMicMute ?? false) ? 'Unmute' : 'Mute'),
                 onTap: () async {
                   AdminLiveRoomControls? settings =
                       await LiveRoomFirebase.getLiveRoomAdminSettings(
@@ -2223,7 +2232,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
                       LiveroomChat liveroomChat = LiveroomChat(
                           message:
-                              '${user?.name} kicked out ${hotSeatMap[position + 1]?.username}',
+                              '@${user?.name} kicked out @${hotSeatMap[position + 1]?.username}',
                           timeStamp: DateTime.now().millisecondsSinceEpoch,
                           userId: user?.id,
                           userImage: user?.image,
@@ -2523,6 +2532,85 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                             getMenuItem('assets/image/music_icon.png', 'Music'),
                       ),
                     ),
+                    const Expanded(child: SizedBox.shrink()),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showAllMenuForSecondaryAdmin(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          showDialog(
+                            context: context,
+                            builder: (context) => CleanChatRoom(
+                              chatRoomId: widget.agoraToken.mainId ?? '',
+                              chat: LiveroomChat(
+                                  message: 'Chat cleaned',
+                                  timeStamp:
+                                      DateTime.now().millisecondsSinceEpoch,
+                                  userId: user?.id,
+                                  userImage: user?.image,
+                                  userName: user?.name),
+                            ),
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/brush.png', 'Clean Chat'),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          showModalBottomSheet(
+                            context: context,
+                            isDismissible: false,
+                            showDragHandle: false,
+                            isScrollControlled: true, // To enable custom height
+                            builder: (context) => MusicBottomsheet(
+                              roomId: widget.agoraToken.mainId ?? '',
+                            ),
+                          ).then(
+                            (value) async {
+                              // if (prefs.containsKey(PrefsKey.musicPlaying)) {
+                              //   String musicPath = await prefs
+                              //           .getString(PrefsKey.musicPlaying) ??
+                              //       '';
+                              //   if (musicPath.isNotEmpty) {
+                              //     _playAudio(musicPath);
+                              //   }
+                              // }
+                            },
+                          );
+                        },
+                        child:
+                            getMenuItem('assets/image/music_icon.png', 'Music'),
+                      ),
+                    ),
+                    const Expanded(child: SizedBox.shrink()),
+                    const Expanded(child: SizedBox.shrink()),
                     const Expanded(child: SizedBox.shrink()),
                   ],
                 ),

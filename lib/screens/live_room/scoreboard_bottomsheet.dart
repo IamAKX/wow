@@ -67,21 +67,23 @@ class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
               Container(
                 padding: const EdgeInsets.all(10),
                 color: const Color(0xFFC39955),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                    ),
-                    Spacer(),
-                    Text(
+                    InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.white,
+                        )),
+                    const Spacer(),
+                    const Text(
                       'History',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ),
@@ -112,17 +114,17 @@ class _ScoreboardBottomsheetState extends State<ScoreboardBottomsheet> {
                                     horizontalGap(20),
                                     Text(
                                       list.elementAt(index).senderName ?? '',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
                                     const Spacer(),
                                     Image.asset('assets/image/diamond.png'),
                                     horizontalGap(5),
                                     Text(
-                                      formatDiamondNumber(int.parse(
+                                      formatDiamondNumber(double.parse(
                                           list.elementAt(index).diamond ??
                                               '0')),
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
                                     horizontalGap(10),

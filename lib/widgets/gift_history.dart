@@ -88,7 +88,7 @@ class _GiftStatsHistoryState extends State<GiftStatsHistory> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    formatDiamondNumber(int.parse(
+                                    formatDiamondNumber(double.parse(
                                         list.elementAt(index).diamond ?? '0')),
                                     style: const TextStyle(
                                         color: Colors.pink,
@@ -105,8 +105,13 @@ class _GiftStatsHistoryState extends State<GiftStatsHistory> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 7, vertical: 3),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xFF0FDEA5),
+                                  decoration: BoxDecoration(
+                                      color: list
+                                                  .elementAt(index)
+                                                  .senderGender ==
+                                              'Male'
+                                          ? Color(0xFF0FDEA5)
+                                          : Color.fromARGB(255, 245, 97, 250),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(20))),
                                   child: Row(
@@ -161,7 +166,7 @@ class _GiftStatsHistoryState extends State<GiftStatsHistory> {
                         ),
                         horizontalGap(4),
                         Text(
-                          formatDiamondNumber(int.parse(total)),
+                          formatDiamondNumber(double.parse(total)),
                           style: const TextStyle(
                             color: Colors.pink,
                             fontSize: 16,

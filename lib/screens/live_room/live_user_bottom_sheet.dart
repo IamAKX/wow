@@ -11,11 +11,13 @@ class LiveUserBottomSheet extends StatefulWidget {
       {super.key,
       required this.roomDetail,
       required this.participants,
-      required this.hotSeatMap});
+      required this.hotSeatMap,
+      required this.adminList});
   final JoinableLiveRoomModel roomDetail;
 
   final List<LiveRoomUserModel> participants;
   final Map<int, LiveRoomUserModel> hotSeatMap;
+  final List<String> adminList;
 
   @override
   State<LiveUserBottomSheet> createState() => _LiveUserBottomSheetState();
@@ -24,10 +26,16 @@ class LiveUserBottomSheet extends StatefulWidget {
 class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
   @override
   Widget build(BuildContext context) {
-    LiveRoomUserModel owner = widget.participants.firstWhere((element) {
-      return element.id == widget.roomDetail.userId;
-    });
-    widget.participants.remove(owner);
+    List<LiveRoomUserModel> ownerList = widget.participants.where((element) {
+      return element.id == widget.roomDetail.userId ||
+          widget.adminList.contains(element.id);
+    }).toList();
+
+    List<LiveRoomUserModel> joinerList = widget.participants.where((element) {
+      return element.id != widget.roomDetail.userId &&
+          !widget.adminList.contains(element.id);
+    }).toList();
+
     return FractionallySizedBox(
       heightFactor: 0.7, // Set height to 60% of screen height
       child: Container(
@@ -51,7 +59,7 @@ class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
                   ),
                   const Spacer(),
                   Text(
-                    '${widget.participants.length + 1} people online',
+                    '${widget.participants.length} people online',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
@@ -61,7 +69,17 @@ class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
             ),
             verticalGap(5),
             Text('    Homeowner'),
-            getMemberList(owner, context),
+            ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  LiveRoomUserModel visitorModel = ownerList.elementAt(index);
+                  return getMemberList(visitorModel, context);
+                },
+                separatorBuilder: (context, index) => Divider(
+                      color: Colors.grey,
+                    ),
+                itemCount: ownerList.length),
             Divider(
               color: Colors.grey,
             ),
@@ -71,13 +89,13 @@ class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
               child: ListView.separated(
                   itemBuilder: (context, index) {
                     LiveRoomUserModel visitorModel =
-                        widget.participants.elementAt(index);
+                        joinerList.elementAt(index);
                     return getMemberList(visitorModel, context);
                   },
                   separatorBuilder: (context, index) => Divider(
                         color: Colors.grey,
                       ),
-                  itemCount: widget.participants.length),
+                  itemCount: joinerList.length),
             )
           ],
         ),
@@ -100,8 +118,10 @@ class _LiveUserBottomSheetState extends State<LiveUserBottomSheet> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: const BoxDecoration(
-                color: Color(0xFF0FDEA5),
+            decoration: BoxDecoration(
+                color: visitorModel?.gender == 'Male'
+                    ? Color(0xFF0FDEA5)
+                    : Color.fromARGB(255, 245, 97, 250),
                 borderRadius: BorderRadius.all(Radius.circular(20))),
             child: Row(
               mainAxisSize: MainAxisSize.min,
