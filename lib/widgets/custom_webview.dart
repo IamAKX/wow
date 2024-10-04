@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class CustomWebview extends StatefulWidget {
@@ -40,17 +42,31 @@ class _CustomWebviewState extends State<CustomWebview> {
             if (request.url.startsWith(widget.url)) {
               return NavigationDecision.prevent;
             }
+            _launchURL(request.url);
             return NavigationDecision.navigate;
           },
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+
     // #enddocregion webview_controller
   }
 
   @override
   Widget build(BuildContext context) {
     log('webview loading : ${widget.url}');
-    return SafeArea(child: WebViewWidget(controller: controller));
+    return SafeArea(
+      child: WebViewWidget(
+        controller: controller,
+      ),
+    );
+  }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

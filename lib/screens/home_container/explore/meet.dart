@@ -105,22 +105,32 @@ class _MeetScreenState extends State<MeetScreen> {
             color: Colors.black,
           ),
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.person,
-              color: Colors.grey,
-              size: 18,
-            ),
-            Text(
-              meet.receiverId ?? '',
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: meet.gender == 'Male'
+                ? Color(0xFF0FDEA5)
+                : Color.fromARGB(255, 245, 97, 250),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                meet.gender == 'Male' ? Icons.male : Icons.female,
+                color: Colors.white,
+                size: 12,
               ),
-            ),
-          ],
+              horizontalGap(2),
+              Text(
+                meet.age ?? '',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

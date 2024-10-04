@@ -5,11 +5,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:provider/provider.dart';
+import 'package:svgaplayer_flutter_rhr/player.dart';
 import 'package:worldsocialintegrationapp/main.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
+import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 import 'package:worldsocialintegrationapp/widgets/wheel.dart';
 import 'package:kbspinningwheel/kbspinningwheel.dart';
 import '../../../models/spin_data_model.dart';
@@ -281,8 +283,6 @@ class _DailySpinScreenState extends State<DailySpinScreen> {
     publishSpinResult(
       result,
     );
-
-    showWinninDialog(context, result);
   }
 
   publishSpinResult(SpinDataModel result) async {
@@ -294,6 +294,11 @@ class _DailySpinScreenState extends State<DailySpinScreen> {
     await apiCallProvider.postRequest(API.hitSpinWheel, reqBody).then((value) {
       if (value['message'] != null) {
         showToastMessage(value['message']);
+        if (['1', '2'].contains(result.typeId)) {
+          showWinninDialog(context, result);
+        } else {
+          showSVGAWinningDialog(context, result, value);
+        }
       }
     });
   }
@@ -323,5 +328,66 @@ class _DailySpinScreenState extends State<DailySpinScreen> {
         _wheelNotifier.sink.add(_generateRandomVelocity());
       }
     });
+  }
+
+  void showSVGAWinningDialog(
+      BuildContext context, SpinDataModel result, Map value) {
+    String url = value['details']['gift'];
+    if (result.typeId == '3' || result.typeId == '4') {
+      if (value['details']['frame'] != '') {
+        url = '${API.baseUrl}/${value['details']['frame']}';
+      } else {
+        url = value['details']['entryEffect'];
+      }
+    }
+    debugPrint('url = $url');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: (result.typeId == '3' || result.typeId == '4')
+                    ? SVGASimpleImage(
+                        resUrl: url,
+                      )
+                    : Image.network(url),
+              ),
+              verticalGap(10),
+              Text('Congratulations'),
+              verticalGap(5),
+              Text('you Won ${result.header ?? ''} ${result.subtitle ?? ''}'),
+              verticalGap(10),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'OK',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFF3488D5),
+                        Color(0xFFEA0A8A),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }

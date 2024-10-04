@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
@@ -398,10 +399,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.chevron_right,
                   color: Colors.grey,
                 ),
-                onTap: () => Navigator.of(context, rootNavigator: true).pushNamed(
-                    CustomWebview.route,
-                    arguments:
-                        'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}'),
+                // onTap: () =>
+                //     Navigator.of(context, rootNavigator: true).pushNamed(
+                //   CustomWebview.route,
+                //   // arguments: 'https://www5.lunapic.com/editor/?action=convert'
+                //   arguments:
+                //       'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}',
+                // ),
+                onTap: () {
+                  _openNativeWebView('https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}');
+                },
               ),
               ListTile(
                 leading: Image.asset(
@@ -553,5 +560,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
 
     log('frame = ${frame}');
+  }
+
+  static const platform = MethodChannel('com.example.webview/native');
+  Future<void> _openNativeWebView(String url) async {
+    try {
+      await platform.invokeMethod('openWebView', {'url': url});
+    } on PlatformException catch (e) {
+      print("Failed to open WebView: '${e.message}'.");
+    }
   }
 }

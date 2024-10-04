@@ -409,22 +409,16 @@ class _ChatWindowState extends State<ChatWindow> {
                         'userId': prefs.getString(PrefsKey.userId)
                       };
                       chat.isClaimed = true;
+                      FirebaseDbService.updateChat(
+                          widget.chatWindowDetails.chatWindowId ?? '', chat);
                       await apiCallProvider
                           .postRequest(API.claim_garage, reqBody)
                           .then(
                         (value) {
                           showToastMessage(value['message']);
-                          if (value['success'] == '1') {
-                            FirebaseDbService.updateChat(
-                                    widget.chatWindowDetails.chatWindowId ?? '',
-                                    chat)
-                                .then(
-                              (value) {
-                                textCtrl.text = '';
-                                _scrollToBottom();
-                              },
-                            );
-                          }
+
+                          textCtrl.text = '';
+                          _scrollToBottom();
                         },
                       );
                     },

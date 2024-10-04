@@ -6,6 +6,7 @@ import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../main.dart';
+import '../../models/generate_order_model.dart';
 import '../../models/user_profile_detail.dart';
 import '../../models/wallet_model.dart';
 import '../../providers/api_call_provider.dart';
@@ -51,11 +52,12 @@ class _CoinsState extends State<Coins> {
     debugPrint('paymentId details : ${response.paymentId}');
     debugPrint('signature details : ${response.signature}');
     showToastMessage('Payment Successful: ${response.paymentId}');
-    orderIdGenerate();
+    purchaseCoin(response);
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    showToastMessage('Payment Failed: ${response.code} - ${response.message}');
+    showToastMessage(
+        'Payment Failed: ${response.error?['code']} - ${response.error?['reason']}');
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -145,8 +147,8 @@ class _CoinsState extends State<Coins> {
             itemBuilder: (BuildContext context, int index) {
               return InkWell(
                 onTap: () {
-                  initiateRazorPayPayment(
-                      coins.elementAt(index).moneyValue ?? '0');
+                  selectedAmount = coins.elementAt(index).id ?? '0';
+                  orderIdGenerate(coins.elementAt(index).moneyValue ?? '0');
                 },
                 child: Card(
                   child: Padding(
@@ -182,12 +184,15 @@ class _CoinsState extends State<Coins> {
     );
   }
 
-  void initiateRazorPayPayment(String amount) {
-    selectedAmount = amount;
+  void initiateRazorPayPayment(
+    String amount,
+    GenerateOrderModel? generateOrderModel,
+  ) {
     var options = {
-      'key': 'rzp_test_usEmd5LTJQKCTA',
+      'key': generateOrderModel?.key ?? 'rzp_test_usEmd5LTJQKCTA',
       'amount': '${amount}00',
       'name': user?.name ?? '',
+      'order_id': generateOrderModel?.orderId ?? '',
       'description': 'Requesting for withdrawl from ${user?.username}',
       'prefill': {'contact': '${user?.phone}', 'email': '${user?.email}'},
       'external': {
@@ -213,15 +218,38 @@ class _CoinsState extends State<Coins> {
     });
   }
 
-  void orderIdGenerate() async {
-    Map<String, dynamic> reqBody = {'amount': selectedAmount};
+  GenerateOrderModel? generateOrderModel;
+  void orderIdGenerate(String amount) async {
+    Map<String, dynamic> reqBody = {'amount': amount};
 
     await apiCallProvider
         .postRequest(API.orderIdGenerate, reqBody)
         .then((value) {
-      if (value['details'] != null) {
-        walletModel = WalletModel.fromJson(value['details'][0]);
+      if (value['success'] == '1') {
+        generateOrderModel = GenerateOrderModel.fromJson(value);
         setState(() {});
+        initiateRazorPayPayment(amount, generateOrderModel);
+      }
+    });
+  }
+
+  purchaseCoin(PaymentSuccessResponse response) async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'wallet_amount': selectedAmount,
+      'razorpay_order_id': response.orderId,
+      'razorpay_payment_id': response.paymentId,
+      'razorpay_signature': response.signature
+    };
+
+    await apiCallProvider
+        .postRequest(API.purchaseGoldCoins, reqBody)
+        .then((value) {
+      if (value['success'] == '1') {
+        setState(() {});
+        getWalletDetails();
+        getCoins();
+        loadUserData();
       }
     });
   }

@@ -489,10 +489,10 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 7, vertical: 3),
-                      decoration:  BoxDecoration(
-                            color: otherUser?.gender == 'Male'
-                                    ? Color(0xFF0FDEA5)
-                                    : Color.fromARGB(255, 245, 97, 250),
+                      decoration: BoxDecoration(
+                          color: otherUser?.gender == 'Male'
+                              ? Color(0xFF0FDEA5)
+                              : Color.fromARGB(255, 245, 97, 250),
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -606,7 +606,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                 child: Row(
                   children: [
                     Text(
-                      'ID:126357',
+                      'ID:${otherUser?.username ?? ''}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -619,7 +619,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                       color: Colors.white,
                     ),
                     Text(
-                      'India',
+                      '${otherUser?.country ?? ''}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -632,25 +632,51 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                       color: Colors.white,
                     ),
                     Text(
-                      'Fans:150',
+                      'Fans:${otherUser?.followersCount ?? ''}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      width: 1,
-                      height: 10,
-                      color: Colors.white,
-                    ),
-                    Text(
-                      '3w ago',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: 10),
+                    //   width: 1,
+                    //   height: 10,
+                    //   color: Colors.white,
+                    // ),
+                    // Text(
+                    //   'Following:${otherUser?.followingCount ?? ''}',
+                    //   style: TextStyle(
+                    //     color: Colors.white,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: 5),
+                    //   width: 1,
+                    //   height: 10,
+                    //   color: Colors.white,
+                    // ),
+                    // Text(
+                    //   'Visitor:${otherUser?.visitorsCount ?? ''}',
+                    //   style: TextStyle(
+                    //     color: Colors.white,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: 5),
+                    //   width: 1,
+                    //   height: 10,
+                    //   color: Colors.white,
+                    // ),
+                    // Text(
+                    //   'Friends:${otherUser?.friendsCount ?? ''}',
+                    //   style: TextStyle(
+                    //     color: Colors.white,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                   ],
                 ),
               )

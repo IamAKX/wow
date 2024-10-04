@@ -468,8 +468,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
     await apiCallProvider
         .postRequest(API.exchangeCoins, reqBody)
         .then((value) async {
+      showToastMessage(value['message'] ?? '');
       if (value['status'] == '1') {
-        showToastMessage(value['message']);
         editingController.text = '';
         await getWalletDetail();
         setState(() {});

@@ -279,6 +279,7 @@ class NavRoute {
             builder: (_) => CustomWebview(
                   url: settings.arguments as String,
                 ));
+     
       case GiftWallMore.route:
         return MaterialPageRoute(builder: (_) => const GiftWallMore());
       case GiftWall.route:

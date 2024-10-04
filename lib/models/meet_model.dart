@@ -74,6 +74,11 @@ class MeetModel {
   String? fixedCoins;
   String? friendsLimit;
   String? followingLimit;
+  String? isVipOneEnable;
+  String? isVipTwoEnable;
+  String? isVipThreeEnable;
+  String? isVipFourEnable;
+  String? isVipFiveEnable;
   String? imageDp;
 
   MeetModel(
@@ -152,6 +157,11 @@ class MeetModel {
       this.fixedCoins,
       this.friendsLimit,
       this.followingLimit,
+      this.isVipOneEnable,
+      this.isVipTwoEnable,
+      this.isVipThreeEnable,
+      this.isVipFourEnable,
+      this.isVipFiveEnable,
       this.imageDp});
 
   MeetModel.fromJson(Map<String, dynamic> json) {
@@ -230,87 +240,97 @@ class MeetModel {
     fixedCoins = json['fixed_coins'];
     friendsLimit = json['friendsLimit'];
     followingLimit = json['followingLimit'];
+    isVipOneEnable = json['isVipOneEnable'];
+    isVipTwoEnable = json['isVipTwoEnable'];
+    isVipThreeEnable = json['isVipThreeEnable'];
+    isVipFourEnable = json['isVipFourEnable'];
+    isVipFiveEnable = json['isVipFiveEnable'];
     imageDp = json['imageDp'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['diamond'] = diamond;
-    data['receiverId'] = receiverId;
-    data['id'] = id;
-    data['name'] = name;
-    data['username'] = username;
-    data['familyId'] = familyId;
-    data['phone'] = phone;
-    data['facebookUserName'] = facebookUserName;
-    data['email'] = email;
-    data['host_status'] = hostStatus;
-    data['social_id'] = socialId;
-    data['fb_social_id'] = fbSocialId;
-    data['snap_social_id'] = snapSocialId;
-    data['myExp'] = myExp;
-    data['myRecieveExperience'] = myRecieveExperience;
-    data['vipLevel'] = vipLevel;
-    data['vipFrom'] = vipFrom;
-    data['vipTo'] = vipTo;
-    data['myLevel'] = myLevel;
-    data['receivingLevel'] = receivingLevel;
-    data['myCoin'] = myCoin;
-    data['myDiamond'] = myDiamond;
-    data['totalSendDiamond'] = totalSendDiamond;
-    data['myRecievedDiamond'] = myRecievedDiamond;
-    data['dob'] = dob;
-    data['bio'] = bio;
-    data['Country'] = country;
-    data['continent'] = continent;
-    data['country_showUnshow'] = countryShowUnshow;
-    data['myFrame'] = myFrame;
-    data['myGallery'] = myGallery;
-    data['myLuckyId'] = myLuckyId;
-    data['myTheme'] = myTheme;
-    data['myTheme_type'] = myThemeType;
-    data['email_verified_at'] = emailVerifiedAt;
-    data['password'] = password;
-    data['salt'] = salt;
-    data['is_admin'] = isAdmin;
-    data['image'] = image;
-    data['lang_id'] = langId;
-    data['age'] = age;
-    data['gender'] = gender;
-    data['dev_id'] = devId;
-    data['reg_id'] = regId;
-    data['latitude'] = latitude;
-    data['longitude'] = longitude;
-    data['dev_type'] = devType;
-    data['remember_token'] = rememberToken;
-    data['loginOtp'] = loginOtp;
-    data['login_type'] = loginType;
-    data['registerType'] = registerType;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
-    data['phoneUpOtp'] = phoneUpOtp;
-    data['eventId'] = eventId;
-    data['isEventCreater'] = isEventCreater;
-    data['isEventSubscriber'] = isEventSubscriber;
-    data['isFamilyLeader'] = isFamilyLeader;
-    data['isFamilyMember'] = isFamilyMember;
-    data['monthlyCoins'] = monthlyCoins;
-    data['hoursLive'] = hoursLive;
-    data['talent_level'] = talentLevel;
-    data['basicSalary'] = basicSalary;
-    data['userBanStatus'] = userBanStatus;
-    data['idBannedFrom'] = idBannedFrom;
-    data['idBannedTo'] = idBannedTo;
-    data['liveStatus'] = liveStatus;
-    data['Liveimage'] = liveimage;
-    data['imageText'] = imageText;
-    data['imageTitle'] = imageTitle;
-    data['fixed_valid_day'] = fixedValidDay;
-    data['fixed_minutes'] = fixedMinutes;
-    data['fixed_coins'] = fixedCoins;
-    data['friendsLimit'] = friendsLimit;
-    data['followingLimit'] = followingLimit;
-    data['imageDp'] = imageDp;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['diamond'] = this.diamond;
+    data['receiverId'] = this.receiverId;
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['username'] = this.username;
+    data['familyId'] = this.familyId;
+    data['phone'] = this.phone;
+    data['facebookUserName'] = this.facebookUserName;
+    data['email'] = this.email;
+    data['host_status'] = this.hostStatus;
+    data['social_id'] = this.socialId;
+    data['fb_social_id'] = this.fbSocialId;
+    data['snap_social_id'] = this.snapSocialId;
+    data['myExp'] = this.myExp;
+    data['myRecieveExperience'] = this.myRecieveExperience;
+    data['vipLevel'] = this.vipLevel;
+    data['vipFrom'] = this.vipFrom;
+    data['vipTo'] = this.vipTo;
+    data['myLevel'] = this.myLevel;
+    data['receivingLevel'] = this.receivingLevel;
+    data['myCoin'] = this.myCoin;
+    data['myDiamond'] = this.myDiamond;
+    data['totalSendDiamond'] = this.totalSendDiamond;
+    data['myRecievedDiamond'] = this.myRecievedDiamond;
+    data['dob'] = this.dob;
+    data['bio'] = this.bio;
+    data['Country'] = this.country;
+    data['continent'] = this.continent;
+    data['country_showUnshow'] = this.countryShowUnshow;
+    data['myFrame'] = this.myFrame;
+    data['myGallery'] = this.myGallery;
+    data['myLuckyId'] = this.myLuckyId;
+    data['myTheme'] = this.myTheme;
+    data['myTheme_type'] = this.myThemeType;
+    data['email_verified_at'] = this.emailVerifiedAt;
+    data['password'] = this.password;
+    data['salt'] = this.salt;
+    data['is_admin'] = this.isAdmin;
+    data['image'] = this.image;
+    data['lang_id'] = this.langId;
+    data['age'] = this.age;
+    data['gender'] = this.gender;
+    data['dev_id'] = this.devId;
+    data['reg_id'] = this.regId;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
+    data['dev_type'] = this.devType;
+    data['remember_token'] = this.rememberToken;
+    data['loginOtp'] = this.loginOtp;
+    data['login_type'] = this.loginType;
+    data['registerType'] = this.registerType;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['phoneUpOtp'] = this.phoneUpOtp;
+    data['eventId'] = this.eventId;
+    data['isEventCreater'] = this.isEventCreater;
+    data['isEventSubscriber'] = this.isEventSubscriber;
+    data['isFamilyLeader'] = this.isFamilyLeader;
+    data['isFamilyMember'] = this.isFamilyMember;
+    data['monthlyCoins'] = this.monthlyCoins;
+    data['hoursLive'] = this.hoursLive;
+    data['talent_level'] = this.talentLevel;
+    data['basicSalary'] = this.basicSalary;
+    data['userBanStatus'] = this.userBanStatus;
+    data['idBannedFrom'] = this.idBannedFrom;
+    data['idBannedTo'] = this.idBannedTo;
+    data['liveStatus'] = this.liveStatus;
+    data['Liveimage'] = this.liveimage;
+    data['imageText'] = this.imageText;
+    data['imageTitle'] = this.imageTitle;
+    data['fixed_valid_day'] = this.fixedValidDay;
+    data['fixed_minutes'] = this.fixedMinutes;
+    data['fixed_coins'] = this.fixedCoins;
+    data['friendsLimit'] = this.friendsLimit;
+    data['followingLimit'] = this.followingLimit;
+    data['isVipOneEnable'] = this.isVipOneEnable;
+    data['isVipTwoEnable'] = this.isVipTwoEnable;
+    data['isVipThreeEnable'] = this.isVipThreeEnable;
+    data['isVipFourEnable'] = this.isVipFourEnable;
+    data['isVipFiveEnable'] = this.isVipFiveEnable;
+    data['imageDp'] = this.imageDp;
     return data;
   }
 }

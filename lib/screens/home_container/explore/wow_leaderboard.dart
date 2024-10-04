@@ -31,10 +31,12 @@ class _WowLeaderboardState extends State<WowLeaderboard>
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(
       () {
+        list.clear();
         loadWowLeaderboard(_tabController.index + 1);
       },
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      list.clear();
       loadWowLeaderboard(1);
     });
   }
@@ -44,6 +46,7 @@ class _WowLeaderboardState extends State<WowLeaderboard>
     list.clear();
     setState(() {});
     apiCallProvider.postRequest(API.getLeaderBoard, reqBody).then((value) {
+      list.clear();
       if (value['data'] != null) {
         for (var item in value['data']) {
           list.add(WowLeaderboardModel.fromJson(item));
@@ -267,7 +270,7 @@ class _WowLeaderboardState extends State<WowLeaderboard>
                 ),
                 Text(
                   '${list.elementAt(index).userDetails?.name ?? ''}',
-                  style: const TextStyle(color: Colors.brown),
+                  style: const TextStyle(color: Colors.white),
                 )
               ],
             ),
@@ -284,7 +287,7 @@ class _WowLeaderboardState extends State<WowLeaderboard>
                 ),
                 Text(
                   '${list.elementAt(index).diamond ?? ''}',
-                  style: const TextStyle(color: Colors.brown),
+                  style: const TextStyle(color: Colors.grey),
                 )
               ],
             ),

@@ -139,4 +139,5 @@ class API {
   static const String getSilverCoinHistory = '$baseUrl/getSilverCoinHistory';
   static const String getLiveGiftingRecord = '$baseUrl/getLiveGiftingRecord';
   static const String userEnterLiveRoom = '$baseUrl/userEnterLiveRoom';
+  static const String purchaseGoldCoins = '$baseUrl/purchaseGoldCoins';
 }

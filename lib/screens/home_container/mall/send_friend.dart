@@ -129,7 +129,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                     color: friendList.elementAt(index).gender == 'Male'
                         ? Color(0xFF0FDEA5)
                         : Color.fromARGB(255, 245, 97, 250),
@@ -305,7 +305,7 @@ class _SendFriendScreenState extends State<SendFriendScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.pop(context);
                         sendLucky(friend);
                       },
                       style: ElevatedButton.styleFrom(

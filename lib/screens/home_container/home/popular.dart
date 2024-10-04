@@ -79,17 +79,19 @@ class _PopularScreenState extends State<PopularScreen> {
     return Scaffold(
       floatingActionButton: InkWell(
         onTap: () async {
-          Map<String, dynamic> reqBody = {
-            'userId': prefs.getString(PrefsKey.userId),
-          };
-          await apiCallProvider.postRequest(API.getHost, reqBody).then((value) {
-            if (value['success'] == '0') {
-              Navigator.of(context, rootNavigator: true)
-                  .pushNamed(DailySpinScreen.route);
-            } else {
-              showToastMessage(value['message']);
-            }
-          });
+          // Map<String, dynamic> reqBody = {
+          //   'userId': prefs.getString(PrefsKey.userId),
+          // };
+          // await apiCallProvider.postRequest(API.getHost, reqBody).then((value) {
+          //   if (value['success'] == '0') {
+          //     Navigator.of(context, rootNavigator: true)
+          //         .pushNamed(DailySpinScreen.route);
+          //   } else {
+          //     showToastMessage(value['message']);
+          //   }
+          // });
+          Navigator.of(context, rootNavigator: true)
+              .pushNamed(DailySpinScreen.route);
         },
         child: Image.asset(
           'assets/image/spinnwheell.png',

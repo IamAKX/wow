@@ -5,6 +5,8 @@ import 'package:worldsocialintegrationapp/screens/home_container/related/moments
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../daily_spin/daily_spin_screen.dart';
+
 class RelatedScreen extends StatefulWidget {
   const RelatedScreen({super.key});
 
@@ -17,7 +19,10 @@ class _RelatedScreenState extends State<RelatedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: InkWell(
-        onTap: () => {},
+        onTap: () => {
+          Navigator.of(context, rootNavigator: true)
+              .pushNamed(DailySpinScreen.route)
+        },
         child: Image.asset(
           'assets/image/spinnwheell.png',
           width: 60,

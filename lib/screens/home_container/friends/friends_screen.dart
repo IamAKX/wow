@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/main.dart';
+import 'package:worldsocialintegrationapp/models/friend_model.dart';
+import 'package:worldsocialintegrationapp/models/user_profile_detail.dart';
 import 'package:worldsocialintegrationapp/models/visitor_model.dart';
+import 'package:worldsocialintegrationapp/models/wow_leaderboard_model.dart';
 import 'package:worldsocialintegrationapp/utils/prefs_key.dart';
+import 'package:worldsocialintegrationapp/widgets/user_profile_tile.dart';
 
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
@@ -18,7 +22,7 @@ class FriendScreen extends StatefulWidget {
 }
 
 class _FriendScreenState extends State<FriendScreen> {
-  List<VisitorModel> visitorList = [];
+  List<FriendModel> visitorList = [];
   late ApiCallProvider apiCallProvider;
 
   @override
@@ -36,7 +40,7 @@ class _FriendScreenState extends State<FriendScreen> {
       visitorList.clear();
       if (value['details'] != null) {
         for (var item in value['details']) {
-          visitorList.add(VisitorModel.fromJson(item));
+          visitorList.add(FriendModel.fromJson(item));
         }
         setState(() {});
       }
@@ -59,7 +63,7 @@ class _FriendScreenState extends State<FriendScreen> {
     return ListView.builder(
       padding: EdgeInsets.zero,
       itemCount: visitorList.length,
-      itemBuilder: (context, index) => UserTile(
+      itemBuilder: (context, index) => UserProfileTile(
         visitorModel: visitorList.elementAt(index),
       ),
     );

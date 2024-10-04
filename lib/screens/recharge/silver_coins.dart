@@ -141,7 +141,7 @@ class _SilverCoinsState extends State<SilverCoins> {
                           width: 20,
                         ),
                         Text(
-                          coins.elementAt(index).coinValue ?? '0',
+                          coins.elementAt(index).moneyValue ?? '0',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
@@ -154,7 +154,7 @@ class _SilverCoinsState extends State<SilverCoins> {
                             ),
                             horizontalGap(5),
                             Text(
-                              '${coins.elementAt(index).moneyValue ?? '0'}',
+                              '${coins.elementAt(index).coinValue ?? '0'}',
                               style: TextStyle(
                                 fontWeight: FontWeight.normal,
                               ),
