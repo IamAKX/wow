@@ -374,7 +374,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateFormat dateFormat = DateFormat('yy/MM/dd');
+    final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     final DateTime? picked = await showDatePicker(
       context: context,
       helpText: '',

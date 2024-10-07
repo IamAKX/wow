@@ -31,6 +31,7 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
   UserProfileDetail? user;
   List<AgencyModel> agencyModelList = [];
   AgencyModel? selectedAgent;
+  DateTime selectedDate = DateTime.now();
   String country = 'India';
   final TextEditingController nameCtrl = TextEditingController();
   final TextEditingController dateCtrl = TextEditingController();
@@ -244,11 +245,11 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateFormat dateFormat = DateFormat('yy/MM/dd');
+    final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     final DateTime? picked = await showDatePicker(
       context: context,
       helpText: '',
-      initialDate: DateTime.now(),
+      initialDate: selectedDate,
       firstDate: DateTime(1900),
       lastDate: DateTime(2100),
       builder: (context, child) {
@@ -269,8 +270,9 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
         );
       },
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
+        selectedDate = picked;
         dateCtrl.text = dateFormat.format(picked);
       });
     }

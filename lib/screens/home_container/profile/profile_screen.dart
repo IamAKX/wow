@@ -234,6 +234,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'assets/svg/userlevel.svg',
                   width: 20,
                 ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if ((user?.lavelInfomation?.sendLevel ?? '0') != '0')
+                      Container(
+                        width: 50,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                user?.lavelInfomation?.sandBgImage ?? '',
+                              ),
+                              fit: BoxFit.fill),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/image/starlevel.png',
+                              width: 12,
+                            ),
+                            horizontalGap(5),
+                            Text(
+                              '${user?.lavelInfomation?.sendLevel}',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            )
+                          ],
+                        ),
+                      ),
+                    horizontalGap(5),
+                    if ((user?.lavelInfomation?.reciveLevel ?? '0') != '0')
+                      Container(
+                        width: 50,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                user?.lavelInfomation?.reciveBgImage ?? '',
+                              ),
+                              fit: BoxFit.fill),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/image/coins_img.png',
+                              width: 12,
+                            ),
+                            horizontalGap(5),
+                            Text(
+                              '${user?.lavelInfomation?.reciveLevel}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
                 title: const Text(
                   'User Level',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -407,7 +471,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 //       'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}',
                 // ),
                 onTap: () {
-                  _openNativeWebView('https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}');
+                  _openNativeWebView(
+                      'https://xrdsimulators.tech/wow_project/index.php/UserSender?id=${user?.id}&name=${user?.name}');
                 },
               ),
               ListTile(

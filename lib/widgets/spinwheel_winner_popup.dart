@@ -120,19 +120,39 @@ class _SpinwheelWinnerPopupState extends State<SpinwheelWinnerPopup> {
             ),
             Positioned(
               top: 420,
-              left: MediaQuery.of(context).size.width / 2 - 80,
+              left: MediaQuery.of(context).size.width / 2 - 60,
               child: Container(
-                height: 50,
-                width: 130,
+                height: 30,
+                width: 120,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/image/bg_coin_profile.png'),
-                  ),
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.grey),
                 ),
-                child: Text(
-                  '    ${widget.spinDataModel.header ?? ''} ${widget.spinDataModel.subtitle ?? ''}',
-                  style: TextStyle(color: Colors.white),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset(
+                        widget.spinDataModel.subtitle == 'coins'
+                            ? 'assets/image/coins_img.png'
+                            : 'assets/image/new_diamond.png',
+                        width: 15,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${widget.spinDataModel.header ?? ''} ${widget.spinDataModel.subtitle ?? ''}',
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 30,
+                    )
+                  ],
                 ),
               ),
             ),

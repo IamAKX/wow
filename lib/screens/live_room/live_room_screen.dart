@@ -1965,6 +1965,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     alignment: Alignment.centerRight,
                     height: 30,
                     width: 90,
+                    padding: EdgeInsets.only(left: 40),
                     decoration: const BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage(
@@ -1975,11 +1976,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          roomOwner?.familyName ?? '',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
+                        Expanded(
+                          child: Text(
+                            roomOwner?.familyName ?? '',
+                            style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
                           ),
                         ),
                         horizontalGap(5),

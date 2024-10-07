@@ -19,6 +19,8 @@ import '../../utils/prefs_key.dart';
 import '../../widgets/animated_framed_circular_image.dart';
 import '../../widgets/circular_image.dart';
 import '../home_container/chat/chat_screen.dart';
+import '../home_container/profile/profile_detail_screen.dart';
+import '../home_container/user_detail_screen/other_user_detail_screen.dart';
 
 class ProfileBottomsheet extends StatefulWidget {
   const ProfileBottomsheet({
@@ -104,15 +106,28 @@ class _ProfileBottomsheetState extends State<ProfileBottomsheet> {
                       icon: const Icon(Icons.close))
                 ],
               ),
-              frame.isEmpty
-                  ? CircularImage(
-                      imagePath: widget.liveRoomUserModel.image ?? '',
-                      diameter: 80,
-                    )
-                  : AnimatedFramedCircularImage(
-                      imagePath: widget.liveRoomUserModel.image ?? '',
-                      imageSize: 80,
-                      framePath: frame),
+              InkWell(
+                onTap: () {
+                  if (widget.liveRoomUserModel.id ==
+                      prefs.getString(PrefsKey.userId)) {
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(ProfileDeatilScreen.route);
+                  } else {
+                    Navigator.of(context, rootNavigator: true).pushNamed(
+                        OtherUserDeatilScreen.route,
+                        arguments: widget.liveRoomUserModel.id);
+                  }
+                },
+                child: frame.isEmpty
+                    ? CircularImage(
+                        imagePath: widget.liveRoomUserModel.image ?? '',
+                        diameter: 80,
+                      )
+                    : AnimatedFramedCircularImage(
+                        imagePath: widget.liveRoomUserModel.image ?? '',
+                        imageSize: 80,
+                        framePath: frame),
+              ),
               verticalGap(20),
               Text(
                 '${widget.liveRoomUserModel.username}',

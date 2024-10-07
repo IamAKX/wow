@@ -7,9 +7,12 @@ import 'package:worldsocialintegrationapp/screens/income/live_record.dart';
 import 'package:worldsocialintegrationapp/screens/income/withdrawl.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../main.dart';
 import '../../models/user_profile_detail.dart';
 import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
+import '../../utils/prefs_key.dart';
 
 class IncomeChoiceScreen extends StatefulWidget {
   const IncomeChoiceScreen({super.key});
@@ -23,6 +26,7 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
   UserProfileDetail? user;
 
   late ApiCallProvider apiCallProvider;
+  bool isHost = false;
 
   @override
   void initState() {
@@ -33,7 +37,23 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
     });
   }
 
+  void getHost() async {
+    Map<String, dynamic> reqBody = {};
+
+    reqBody['userId'] = prefs.getString(PrefsKey.userId);
+
+    await apiCallProvider.postRequest(API.getHost, reqBody).then((value) async {
+      if (value['success'] == '1') {
+        isHost = true;
+      } else {
+        isHost = false;
+      }
+      setState(() {});
+    });
+  }
+
   void loadUserData() async {
+    getHost();
     await getCurrentUser().then(
       (value) {
         setState(() {
@@ -55,7 +75,18 @@ class _IncomeChoiceScreenState extends State<IncomeChoiceScreen> {
           statusBarBrightness: Brightness.light,
         ),
         title: const Text('Income'),
-        actions: [],
+        actions: [
+          Visibility(
+            visible: isHost,
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true)
+                    .pushNamed(LiveRecord.route);
+              },
+              child: const Text('Live Record'),
+            ),
+          )
+        ],
       ),
       body: getBody(context),
     );

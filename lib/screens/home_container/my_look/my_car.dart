@@ -58,7 +58,7 @@ class _MyCarsState extends State<MyCars> {
               crossAxisCount: 2,
               crossAxisSpacing: 10.0,
               mainAxisSpacing: 10.0,
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.75,
             ),
             itemCount: list.length,
             itemBuilder: (BuildContext context, int index) {

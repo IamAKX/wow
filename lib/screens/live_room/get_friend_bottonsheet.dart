@@ -168,7 +168,7 @@ class _GetFriendBottomsheetState extends State<GetFriendBottomsheet> {
                                     widget.friendList.elementAt(index).id ?? '',
                                     widget.friendList.elementAt(index));
                               }
-                              // Navigator.pop(context);
+                              Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

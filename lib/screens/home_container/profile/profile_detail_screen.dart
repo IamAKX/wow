@@ -624,11 +624,12 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             ),
                             horizontalGap(10),
                           },
-                          // Image.asset(
-                          //   'assets/image/microphoneicon.png',
-                          //   width: 40,
-                          // ),
-
+                          if (user?.agencyStatus ?? false) ...{
+                            Image.asset(
+                              'assets/image/microphoneicon.png',
+                              width: 40,
+                            ),
+                          },
                           Container(
                             alignment: Alignment.centerRight,
                             height: 40,

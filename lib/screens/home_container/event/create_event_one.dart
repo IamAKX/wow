@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:worldsocialintegrationapp/models/create_event.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/event/create_event_two.dart';
+import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 class CreateEventOne extends StatefulWidget {
@@ -17,7 +18,7 @@ class _CreateEventOneState extends State<CreateEventOne> {
   CreateEvent createEvent = CreateEvent(event_Type: 'Themed');
   final TextEditingController topicCtrl = TextEditingController();
   final TextEditingController ruleCtrl = TextEditingController();
-  DateTime eventStartTime = DateTime.now();
+  DateTime eventStartTime = DateTime.now().add(Duration(minutes: 5));
 
   @override
   Widget build(BuildContext context) {
@@ -212,8 +213,8 @@ class _CreateEventOneState extends State<CreateEventOne> {
                 onTap: () async {
                   eventStartTime = await showDateTimePicker(
                           context: context,
-                          firstDate: DateTime.now(),
-                          initialDate: DateTime.now(),
+                          firstDate: eventStartTime,
+                          initialDate: eventStartTime,
                           lastDate: DateTime.now()
                               .add(const Duration(days: 365 * 5))) ??
                       DateTime.now();
@@ -247,6 +248,10 @@ class _CreateEventOneState extends State<CreateEventOne> {
                     ruleCtrl.text.isEmpty)
                 ? null
                 : () {
+                    if (eventStartTime.isBefore(DateTime.now())) {
+                      showToastMessage('Select future date time');
+                      return;
+                    }
                     createEvent.event_topic = topicCtrl.text;
                     createEvent.description = ruleCtrl.text;
                     Navigator.pushReplacementNamed(
