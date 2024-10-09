@@ -35,10 +35,12 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
   String country = 'India';
   final TextEditingController nameCtrl = TextEditingController();
   final TextEditingController dateCtrl = TextEditingController();
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
   @override
   void initState() {
     super.initState();
+    dateCtrl.text = dateFormat.format(DateTime.now());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadSelfUserData();
       loadAgency();
@@ -168,10 +170,10 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
         TextField(
           controller: dateCtrl,
           decoration: const InputDecoration(),
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-            _selectDate(context);
-          },
+          // onTap: () {
+          //   FocusScope.of(context).requestFocus(FocusNode());
+          //   _selectDate(context);
+          // },
           readOnly: true,
         ),
         verticalGap(20),
@@ -245,7 +247,6 @@ class _AnchorRequestScreenState extends State<AnchorRequestScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     final DateTime? picked = await showDatePicker(
       context: context,
       helpText: '',

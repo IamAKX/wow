@@ -14,6 +14,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/family/family_m
 import 'package:worldsocialintegrationapp/screens/home_container/family/family_rule.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invitation_request.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/invite_family_member.dart';
+import 'package:worldsocialintegrationapp/screens/home_container/family/only_invitation.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/other_user_detail_screen.dart';
 import 'package:worldsocialintegrationapp/utils/colors.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
@@ -294,14 +295,25 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
-                        Navigator.of(context, rootNavigator: true)
-                            .pushNamed(InvitationRequestScreen.route,
-                                arguments: familyDetails)
-                            .then(
-                          (value) {
-                            loadFamilyDeatilsData();
-                          },
-                        );
+                        if (familyDetails?.family?.leaderId != user?.id) {
+                          Navigator.of(context, rootNavigator: true)
+                              .pushNamed(InvitationRequestScreen.route,
+                                  arguments: familyDetails)
+                              .then(
+                            (value) {
+                              loadFamilyDeatilsData();
+                            },
+                          );
+                        } else {
+                          Navigator.of(context, rootNavigator: true)
+                              .pushNamed(OnlyInvitationScreen.route,
+                                  arguments: familyDetails)
+                              .then(
+                            (value) {
+                              loadFamilyDeatilsData();
+                            },
+                          );
+                        }
                       },
                       icon: Badge(
                         isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,

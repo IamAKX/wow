@@ -77,6 +77,7 @@ import '../models/whats_on_model.dart';
 import '../screens/home_container/chat/chat_screen.dart';
 import '../screens/home_container/event/create_event_one.dart';
 import '../screens/home_container/explore/wow_leaderboard.dart';
+import '../screens/home_container/family/only_invitation.dart';
 import '../screens/home_container/profile/comment.dart';
 import '../screens/income/bank_details.dart';
 import '../screens/income/diamond_help.dart';
@@ -86,6 +87,7 @@ import '../screens/income/live_record.dart';
 import '../screens/income/withdrawl.dart';
 import '../screens/recharge/billing_record.dart';
 import '../screens/recharge/recharge.dart';
+import '../screens/vip/vip_screen.dart';
 
 class NavRoute {
   static MaterialPageRoute<dynamic> generatedRoute(RouteSettings settings) {
@@ -231,6 +233,12 @@ class NavRoute {
                   familyDetails:
                       (settings.arguments ?? FamilyDetails()) as FamilyDetails,
                 ));
+      case OnlyInvitationScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => OnlyInvitationScreen(
+                  familyDetails:
+                      (settings.arguments ?? FamilyDetails()) as FamilyDetails,
+                ));
       case ReportCategory.route:
         return MaterialPageRoute(
           builder: (_) => ReportCategory(
@@ -279,7 +287,7 @@ class NavRoute {
             builder: (_) => CustomWebview(
                   url: settings.arguments as String,
                 ));
-     
+
       case GiftWallMore.route:
         return MaterialPageRoute(builder: (_) => const GiftWallMore());
       case GiftWall.route:
@@ -322,6 +330,8 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const RechargeScreen());
       case BillingRecord.route:
         return MaterialPageRoute(builder: (_) => const BillingRecord());
+      case VipScreen.route:
+        return MaterialPageRoute(builder: (_) => const VipScreen());
       case '/invite':
         return MaterialPageRoute(builder: (_) => const BankDetails());
       default:

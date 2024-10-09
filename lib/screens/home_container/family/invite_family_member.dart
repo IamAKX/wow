@@ -6,6 +6,7 @@ import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../models/search_family_member.dart';
 import '../../../models/search_user_model.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
@@ -24,7 +25,7 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
   final TextEditingController searchCtrl = TextEditingController();
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
-  List<SearchUserModel> searchList = [];
+  List<SearchFamilyMember> searchList = [];
 
   @override
   void initState() {
@@ -46,12 +47,12 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
 
   void searchUsers(String searchString) {
     Map<String, dynamic> reqBody = {'search': searchString};
-    apiCallProvider.postRequest(API.searchUsers, reqBody).then((value) {
+    apiCallProvider.postRequest(API.searchFriends, reqBody).then((value) {
       searchList.clear();
       showToastMessage(value['message']);
       if (value['details'] != null) {
         for (var item in value['details']) {
-          searchList.add(SearchUserModel.fromJson(item));
+          searchList.add(SearchFamilyMember.fromJson(item));
         }
         setState(() {});
       }
@@ -136,29 +137,33 @@ class _InviteFamilyMemberState extends State<InviteFamilyMember> {
                           imagePath: searchList.elementAt(index).image ?? '',
                           diameter: 50),
                       title: Text(searchList.elementAt(index).name ?? ''),
-                      trailing: InkWell(
-                        onTap: () {
-                          inviteUser(searchList.elementAt(index).id ?? '',
-                              user?.familyId ?? '');
-                        },
-                        child: Container(
-                          width: 90,
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xff2F89D8),
-                                Color(0xffEB0F93),
-                              ],
+                      trailing: Visibility(
+                        visible:
+                            searchList.elementAt(index).isInvitable ?? false,
+                        child: InkWell(
+                          onTap: () {
+                            inviteUser(searchList.elementAt(index).id ?? '',
+                                user?.familyId ?? '');
+                          },
+                          child: Container(
+                            width: 90,
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xff2F89D8),
+                                  Color(0xffEB0F93),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(30.0),
                             ),
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                          child: const Text(
-                            'Invite',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                            child: const Text(
+                              'Invite',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),

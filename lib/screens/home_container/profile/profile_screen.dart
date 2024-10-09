@@ -19,6 +19,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/user_level/user
 import 'package:worldsocialintegrationapp/screens/income/income_Screen.dart';
 import 'package:worldsocialintegrationapp/screens/income/income_screen_choice.dart';
 import 'package:worldsocialintegrationapp/screens/recharge/recharge.dart';
+import 'package:worldsocialintegrationapp/screens/vip/vip_screen.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
 import 'package:worldsocialintegrationapp/utils/generic_api_calls.dart';
 import 'package:worldsocialintegrationapp/widgets/animated_framed_circular_image.dart';
@@ -334,7 +335,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 contentPadding: EdgeInsets.zero,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed(VipScreen.route);
+                },
               ),
               ListTile(
                 leading: SvgPicture.asset(

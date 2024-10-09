@@ -260,11 +260,15 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                   ),
                   title: Row(
                     children: [
-                      Text(
-                        list.elementAt(i).familyName ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                      Expanded(
+                        child: Text(
+                          list.elementAt(i).familyName ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                       horizontalGap(10),
@@ -333,79 +337,74 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 ),
               )
             : (user?.familyJoinStatus ?? false)
-                ? list.any(
-                    (element) => element.id == user?.familyId,
-                  )
-                    ? Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.all(pagePadding / 2),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFFB7945C),
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 10),
-                          leading: BorderedCircularImage(
-                              imagePath: user?.familyImage ?? '',
-                              diameter: 50,
-                              borderColor: const Color(0xFFB7945C),
-                              borderThickness: 2),
-                          onTap: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pushNamed(FamilyScreen.route,
-                                    arguments: FamilyIdModel(
-                                        userId: user?.id,
-                                        familyId: user?.familyId))
-                                .then(
-                              (value) {
-                                loadUserData();
-                                loadFamilyLeaderboard(1);
-                              },
-                            );
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(pagePadding / 2),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFFB7945C),
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 10),
+                      leading: BorderedCircularImage(
+                          imagePath: user?.familyImage ?? '',
+                          diameter: 50,
+                          borderColor: const Color(0xFFB7945C),
+                          borderThickness: 2),
+                      onTap: () {
+                        Navigator.of(context, rootNavigator: true)
+                            .pushNamed(FamilyScreen.route,
+                                arguments: FamilyIdModel(
+                                    userId: user?.id, familyId: user?.familyId))
+                            .then(
+                          (value) {
+                            loadUserData();
+                            loadFamilyLeaderboard(1);
                           },
-                          title: Row(
-                            children: [
-                              Text(
-                                user?.familyName ?? '',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              horizontalGap(10),
-                              Image.asset(
-                                'assets/image/levelbadge.jpeg',
-                                width: 18,
-                              )
-                            ],
-                          ),
-                          subtitle: const Text(
-                            'zzzz',
-                            style: TextStyle(
+                        );
+                      },
+                      title: Row(
+                        children: [
+                          Text(
+                            user?.familyName ?? '',
+                            style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 16,
                             ),
                           ),
-                          trailing: Container(
-                            width: 60,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    'assets/image/family_points_border.png'),
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Image.asset(
-                              'assets/image/fire.png',
-                              width: 9,
-                            ),
+                          horizontalGap(10),
+                          Image.asset(
+                            'assets/image/levelbadge.jpeg',
+                            width: 18,
+                          )
+                        ],
+                      ),
+                      subtitle: const Text(
+                        'zzzz',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: Container(
+                        width: 60,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/image/family_points_border.png'),
                           ),
                         ),
-                      )
-                    : Container()
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          'assets/image/fire.png',
+                          width: 9,
+                        ),
+                      ),
+                    ),
+                  )
                 : Container(
                     width: double.infinity,
                     height: 50,

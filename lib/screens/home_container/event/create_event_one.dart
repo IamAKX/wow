@@ -213,7 +213,7 @@ class _CreateEventOneState extends State<CreateEventOne> {
                 onTap: () async {
                   eventStartTime = await showDateTimePicker(
                           context: context,
-                          firstDate: eventStartTime,
+                          firstDate: DateTime.now(),
                           initialDate: eventStartTime,
                           lastDate: DateTime.now()
                               .add(const Duration(days: 365 * 5))) ??
