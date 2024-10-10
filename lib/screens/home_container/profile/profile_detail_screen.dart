@@ -630,31 +630,33 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                               width: 40,
                             ),
                           },
-                          Container(
-                            alignment: Alignment.centerRight,
-                            height: 40,
-                            width: 90,
-                            padding: const EdgeInsets.all(5),
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/image/family_badge_23.webp',
-                                  ),
-                                  fit: BoxFit.fill),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  user?.familyName ?? '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
+                          if (user?.familyName?.isNotEmpty ?? false) ...{
+                            Container(
+                              alignment: Alignment.centerRight,
+                              height: 40,
+                              width: 90,
+                              padding: const EdgeInsets.all(5),
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                      'assets/image/family_badge_23.webp',
+                                    ),
+                                    fit: BoxFit.fill),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    user?.familyName ?? '',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          }
                         ],
                       ),
                     )

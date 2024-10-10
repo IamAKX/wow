@@ -141,4 +141,5 @@ class API {
   static const String userEnterLiveRoom = '$baseUrl/userEnterLiveRoom';
   static const String purchaseGoldCoins = '$baseUrl/purchaseGoldCoins';
   static const String searchFriends = '$baseUrl/searchFriends';
+  static const String getVipLevelDetails = '$baseUrl/getVipLevelDetails';
 }

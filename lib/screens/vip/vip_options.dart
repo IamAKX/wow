@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shape_of_view_null_safe/shape_of_view_null_safe.dart';
+import 'package:worldsocialintegrationapp/models/vip_model.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
-import '../../widgets/inward_curve_clipper.dart';
-
 class VipOptions extends StatefulWidget {
-  const VipOptions({super.key});
+  const VipOptions({super.key, required this.vipModel});
+  final VipModel vipModel;
 
   @override
   State<VipOptions> createState() => _VipOptionsState();
@@ -40,7 +40,7 @@ class _VipOptionsState extends State<VipOptions> {
                     height: 30,
                     position: ArcPosition.Top),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                   ),
@@ -50,13 +50,13 @@ class _VipOptionsState extends State<VipOptions> {
                         alignment: Alignment.center,
                         height: 50,
                         width: 80,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
                               image:
                                   AssetImage('assets/image/vip_privileges.png'),
                               fit: BoxFit.fill),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Privileges',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
@@ -70,27 +70,52 @@ class _VipOptionsState extends State<VipOptions> {
                                   crossAxisCount: 3,
                                   crossAxisSpacing: 10.0,
                                   mainAxisSpacing: 10.0,
-                                  childAspectRatio: 1.5),
-                          itemCount: 12,
+                                  childAspectRatio: 1.8),
+                          itemCount: widget.vipModel.privilegs?.length ?? 0,
                           itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: () {},
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.punch_clock_outlined,
-                                    size: 30,
-                                    color: Color(0xFFC5A36C),
-                                  ),
-                                  Text(
-                                    'Some text',
-                                    style: TextStyle(
-                                        color: Color(0xFFC5A36C),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  )
-                                ],
+                            Privilegs privilegs =
+                                widget.vipModel.privilegs!.elementAt(index);
+                            return Container(
+                              alignment: Alignment.center,
+                              child: InkWell(
+                                onTap: () {
+                                  showPrivilegePopup(
+                                      privilegs.alertBoxDetails, context);
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CachedNetworkImage(
+                                      imageUrl: privilegs.icon ?? '',
+                                      color: privilegs.isHighlight == '1'
+                                          ? const Color(0xFFC5A36C)
+                                          : Colors.grey,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Center(
+                                        child:
+                                            Text('Error ${error.toString()}'),
+                                      ),
+                                      fit: BoxFit.fitWidth,
+                                      width: 25,
+                                    ),
+                                    verticalGap(10),
+                                    Text(
+                                      privilegs.label ?? '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: privilegs.isHighlight == '1'
+                                              ? const Color(0xFFC5A36C)
+                                              : Colors.grey,
+                                          fontSize: 10),
+                                    )
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -115,20 +140,20 @@ class _VipOptionsState extends State<VipOptions> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '60000 coins / 30 days',
-                            style: TextStyle(
+                            '${widget.vipModel.coins ?? ''} coins / ${widget.vipModel.days ?? ''} days',
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
                           ),
                           Text(
-                            'You are not VIP1',
-                            style: TextStyle(
+                            widget.vipModel.message ?? '',
+                            style: const TextStyle(
                               fontWeight: FontWeight.normal,
                               fontSize: 10,
                             ),
@@ -163,6 +188,104 @@ class _VipOptionsState extends State<VipOptions> {
           ),
         )
       ],
+    );
+  }
+
+  void showPrivilegePopup(
+      AlertBoxDetails? alertBoxDetails, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (alertBoxDetails?.topButton?.isNotEmpty ?? false) ...{
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  child: Text(
+                    alertBoxDetails?.topButton ?? '',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                verticalGap(10),
+              },
+              if (alertBoxDetails?.icon?.isNotEmpty ?? false) ...{
+                CachedNetworkImage(
+                  imageUrl: alertBoxDetails?.icon ?? '',
+                  errorWidget: (context, url, error) => Center(
+                    child: Text('Error ${error.toString()}'),
+                  ),
+                  fit: BoxFit.fitWidth,
+                  width: 50,
+                ),
+                verticalGap(10),
+              },
+              if (alertBoxDetails?.title?.isNotEmpty ?? false) ...{
+                Text(
+                  alertBoxDetails?.title ?? '',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold),
+                ),
+                verticalGap(10),
+              },
+              if (alertBoxDetails?.subtitle?.isNotEmpty ?? false) ...{
+                Text(
+                  alertBoxDetails?.subtitle ?? '',
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold),
+                ),
+              },
+              if (alertBoxDetails?.secondary?.isNotEmpty ?? false) ...{
+                Text(
+                  alertBoxDetails?.secondary ?? '',
+                  style: TextStyle(
+                      color: Color(0xFFC6B06C),
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold),
+                ),
+              },
+              verticalGap(10),
+              if (alertBoxDetails?.buttonText?.isNotEmpty ?? false) ...{
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all(
+                        Color(0xFFA08327),
+                      ), // background color
+                    ),
+                    child: Text(
+                      alertBoxDetails?.buttonText ?? '',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                )
+              }
+            ],
+          ),
+        );
+      },
     );
   }
 }
