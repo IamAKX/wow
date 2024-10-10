@@ -87,6 +87,7 @@ import '../screens/income/live_record.dart';
 import '../screens/income/withdrawl.dart';
 import '../screens/recharge/billing_record.dart';
 import '../screens/recharge/recharge.dart';
+import '../screens/vip/send_vip_to_friend.dart';
 import '../screens/vip/vip_screen.dart';
 
 class NavRoute {
@@ -332,6 +333,11 @@ class NavRoute {
         return MaterialPageRoute(builder: (_) => const BillingRecord());
       case VipScreen.route:
         return MaterialPageRoute(builder: (_) => const VipScreen());
+      case SendVipToFriendScreen.route:
+        return MaterialPageRoute(
+            builder: (_) => SendVipToFriendScreen(
+                  vipType: settings.arguments as String,
+                ));
       case '/invite':
         return MaterialPageRoute(builder: (_) => const BankDetails());
       default:

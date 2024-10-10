@@ -142,4 +142,6 @@ class API {
   static const String purchaseGoldCoins = '$baseUrl/purchaseGoldCoins';
   static const String searchFriends = '$baseUrl/searchFriends';
   static const String getVipLevelDetails = '$baseUrl/getVipLevelDetails';
+  static const String buyVip = '$baseUrl/buyVip';
+  static const String sendVip = '$baseUrl/sendVip';
 }

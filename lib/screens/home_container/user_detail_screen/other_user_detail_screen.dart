@@ -7,14 +7,17 @@ import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/comment_data.dart';
 import 'package:worldsocialintegrationapp/models/firebase_user.dart';
 import 'package:worldsocialintegrationapp/models/report_model.dart';
+import 'package:worldsocialintegrationapp/models/visitor_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/user_detail_screen/report_category.dart';
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/dimensions.dart';
+import 'package:worldsocialintegrationapp/utils/user_profile_details_convertor.dart';
 import 'package:worldsocialintegrationapp/widgets/bordered_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
+import '../../../models/chat_window_model.dart';
 import '../../../models/feed.dart';
 import '../../../models/live_room_detail_model.dart';
 import '../../../models/user_profile_detail.dart';
@@ -27,6 +30,7 @@ import '../../../utils/prefs_key.dart';
 import '../../../widgets/feed_video_player.dart';
 import '../../../widgets/network_image_preview_fullscreen.dart';
 import '../../live_room/live_room_screen.dart';
+import '../chat/chat_window.dart';
 import '../profile/comment.dart';
 
 class OtherUserDeatilScreen extends StatefulWidget {
@@ -182,7 +186,16 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                   ? null
                   : isFriend
                       ? () async {
-                          // Call chat
+                          ChatWindowModel chatWindowModel = ChatWindowModel(
+                              chatWindowId: getChatRoomId(otherUser?.id ?? '',
+                                  prefs.getString(PrefsKey.userId)!),
+                              currentUser: user,
+                              friendUser:
+                                  UserProfileDetailConverter.toVisitorModel(
+                                      otherUser));
+                          Navigator.of(context, rootNavigator: true).pushNamed(
+                              ChatWindow.route,
+                              arguments: chatWindowModel);
                         }
                       : () async {
                           // Call Friend request

@@ -1,8 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shape_of_view_null_safe/shape_of_view_null_safe.dart';
 import 'package:worldsocialintegrationapp/models/vip_model.dart';
+import 'package:worldsocialintegrationapp/screens/vip/send_vip_to_friend.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
+
+import '../../main.dart';
+import '../../providers/api_call_provider.dart';
+import '../../utils/api.dart';
+import '../../utils/helpers.dart';
+import '../../utils/prefs_key.dart';
 
 class VipOptions extends StatefulWidget {
   const VipOptions({super.key, required this.vipModel});
@@ -13,8 +21,11 @@ class VipOptions extends StatefulWidget {
 }
 
 class _VipOptionsState extends State<VipOptions> {
+  late ApiCallProvider apiCallProvider;
+
   @override
   Widget build(BuildContext context) {
+    apiCallProvider = Provider.of<ApiCallProvider>(context);
     return Stack(
       children: [
         CachedNetworkImage(
@@ -162,7 +173,11 @@ class _VipOptionsState extends State<VipOptions> {
                       ),
                       const Spacer(),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                              SendVipToFriendScreen.route,
+                              arguments: widget.vipModel.vipLevel);
+                        },
                         child: const Text('SEND'),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFFC5A36C)),
@@ -171,7 +186,32 @@ class _VipOptionsState extends State<VipOptions> {
                       ),
                       horizontalGap(10),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Purchase Confirmation'),
+                                content: const Text('Do you want to purchase?'),
+                                actions: [
+                                  TextButton(
+                                    child: const Text('Yes'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      buy();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         child: const Text('BUY'),
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(
@@ -212,7 +252,7 @@ class _VipOptionsState extends State<VipOptions> {
                   ),
                   child: Text(
                     alertBoxDetails?.topButton ?? '',
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14.0,
                         fontWeight: FontWeight.bold),
@@ -234,7 +274,7 @@ class _VipOptionsState extends State<VipOptions> {
               if (alertBoxDetails?.title?.isNotEmpty ?? false) ...{
                 Text(
                   alertBoxDetails?.title ?? '',
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black,
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold),
@@ -244,7 +284,7 @@ class _VipOptionsState extends State<VipOptions> {
               if (alertBoxDetails?.subtitle?.isNotEmpty ?? false) ...{
                 Text(
                   alertBoxDetails?.subtitle ?? '',
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold),
@@ -253,7 +293,7 @@ class _VipOptionsState extends State<VipOptions> {
               if (alertBoxDetails?.secondary?.isNotEmpty ?? false) ...{
                 Text(
                   alertBoxDetails?.secondary ?? '',
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Color(0xFFC6B06C),
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold),
@@ -269,12 +309,12 @@ class _VipOptionsState extends State<VipOptions> {
                     },
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(
-                        Color(0xFFA08327),
+                        const Color(0xFFA08327),
                       ), // background color
                     ),
                     child: Text(
                       alertBoxDetails?.buttonText ?? '',
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.black,
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold),
@@ -287,5 +327,16 @@ class _VipOptionsState extends State<VipOptions> {
         );
       },
     );
+  }
+
+  void buy() async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'vipId': widget.vipModel.vipLevel
+    };
+    await apiCallProvider.postRequest(API.buyVip, reqBody).then((value) {
+      showToastMessage(value['message']);
+      Navigator.pop(context);
+    });
   }
 }
