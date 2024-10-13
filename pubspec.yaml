@@ -53,6 +53,7 @@ dependencies:
   jwt_decode: ^0.3.1
   kbspinningwheel: ^1.0.3
   lottie: ^3.1.2
+  material_segmented_control: ^5.0.1
   otp_pin_field: ^1.2.9+1
   path: ^1.9.0
   permission_handler: ^11.3.1

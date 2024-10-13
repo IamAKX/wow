@@ -610,12 +610,13 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             ),
                           ),
                           horizontalGap(5),
-
-                          // Image.asset(
-                          //   'assets/image/vip1img.png',
-                          //   width: 40,
-                          // ),
-                          // horizontalGap(5),
+                          if (user?.vipStatus ?? false) ...{
+                            Image.asset(
+                              'assets/image/vip1img.png',
+                              width: 40,
+                            ),
+                            horizontalGap(5),
+                          },
                           if (user?.coinAgencyCreater ?? false) ...{
                             Image.asset(
                               'assets/image/dollarrr.png',
@@ -624,7 +625,7 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                             ),
                             horizontalGap(10),
                           },
-                          if (user?.agencyStatus ?? false) ...{
+                          if (user?.hostStatus == '2') ...{
                             Image.asset(
                               'assets/image/microphoneicon.png',
                               width: 40,

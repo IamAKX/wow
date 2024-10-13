@@ -30,6 +30,7 @@ import 'package:worldsocialintegrationapp/screens/live_room/hide_liveroom_alert.
 import 'package:worldsocialintegrationapp/screens/live_room/invite_audience_bottom_sheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/live_user_bottom_sheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/lock_room.dart';
+import 'package:worldsocialintegrationapp/screens/live_room/lucky_bag_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/music_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/scoreboard_bottomsheet.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/theme_bottomsheet.dart';
@@ -2930,7 +2931,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => LuckyBagBottomsheet(
+                              roomDetail: roomDetail ??
+                                  JoinableLiveRoomModel(
+                                    id: widget.agoraToken.mainId,
+                                  ),
+                              user: user,
+                              participants: List.from(participants),
+                            ),
+                          );
+                        },
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

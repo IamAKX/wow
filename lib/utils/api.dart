@@ -144,4 +144,9 @@ class API {
   static const String getVipLevelDetails = '$baseUrl/getVipLevelDetails';
   static const String buyVip = '$baseUrl/buyVip';
   static const String sendVip = '$baseUrl/sendVip';
+  static const String createUserSuperLuckyBag =
+      '$baseUrl/createUserSuperLuckyBag';
+  static const String getSuperLuckyBagDetails =
+      '$baseUrl/getSuperLuckyBagDetails';
+  static const String hitLuckyBag = '$baseUrl/hitLuckyBag';
 }

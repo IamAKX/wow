@@ -173,7 +173,7 @@ class _FriendRequestState extends State<FriendRequest> {
   acceptFriendRequestAPI(String friendId) async {
     Map<String, dynamic> reqBody = {
       'userId': prefs.getString(PrefsKey.userId),
-      'friendUserID': friendId
+      'friednRequestId': friendId
     };
     await apiCallProvider
         .postRequest(API.acceptFriendRequest, reqBody)

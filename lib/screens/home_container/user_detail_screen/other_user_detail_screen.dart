@@ -205,7 +205,7 @@ class _OtherUserDeatilScreenState extends State<OtherUserDeatilScreen>
                                   image: user?.image,
                                   name: user?.name,
                                   userId: user?.id,
-                                  userName: user?.name);
+                                  userName: user?.username);
 
                           await FirebaseDbService.addFriendRequest(
                               friendReqestModel, otherUser?.id ?? '');

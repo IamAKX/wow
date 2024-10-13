@@ -247,7 +247,10 @@ class _FamilyScreenState extends State<FamilyScreen> {
               actions: [
                 Visibility(
                   visible: widget.familyIdModel.userId == user?.id &&
-                      familyDetails?.family?.leaderId != user?.id,
+                      familyDetails?.family?.leaderId != user?.id &&
+                      (familyDetails?.allMembers ?? []).any((item) {
+                        return item.id == user?.id;
+                      }),
                   child: IconButton(
                     onPressed: () {
                       showLeaveFamilyPopup(context);
@@ -295,7 +298,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
-                        if (familyDetails?.family?.leaderId != user?.id) {
+                        if (familyDetails?.admin ?? false) {
                           Navigator.of(context, rootNavigator: true)
                               .pushNamed(InvitationRequestScreen.route,
                                   arguments: familyDetails)
