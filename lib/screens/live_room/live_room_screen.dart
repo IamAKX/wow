@@ -21,6 +21,7 @@ import 'package:worldsocialintegrationapp/models/joinable_live_room_model.dart';
 import 'package:worldsocialintegrationapp/models/live_room_music.dart';
 import 'package:worldsocialintegrationapp/models/live_room_user_model.dart';
 import 'package:worldsocialintegrationapp/models/liveroom_chat.dart';
+import 'package:worldsocialintegrationapp/models/super_lucky_bag_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/chat/chat_screen.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/home_container.dart';
 import 'package:worldsocialintegrationapp/screens/live_room/admin_bottomsheet.dart';
@@ -141,17 +142,32 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   void initState() {
     super.initState();
     // Isolate.spawn(getPeriodicReward, _receivePort.sendPort);
-    _timer = Timer.periodic(const Duration(minutes: 10), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      checkSuperLuckyBag();
       if (widget.agoraToken.isSelfCreated ?? false) {
         getSelfRoomReward();
       } else {
         getOtherRoomReward();
       }
     });
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+    _diamondtimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       liveTimeInSec += 30;
       fetchDiamond();
     });
+
+    _superLuckyBagcontroller = AnimationController(
+      duration: const Duration(seconds: 5), // 5-second animation
+      vsync: this,
+    );
+
+    _superLuckyBaganimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_superLuckyBagcontroller!)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              _superLuckyBagcontroller!
+                  .reverse(); // Reverse animation after it completes
+            }
+          });
 
     initAudioPlayer();
 
@@ -809,22 +825,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           resUrl: selectedGift,
                         ),
                       ),
-                    // AnimatedOpacity(
-                    //   opacity: _soundGiftOpacity,
-                    //   duration: const Duration(
-                    //       milliseconds: 500), // Fade-out duration
-                    //   child: Positioned(
-                    //     top: 1,
-                    //     child: Container(
-                    //       width: MediaQuery.of(context).size.width,
-                    //       alignment: Alignment.center,
-                    //       height: MediaQuery.of(context).size.height,
-                    //       child: SVGASimpleImage(
-                    //         resUrl: selectedGift,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
+                    buildSuperBag(),
                   ],
                 ),
               ),
@@ -1151,6 +1152,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
     _diamondtimer?.cancel();
 
     // _musicplayerAnimationController.dispose();
+    _superLuckyBagcontroller?.dispose();
     agoraEngine.leaveChannel();
     agoraEngine.release();
 
@@ -3267,23 +3269,68 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .then((value) {});
   }
 
-  // void _showSnackbarWithImage(String imageLink) {
-  //   log('img = ${imageLink}');
-  //   final snackBar = SnackBar(
-  //     content: SizedBox(
-  //       width: MediaQuery.of(navigatorKey.currentContext!).size.width,
-  //       child: SVGASimpleImage(
-  //         resUrl: imageLink,
-  //       ),
-  //     ),
-  //     duration: Duration(seconds: 5), // Show for 5 seconds
-  //     backgroundColor: Colors
-  //         .transparent, // Transparent background for better image visibility
-  //     behavior: SnackBarBehavior.floating, // Floating Snackbar at the bottom
-  //     elevation: 0, // Remove shadow to focus on the image
-  //   );
+  SuperLuckyBagModel? superLuckyBagModel;
+  checkSuperLuckyBag() async {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+    };
+    apiCallProvider
+        .postRequest(API.getSuperLuckyBagDetails, reqBody)
+        .then((value) async {
+      if (value['success'] == '1') {
+        superLuckyBagModel = SuperLuckyBagModel.fromJson(value['details']);
+        if (superLuckyBagModel?.status == 'live') {
+          initSuperLuckyBagAnimation();
+        }
+        if (mounted) setState(() {});
+      }
+    });
+  }
 
-  //   // Show the SnackBar
-  //   ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackBar);
-  // }
+  AnimationController? _superLuckyBagcontroller;
+  Animation<double>? _superLuckyBaganimation;
+  buildSuperBag() {
+    return _superLuckyBaganimation == null && superLuckyBagModel != null
+        ? SizedBox.shrink()
+        : Positioned(
+            top: 150,
+            left: 50,
+            child: AnimatedBuilder(
+              animation: _superLuckyBaganimation!,
+              builder: (BuildContext context, Widget? child) {
+                return Opacity(
+                  opacity: _superLuckyBaganimation!.value, // Animate opacity
+                  child: child,
+                );
+              },
+              child: InkWell(
+                onTap: () {
+                  hitLuckyBag();
+                },
+                child: Image.asset(
+                  'assets/image/luckygiftimg.png',
+                  width: 40,
+                ),
+              ),
+            ),
+          );
+  }
+
+  void initSuperLuckyBagAnimation() {
+    if (_superLuckyBagcontroller != null) {
+      _superLuckyBagcontroller!.forward();
+    }
+  }
+
+  void hitLuckyBag() {
+    Map<String, dynamic> reqBody = {
+      'userId': prefs.getString(PrefsKey.userId),
+      'luckybagId': superLuckyBagModel?.superLuckyBagDetailsId,
+    };
+    apiCallProvider.postRequest(API.hitLuckyBag, reqBody).then((value) async {
+      if (value['message'] != null) {
+        showToastMessage(value['message']);
+      }
+    });
+  }
 }
