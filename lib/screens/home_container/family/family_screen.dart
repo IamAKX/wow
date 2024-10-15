@@ -294,8 +294,9 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: widget.familyIdModel.userId == user?.id &&
-                      familyDetails?.family?.leaderId == user?.id,
+                  visible: true ||
+                      widget.familyIdModel.userId == user?.id &&
+                          familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
                         if (familyDetails?.admin ?? false) {
@@ -319,8 +320,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         }
                       },
                       icon: Badge(
-                        isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
-                        label: Text('${familyDetails?.totalCount ?? 0}'),
+                        isLabelVisible: (familyDetails?.admin ?? false)
+                            ? (familyDetails?.totalCount ?? 0) > 0
+                            : (familyDetails?.invitationCount ?? 0) > 0,
+                        label: (familyDetails?.admin ?? false)
+                            ? Text('${familyDetails?.totalCount ?? 0}')
+                            : Text('${familyDetails?.invitationCount ?? 0}'),
                         offset: const Offset(0, -10),
                         backgroundColor: Colors.red,
                         child: Image.asset(
@@ -522,7 +527,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                     channelName: list.elementAt(index).channelName,
                     mainId: list.elementAt(index).id,
                     token: list.elementAt(index).rtmToken,
-                    isSelfCreated: false,
+                    isSelfCreated: list.elementAt(index).userId ==
+                        prefs.getString(PrefsKey.userId),
                     roomCreatedBy: list.elementAt(index).userId,
                   );
                   Navigator.of(context, rootNavigator: true)

@@ -56,6 +56,7 @@ import '../../utils/api.dart';
 import '../../utils/generic_api_calls.dart';
 import '../../widgets/audio_wave_painter.dart';
 import '../../widgets/enum.dart';
+import '../../widgets/framed_circular_image.dart';
 import '../home_container/family/family_screen.dart';
 import 'cover_info_bottomsheet.dart';
 import 'edit_announcement.dart';
@@ -225,6 +226,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   }
 
   late StreamSubscription<DatabaseEvent> fbAudAudioSubs;
+  late StreamSubscription<DatabaseEvent> fbEntryEffect;
   void firebaseDetailListners() async {
     database
         .ref('${FirebaseDbNode.liveRoom}/${widget.agoraToken.mainId}')
@@ -259,7 +261,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         participants.clear();
         p.forEach(
           (element) {
-            participants.add(LiveRoomUserModel.fromMap(element));
+            LiveRoomUserModel lrum = LiveRoomUserModel.fromMap(element);
+            participants.add(lrum);
           },
         );
         if (mounted)
@@ -466,6 +469,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       }
     });
 
+    fbEntryEffect = await database
+        .ref(
+            '${FirebaseDbNode.liveRoomEntryEffect}/${widget.agoraToken.mainId}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        if (mounted) {
+          String ee = dataSnapshot.value as String;
+          if (ee.isNotEmpty) {
+            selectedGift = ee;
+            _showSoundGiftImage(selectedGift);
+          }
+        }
+      }
+    });
     database
         .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
         .onValue
@@ -510,7 +529,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           if (selectedGift.endsWith('.svga')) {
             liveRoomExitModel.totalGift =
                 (liveRoomExitModel.totalGift ?? 0) + 1;
-            _showSoundGiftImage();
+            _showSoundGiftImage(selectedGift);
           } else {
             String receiverId = giftMap['receiverId'];
             liveRoomExitModel.totalGift =
@@ -619,9 +638,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
           for (var speaker in speakers) {
             // The local user has uid 0
             if (speaker.uid == 0) {
+              log('Audio ${speaker.volume}');
               LiveRoomFirebase.sendAudioSignal(widget.agoraToken.mainId ?? '',
                   prefs.getString(PrefsKey.userId) ?? '', speaker.volume ?? 0);
-            } else {}
+            } else {
+              log('speaker.uid ${speaker.uid}');
+            }
           }
         },
       ),
@@ -706,6 +728,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .onValue
         .drain();
     fbAudAudioSubs.cancel();
+    fbEntryEffect.cancel();
     await database
         .ref('${FirebaseDbNode.liveRoomMusic}/${widget.agoraToken.mainId}')
         .onValue
@@ -742,6 +765,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         user = value;
         if (widget.agoraToken.isSelfCreated ?? false) cleanUpFirebaseData();
         firebaseDetailListners();
+        LiveRoomFirebase.updateLiveRoomEntryEffect(
+            widget.agoraToken.mainId ?? '', user?.myEntryEffectImageLink ?? '');
         LiveRoomFirebase.updateOnlineStatus(user?.id ?? '', 'Online');
         LiveroomChat liveroomChat = LiveroomChat(
             message: (widget.agoraToken.isSelfCreated ?? false)
@@ -771,6 +796,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   Widget build(BuildContext context) {
     apiCallProvider = Provider.of<ApiCallProvider>(context);
     currentContex = context;
+    log('hotSeatMap : $hotSeatMap');
     return PIPView(
         avoidKeyboard: true,
         builder: (context, isFloating) {
@@ -1519,12 +1545,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
-          crossAxisSpacing: 5,
-          mainAxisSpacing: 5,
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 0,
           childAspectRatio: 0.7),
       itemCount: 8,
       itemBuilder: (context, index) {
         return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             if (hotSeatMap[index + 1] == null)
               InkWell(
@@ -1556,8 +1583,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   }
                 },
                 child: Container(
-                  width: 80,
-                  height: 80,
+                  width: 70,
+                  height: 70,
+                  margin: EdgeInsets.only(bottom: 15, top: 15),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(60),
@@ -1580,8 +1608,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                   } else {}
                 },
                 child: Container(
-                  width: 80,
-                  height: 80,
+                  width: 70,
+                  height: 70,
+                  margin: EdgeInsets.only(bottom: 15, top: 15),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(60),
@@ -1609,8 +1638,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                 },
                 child: Container(
                   alignment: Alignment.center,
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   child: Stack(
                     children: [
                       if (speakingMap
@@ -1624,12 +1653,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                           ),
                         ),
                       Center(
-                        child: CircularImage(
-                            imagePath: hotSeatMap[index + 1]?.image ?? '',
-                            diameter:
-                                (activeUserEmojis.containsKey('${index + 1}'))
+                        child: hotSeatMap[index + 1]?.frame?.isEmpty ?? true
+                            ? CircularImage(
+                                imagePath: hotSeatMap[index + 1]?.image ?? '',
+                                diameter: (activeUserEmojis
+                                        .containsKey('${index + 1}'))
                                     ? 50
-                                    : 70),
+                                    : 70)
+                            : AnimatedFramedCircularImage(
+                                imagePath: hotSeatMap[index + 1]?.image ?? '',
+                                imageSize: (activeUserEmojis
+                                        .containsKey('${index + 1}'))
+                                    ? 50
+                                    : 60,
+                                framePath: hotSeatMap[index + 1]?.frame ?? '',
+                              ),
                       ),
                       if (activeUserEmojis.containsKey('${index + 1}'))
                         Center(
@@ -1853,12 +1891,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                 ),
                               ),
                             Center(
-                              child: CircularImage(
-                                imagePath: roomOwner?.image ?? '',
-                                diameter: (activeUserEmojis.containsKey('-1'))
-                                    ? 50
-                                    : 70,
-                              ),
+                              child: roomOwner?.myFrameImageLink?.isEmpty ??
+                                      true
+                                  ? CircularImage(
+                                      imagePath: roomOwner?.image ?? '',
+                                      diameter:
+                                          (activeUserEmojis.containsKey('-1'))
+                                              ? 50
+                                              : 60,
+                                    )
+                                  : AnimatedFramedCircularImage(
+                                      imagePath: roomOwner?.image ?? '',
+                                      imageSize: 60,
+                                      framePath:
+                                          roomOwner?.myFrameImageLink ?? '',
+                                    ),
                             ),
                             if (activeUserEmojis.containsKey('-1'))
                               Center(
@@ -3229,28 +3276,86 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
 
   bool _isSoundGiftVisible = false; // Start with the image not visible
   double _soundGiftOpacity = 0.0; // Start with opacity 0
+  List<String> _giftQueue = [];
+  bool _isAnimationPlaying =
+      false; // Flag to check if an animation is already playing
 
-  void _showSoundGiftImage() {
+  void _showSoundGiftImage(String newGiftUrl) {
+    // Add the new gift to the queue
+    _giftQueue.add(newGiftUrl);
+
+    // If no animation is currently playing, start the animation
+    if (!_isAnimationPlaying) {
+      _playNextGift();
+    }
+  }
+
+  void _playNextGift() {
+    if (_giftQueue.isEmpty) {
+      _isAnimationPlaying = false; // No more gifts in the queue
+      return;
+    }
+
+    // Get the next gift from the queue
+    selectedGift = _giftQueue.removeAt(0);
+
     setState(() {
-      _isSoundGiftVisible = true; // Set image visibility to true
+      _isSoundGiftVisible = true; // Show the image
       _soundGiftOpacity = 1.0; // Set opacity to fully visible
+      _isAnimationPlaying = true; // Animation is now playing
     });
 
     // Start the timer to hide the image after 5 seconds
     Timer(Duration(seconds: 5), () {
-      // Change the opacity to start the fade-out effect
-      setState(() {
-        _soundGiftOpacity = 0.0; // Start fade-out
-      });
-
-      // After fade-out completes, set the visibility to false
-      Timer(Duration(milliseconds: 500), () {
+      if (mounted) {
         setState(() {
-          _isSoundGiftVisible = false; // Hide the image from the widget tree
+          _soundGiftOpacity = 0.0; // Start fade-out
         });
-      });
+
+        // After fade-out completes, hide the image and play the next gift in the queue
+        Timer(Duration(milliseconds: 500), () {
+          LiveRoomFirebase.removeLiveRoomEntryEffect(
+              widget.agoraToken.mainId ?? '');
+
+          if (mounted) {
+            setState(() {
+              _isSoundGiftVisible =
+                  false; // Hide the image from the widget tree
+            });
+
+            _playNextGift(); // Play the next gift in the queue
+          }
+        });
+      }
     });
   }
+
+  // void _showSoundGiftImage() {
+  //   if (mounted)
+  //     setState(() {
+  //       _isSoundGiftVisible = true; // Set image visibility to true
+  //       _soundGiftOpacity = 1.0; // Set opacity to fully visible
+  //     });
+
+  //   // Start the timer to hide the image after 5 seconds
+  //   Timer(Duration(seconds: 5), () {
+  //     // Change the opacity to start the fade-out effect
+  //     if (mounted)
+  //       setState(() {
+  //         _soundGiftOpacity = 0.0; // Start fade-out
+  //       });
+
+  //     // After fade-out completes, set the visibility to false
+  //     Timer(Duration(milliseconds: 500), () {
+  //       LiveRoomFirebase.removeLiveRoomEntryEffect(
+  //           widget.agoraToken.mainId ?? '');
+  //       if (mounted)
+  //         setState(() {
+  //           _isSoundGiftVisible = false; // Hide the image from the widget tree
+  //         });
+  //     });
+  //   });
+  // }
 
   void cleanUpFirebaseData() async {
     await LiveRoomFirebase.clearChat(

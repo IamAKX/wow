@@ -71,6 +71,19 @@ class LiveRoomFirebase {
     await liveRoomRef.set(message);
   }
 
+  static Future<void> updateLiveRoomEntryEffect(
+      String roomId, String effect) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomEntryEffect}/$roomId');
+    await liveRoomRef.set(effect);
+  }
+
+  static Future<void> removeLiveRoomEntryEffect(String roomId) async {
+    DatabaseReference liveRoomRef =
+        database.ref('${FirebaseDbNode.liveRoomEntryEffect}/$roomId');
+    await liveRoomRef.remove();
+  }
+
   static Future<void> updateLiveRoomTheme(
       String roomId, String themeUrl) async {
     DatabaseReference liveRoomRef =

@@ -6,6 +6,7 @@ class FirebaseDbNode {
   static const String liveRoom = 'liveRoom';
   static const String liveRoomParticipants = 'liveRoomParticipants';
   static const String liveRoomAnnouncement = 'liveRoomAnnouncement';
+  static const String liveRoomEntryEffect = 'liveRoomEntryEffect';
   static const String liveRoomChat = 'liveRoomChat';
   static const String liveRoomTheme = 'liveRoomTheme';
   static const String liveRoomHotSeat = 'liveRoomHotSeat';

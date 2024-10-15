@@ -22,6 +22,8 @@ class LiveRoomUserModel {
   String? reciveExp;
   int? reciveStart;
   int? reciveEnd;
+  String? frame;
+  String? effect;
   LiveRoomUserModel({
     this.id,
     this.username,
@@ -44,6 +46,8 @@ class LiveRoomUserModel {
     this.reciveExp,
     this.reciveStart,
     this.reciveEnd,
+    this.frame,
+    this.effect,
   });
 
   LiveRoomUserModel copyWith({
@@ -68,6 +72,8 @@ class LiveRoomUserModel {
     String? reciveExp,
     int? reciveStart,
     int? reciveEnd,
+    String? frame,
+    String? effect,
   }) {
     return LiveRoomUserModel(
       id: id ?? this.id,
@@ -91,6 +97,8 @@ class LiveRoomUserModel {
       reciveExp: reciveExp ?? this.reciveExp,
       reciveStart: reciveStart ?? this.reciveStart,
       reciveEnd: reciveEnd ?? this.reciveEnd,
+      frame: frame ?? this.frame,
+      effect: effect ?? this.effect,
     );
   }
 
@@ -160,6 +168,12 @@ class LiveRoomUserModel {
     if (reciveEnd != null) {
       result.addAll({'reciveEnd': reciveEnd});
     }
+    if (frame != null) {
+      result.addAll({'frame': frame});
+    }
+    if (effect != null) {
+      result.addAll({'effect': effect});
+    }
 
     return result;
   }
@@ -187,6 +201,8 @@ class LiveRoomUserModel {
       reciveExp: map['reciveExp'],
       reciveStart: map['reciveStart']?.toInt(),
       reciveEnd: map['reciveEnd']?.toInt(),
+      frame: map['frame'],
+      effect: map['effect'],
     );
   }
 
@@ -197,7 +213,7 @@ class LiveRoomUserModel {
 
   @override
   String toString() {
-    return 'LiveRoomUserModel(id: $id, username: $username, usernameID: $usernameID, familyId: $familyId, phone: $phone, image: $image, country: $country, age: $age, gender: $gender, sandColor: $sandColor, sandBgImage: $sandBgImage, sendLevel: $sendLevel, sendExp: $sendExp, sendStart: $sendStart, sendEnd: $sendEnd, reciveColor: $reciveColor, reciveBgImage: $reciveBgImage, reciveLevel: $reciveLevel, reciveExp: $reciveExp, reciveStart: $reciveStart, reciveEnd: $reciveEnd)';
+    return 'LiveRoomUserModel(id: $id, username: $username, usernameID: $usernameID, familyId: $familyId, phone: $phone, image: $image, country: $country, age: $age, gender: $gender, sandColor: $sandColor, sandBgImage: $sandBgImage, sendLevel: $sendLevel, sendExp: $sendExp, sendStart: $sendStart, sendEnd: $sendEnd, reciveColor: $reciveColor, reciveBgImage: $reciveBgImage, reciveLevel: $reciveLevel, reciveExp: $reciveExp, reciveStart: $reciveStart, reciveEnd: $reciveEnd, frame: $frame, effect: $effect)';
   }
 
   @override
@@ -225,7 +241,9 @@ class LiveRoomUserModel {
         other.reciveLevel == reciveLevel &&
         other.reciveExp == reciveExp &&
         other.reciveStart == reciveStart &&
-        other.reciveEnd == reciveEnd;
+        other.reciveEnd == reciveEnd &&
+        other.frame == frame &&
+        other.effect == effect;
   }
 
   @override
@@ -250,6 +268,8 @@ class LiveRoomUserModel {
         reciveLevel.hashCode ^
         reciveExp.hashCode ^
         reciveStart.hashCode ^
-        reciveEnd.hashCode;
+        reciveEnd.hashCode ^
+        frame.hashCode ^
+        effect.hashCode;
   }
 }

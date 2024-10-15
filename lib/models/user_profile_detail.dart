@@ -102,6 +102,8 @@ class UserProfileDetail {
   int? friendCount;
   String? archivedTime;
   LavelInfomation? lavelInfomation;
+  String? myFrameImageLink;
+  String? myEntryEffectImageLink;
 
   UserProfileDetail(
       {this.id,
@@ -206,7 +208,9 @@ class UserProfileDetail {
       this.hostRequest,
       this.friendCount,
       this.archivedTime,
-      this.lavelInfomation});
+      this.lavelInfomation,
+      this.myFrameImageLink,
+      this.myEntryEffectImageLink});
 
   UserProfileDetail.fromMap(Map<String, dynamic> json) {
     id = json['id'];
@@ -318,6 +322,8 @@ class UserProfileDetail {
     lavelInfomation = json['lavelInfomation'] != null
         ? new LavelInfomation.fromMap(json['lavelInfomation'])
         : null;
+    myFrameImageLink = json['myFrameImageLink'];
+    myEntryEffectImageLink = json['myEntryEffectImageLink'];
   }
 
   Map<String, dynamic> toMap() {
@@ -431,6 +437,8 @@ class UserProfileDetail {
     if (this.lavelInfomation != null) {
       data['lavelInfomation'] = this.lavelInfomation!.toMap();
     }
+    data['myFrameImageLink'] = this.myFrameImageLink;
+    data['myEntryEffectImageLink'] = this.myEntryEffectImageLink;
     return data;
   }
 }

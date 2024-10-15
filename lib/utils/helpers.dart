@@ -153,30 +153,33 @@ String getChatTimesAgo(int epochTime) {
   return timeago.format(dateTime, locale: 'en');
 }
 
-LiveRoomUserModel convertUserToLiveUser(UserProfileDetail? user) {
+LiveRoomUserModel convertUserToLiveUser(
+  UserProfileDetail? user,
+) {
   return LiveRoomUserModel(
-    id: user?.id,
-    username: user?.name,
-    usernameID: user?.username,
-    familyId: user?.familyId,
-    phone: user?.phone,
-    image: user?.image,
-    country: user?.country,
-    age: user?.age,
-    gender: user?.gender,
-    sandColor: user?.lavelInfomation?.sandColor,
-    sandBgImage: user?.lavelInfomation?.sandBgImage,
-    sendLevel: user?.lavelInfomation?.sendLevel,
-    sendExp: user?.lavelInfomation?.sendExp,
-    sendStart: user?.lavelInfomation?.sendStart,
-    sendEnd: user?.lavelInfomation?.sendEnd,
-    reciveColor: user?.lavelInfomation?.reciveColor,
-    reciveBgImage: user?.lavelInfomation?.reciveBgImage,
-    reciveLevel: user?.lavelInfomation?.reciveLevel,
-    reciveExp: user?.lavelInfomation?.reciveExp,
-    reciveStart: user?.lavelInfomation?.reciveStart,
-    reciveEnd: user?.lavelInfomation?.reciveEnd,
-  );
+      id: user?.id,
+      username: user?.name,
+      usernameID: user?.username,
+      familyId: user?.familyId,
+      phone: user?.phone,
+      image: user?.image,
+      country: user?.country,
+      age: user?.age,
+      gender: user?.gender,
+      sandColor: user?.lavelInfomation?.sandColor,
+      sandBgImage: user?.lavelInfomation?.sandBgImage,
+      sendLevel: user?.lavelInfomation?.sendLevel,
+      sendExp: user?.lavelInfomation?.sendExp,
+      sendStart: user?.lavelInfomation?.sendStart,
+      sendEnd: user?.lavelInfomation?.sendEnd,
+      reciveColor: user?.lavelInfomation?.reciveColor,
+      reciveBgImage: user?.lavelInfomation?.reciveBgImage,
+      reciveLevel: user?.lavelInfomation?.reciveLevel,
+      reciveExp: user?.lavelInfomation?.reciveExp,
+      reciveStart: user?.lavelInfomation?.reciveStart,
+      reciveEnd: user?.lavelInfomation?.reciveEnd,
+      effect: user?.myEntryEffectImageLink,
+      frame: user?.myFrameImageLink);
 }
 
 Map<int, Object?> convertToObjectMap(Map<int, LiveRoomUserModel?> inputMap) {

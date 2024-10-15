@@ -16,6 +16,7 @@ import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
 import 'family_screen.dart';
 import 'invitation_request.dart';
+import 'only_invitation.dart';
 
 class FamilyLeaderboard extends StatefulWidget {
   const FamilyLeaderboard({super.key});
@@ -89,28 +90,50 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true)
-                    .pushNamed(InvitationRequestScreen.route,
-                        arguments: familyDetails)
-                    .then(
-                  (value) {
-                    loadFamilyDeatilsData(user?.id ?? '', user?.familyId ?? '');
-                  },
-                );
-              },
-              icon: Badge(
-                isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
-                label: Text('${familyDetails?.totalCount ?? 0}'),
-                offset: const Offset(0, -10),
-                backgroundColor: Colors.red,
-                child: Image.asset(
-                  'assets/image/invitation.png',
-                  width: 20,
-                  color: Colors.white,
-                ),
-              )),
+          Visibility(
+            visible: true || familyDetails?.family?.leaderId == user?.id,
+            child: IconButton(
+                onPressed: () {
+                  if (familyDetails?.admin ?? false) {
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(InvitationRequestScreen.route,
+                            arguments: familyDetails)
+                        .then(
+                      (value) {
+                        loadFamilyDeatilsData(
+                            user?.id ?? '', user?.familyId ?? '');
+                      },
+                    );
+                  } else {
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed(OnlyInvitationScreen.route,
+                            arguments: familyDetails)
+                        .then(
+                      (value) {
+                        loadFamilyDeatilsData(
+                            user?.id ?? '', user?.familyId ?? '');
+                      },
+                    );
+                  }
+                },
+                icon: Badge(
+                  // isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
+                  // label: Text('${familyDetails?.totalCount ?? 0}'),
+                  isLabelVisible: (familyDetails?.admin ?? false)
+                      ? (familyDetails?.totalCount ?? 0) > 0
+                      : (familyDetails?.invitationCount ?? 0) > 0,
+                  label: (familyDetails?.admin ?? false)
+                      ? Text('${familyDetails?.totalCount ?? 0}')
+                      : Text('${familyDetails?.invitationCount ?? 0}'),
+                  offset: const Offset(0, -10),
+                  backgroundColor: Colors.red,
+                  child: Image.asset(
+                    'assets/image/invitation.png',
+                    width: 20,
+                    color: Colors.white,
+                  ),
+                )),
+          ),
         ],
         bottom: TabBar(
           controller: _tabController,
