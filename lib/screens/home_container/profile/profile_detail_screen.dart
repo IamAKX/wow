@@ -611,8 +611,8 @@ class _ProfileDeatilScreenState extends State<ProfileDeatilScreen>
                           ),
                           horizontalGap(5),
                           if (user?.vipStatus ?? false) ...{
-                            Image.asset(
-                              'assets/image/vip1img.png',
+                            Image.network(
+                              user?.vipDetails?.vipBatchImage ?? '',
                               width: 40,
                             ),
                             horizontalGap(5),

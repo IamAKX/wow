@@ -550,125 +550,73 @@ class UserLive {
 
 class VipDetails {
   String? id;
-  String? coins;
-  String? batch;
-  String? vipicon;
-  String? uniqueframes;
-  String? entranceeffect;
-  String? getthiscar;
-  String? friends;
-  String? following;
-  String? coinsPerDay;
-  String? colorfullMessage;
-  String? flyingComment;
-  String? hdeCountryAndOnlineTime;
-  String? exclusiveGifts;
-  String? preventFromBeingKicked;
-  String? antiBan;
-  String? valid;
-  String? vipIconImage;
+  String? userId;
+  String? receiverId;
+  String? walletAmount;
+  String? vipLevel;
+  String? purchaseType;
+  String? vipBatchImage;
   String? uniqueFrameImage;
-  String? entranceEffectImage;
-  String? getThisCarImage;
-  String? friendsImage;
-  String? followingFriends;
-  String? coinsImage;
-  String? mainImage;
-  String? colorMessageImage;
+  String? carsImage;
+  String? colorFullMessageImage;
   String? flyingCommentImage;
   String? exclusiveGiftImage;
+  String? vipFrom;
+  String? vipTo;
+  String? isApplied;
 
   VipDetails(
       {this.id,
-      this.coins,
-      this.batch,
-      this.vipicon,
-      this.uniqueframes,
-      this.entranceeffect,
-      this.getthiscar,
-      this.friends,
-      this.following,
-      this.coinsPerDay,
-      this.colorfullMessage,
-      this.flyingComment,
-      this.hdeCountryAndOnlineTime,
-      this.exclusiveGifts,
-      this.preventFromBeingKicked,
-      this.antiBan,
-      this.valid,
-      this.vipIconImage,
+      this.userId,
+      this.receiverId,
+      this.walletAmount,
+      this.vipLevel,
+      this.purchaseType,
+      this.vipBatchImage,
       this.uniqueFrameImage,
-      this.entranceEffectImage,
-      this.getThisCarImage,
-      this.friendsImage,
-      this.followingFriends,
-      this.coinsImage,
-      this.mainImage,
-      this.colorMessageImage,
+      this.carsImage,
+      this.colorFullMessageImage,
       this.flyingCommentImage,
-      this.exclusiveGiftImage});
+      this.exclusiveGiftImage,
+      this.vipFrom,
+      this.vipTo,
+      this.isApplied});
 
   VipDetails.fromMap(Map<String, dynamic> json) {
     id = json['id'];
-    coins = json['coins'];
-    batch = json['batch'];
-    vipicon = json['vipicon'];
-    uniqueframes = json['uniqueframes'];
-    entranceeffect = json['entranceeffect'];
-    getthiscar = json['getthiscar'];
-    friends = json['friends'];
-    following = json['following'];
-    coinsPerDay = json['coinsPerDay'];
-    colorfullMessage = json['colorfullMessage'];
-    flyingComment = json['flyingComment'];
-    hdeCountryAndOnlineTime = json['hdeCountryAndOnlineTime'];
-    exclusiveGifts = json['exclusiveGifts'];
-    preventFromBeingKicked = json['preventFromBeingKicked'];
-    antiBan = json['antiBan'];
-    valid = json['valid'];
-    vipIconImage = json['vipIconImage'];
+    userId = json['userId'];
+    receiverId = json['receiverId'];
+    walletAmount = json['wallet_amount'];
+    vipLevel = json['vipLevel'];
+    purchaseType = json['purchaseType'];
+    vipBatchImage = json['vipBatchImage'];
     uniqueFrameImage = json['uniqueFrameImage'];
-    entranceEffectImage = json['entranceEffectImage'];
-    getThisCarImage = json['getThisCarImage'];
-    friendsImage = json['friendsImage'];
-    followingFriends = json['followingFriends'];
-    coinsImage = json['coinsImage'];
-    mainImage = json['mainImage'];
-    colorMessageImage = json['colorMessageImage'];
+    carsImage = json['carsImage'];
+    colorFullMessageImage = json['colorFullMessageImage'];
     flyingCommentImage = json['flyingCommentImage'];
     exclusiveGiftImage = json['exclusiveGiftImage'];
+    vipFrom = json['vipFrom'];
+    vipTo = json['vipTo'];
+    isApplied = json['isApplied'];
   }
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['coins'] = this.coins;
-    data['batch'] = this.batch;
-    data['vipicon'] = this.vipicon;
-    data['uniqueframes'] = this.uniqueframes;
-    data['entranceeffect'] = this.entranceeffect;
-    data['getthiscar'] = this.getthiscar;
-    data['friends'] = this.friends;
-    data['following'] = this.following;
-    data['coinsPerDay'] = this.coinsPerDay;
-    data['colorfullMessage'] = this.colorfullMessage;
-    data['flyingComment'] = this.flyingComment;
-    data['hdeCountryAndOnlineTime'] = this.hdeCountryAndOnlineTime;
-    data['exclusiveGifts'] = this.exclusiveGifts;
-    data['preventFromBeingKicked'] = this.preventFromBeingKicked;
-    data['antiBan'] = this.antiBan;
-    data['valid'] = this.valid;
-    data['vipIconImage'] = this.vipIconImage;
+    data['userId'] = this.userId;
+    data['receiverId'] = this.receiverId;
+    data['wallet_amount'] = this.walletAmount;
+    data['vipLevel'] = this.vipLevel;
+    data['purchaseType'] = this.purchaseType;
+    data['vipBatchImage'] = this.vipBatchImage;
     data['uniqueFrameImage'] = this.uniqueFrameImage;
-    data['entranceEffectImage'] = this.entranceEffectImage;
-    data['getThisCarImage'] = this.getThisCarImage;
-    data['friendsImage'] = this.friendsImage;
-    data['followingFriends'] = this.followingFriends;
-    data['coinsImage'] = this.coinsImage;
-    data['mainImage'] = this.mainImage;
-    data['colorMessageImage'] = this.colorMessageImage;
+    data['carsImage'] = this.carsImage;
+    data['colorFullMessageImage'] = this.colorFullMessageImage;
     data['flyingCommentImage'] = this.flyingCommentImage;
     data['exclusiveGiftImage'] = this.exclusiveGiftImage;
+    data['vipFrom'] = this.vipFrom;
+    data['vipTo'] = this.vipTo;
+    data['isApplied'] = this.isApplied;
     return data;
   }
 }

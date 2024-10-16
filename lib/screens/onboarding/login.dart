@@ -140,9 +140,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 value['details']['username']);
                             prefs.setString(PrefsKey.familyId,
                                 value['details']['familyId']);
-                            prefs.setString(PrefsKey.loginProvider, 'Phone');
                             prefs.setBool(PrefsKey.showProfileUpdatePopup,
                                 value['details']['name'].toString().isEmpty);
+
+                            // prefs.setString(PrefsKey.userId, "176");
+                            // prefs.setString(PrefsKey.userName, "10269");
+                            // prefs.setString(PrefsKey.familyId, "42");
+                            // prefs.setBool(
+                            //     PrefsKey.showProfileUpdatePopup, false);
+
+                            prefs.setString(PrefsKey.loginProvider, 'Phone');
                             Navigator.of(context, rootNavigator: true)
                                 .pushNamedAndRemoveUntil(
                               HomeContainer.route,

@@ -91,10 +91,13 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Visibility(
-            visible: true || familyDetails?.family?.leaderId == user?.id,
+            visible: true ||
+                (familyDetails?.admin ?? false) ||
+                familyDetails?.family?.leaderId == user?.id,
             child: IconButton(
                 onPressed: () {
-                  if (familyDetails?.admin ?? false) {
+                  if ((familyDetails?.admin ?? false) ||
+                      familyDetails?.family?.leaderId == user?.id) {
                     Navigator.of(context, rootNavigator: true)
                         .pushNamed(InvitationRequestScreen.route,
                             arguments: familyDetails)
@@ -119,7 +122,8 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 icon: Badge(
                   // isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
                   // label: Text('${familyDetails?.totalCount ?? 0}'),
-                  isLabelVisible: (familyDetails?.admin ?? false)
+                  isLabelVisible: (familyDetails?.admin ?? false) ||
+                          familyDetails?.family?.leaderId == user?.id
                       ? (familyDetails?.totalCount ?? 0) > 0
                       : (familyDetails?.invitationCount ?? 0) > 0,
                   label: (familyDetails?.admin ?? false)

@@ -775,6 +775,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
             timeStamp: DateTime.now().millisecondsSinceEpoch,
             userId: user?.id,
             userImage: user?.image,
+            isVip: user?.vipStatus,
             userName: user?.name);
         LiveRoomFirebase.sendChat(widget.agoraToken.mainId ?? '', liveroomChat)
             .then(
@@ -1162,6 +1163,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         message: 'left Stream',
         timeStamp: DateTime.now().millisecondsSinceEpoch,
         userId: user?.id,
+        isVip: user?.vipStatus,
         userImage: user?.image,
         userName: user?.name);
     await LiveRoomFirebase.sendChat(
@@ -1507,10 +1509,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.green, Colors.yellow, Colors.deepOrange],
-          ),
-          // color: const Color(0xFF252526),
+          gradient: (chatContent.isVip ?? false)
+              ? const LinearGradient(
+                  colors: [Colors.green, Colors.yellow, Colors.deepOrange],
+                )
+              : null,
+          color: (chatContent.isVip ?? false) ? null : const Color(0xFF252526),
           border: Border.all(color: Colors.red),
           borderRadius: BorderRadius.circular(10)),
       child: Row(
@@ -1751,6 +1755,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               message: messageCtrl.text,
                               timeStamp: DateTime.now().millisecondsSinceEpoch,
                               userId: user?.id,
+                              isVip: user?.vipStatus,
                               userImage: user?.image,
                               userName: user?.name);
                           LiveRoomFirebase.sendChat(
@@ -2290,6 +2295,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                               '@${user?.name} kicked out @${hotSeatMap[position + 1]?.username}',
                           timeStamp: DateTime.now().millisecondsSinceEpoch,
                           userId: user?.id,
+                          isVip: user?.vipStatus,
                           userImage: user?.image,
                           userName: user?.name);
                       LiveRoomFirebase.sendChat(
@@ -2494,6 +2500,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                       DateTime.now().millisecondsSinceEpoch,
                                   userId: user?.id,
                                   userImage: user?.image,
+                                  isVip: user?.vipStatus,
                                   userName: user?.name),
                             ),
                           );
@@ -2627,6 +2634,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                                       DateTime.now().millisecondsSinceEpoch,
                                   userId: user?.id,
                                   userImage: user?.image,
+                                  isVip: user?.vipStatus,
                                   userName: user?.name),
                             ),
                           );

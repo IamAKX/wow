@@ -6,12 +6,14 @@ class LiveroomChat {
   String? userId;
   String? userName;
   int? timeStamp;
+  bool? isVip;
   LiveroomChat({
     this.message,
     this.userImage,
     this.userId,
     this.userName,
     this.timeStamp,
+    this.isVip,
   });
 
   LiveroomChat copyWith({
@@ -20,6 +22,7 @@ class LiveroomChat {
     String? userId,
     String? userName,
     int? timeStamp,
+    bool? isVip,
   }) {
     return LiveroomChat(
       message: message ?? this.message,
@@ -27,11 +30,12 @@ class LiveroomChat {
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       timeStamp: timeStamp ?? this.timeStamp,
+      isVip: isVip ?? this.isVip,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    final result = <String, dynamic>{};
+  Map<dynamic, dynamic> toMap() {
+    final result = <dynamic, dynamic>{};
 
     if (message != null) {
       result.addAll({'message': message});
@@ -48,6 +52,9 @@ class LiveroomChat {
     if (timeStamp != null) {
       result.addAll({'timeStamp': timeStamp});
     }
+    if (isVip != null) {
+      result.addAll({'isVip': isVip});
+    }
 
     return result;
   }
@@ -59,6 +66,7 @@ class LiveroomChat {
       userId: map['userId'],
       userName: map['userName'],
       timeStamp: map['timeStamp']?.toInt(),
+      isVip: map['isVip'],
     );
   }
 
@@ -69,7 +77,7 @@ class LiveroomChat {
 
   @override
   String toString() {
-    return 'LiveroomChat(message: $message, userImage: $userImage, userId: $userId, userName: $userName, timeStamp: $timeStamp)';
+    return 'LiveroomChat(message: $message, userImage: $userImage, userId: $userId, userName: $userName, timeStamp: $timeStamp, isVip: $isVip)';
   }
 
   @override
@@ -81,7 +89,8 @@ class LiveroomChat {
         other.userImage == userImage &&
         other.userId == userId &&
         other.userName == userName &&
-        other.timeStamp == timeStamp;
+        other.timeStamp == timeStamp &&
+        other.isVip == isVip;
   }
 
   @override
@@ -90,6 +99,7 @@ class LiveroomChat {
         userImage.hashCode ^
         userId.hashCode ^
         userName.hashCode ^
-        timeStamp.hashCode;
+        timeStamp.hashCode ^
+        isVip.hashCode;
   }
 }

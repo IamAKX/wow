@@ -412,12 +412,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 20,
                 ),
                 trailing: Visibility(
-                  visible: (familyDetails?.totalCount ?? 0) > 0,
+                  visible: (((familyDetails?.admin ?? false) ||
+                              familyDetails?.family?.leaderId == user?.id) &&
+                          (familyDetails?.totalCount ?? 0) > 0) ||
+                      (!((user?.familyJoinStatus) ?? true) &&
+                          ((familyDetails?.invitationCount ?? 0) > 0)),
                   child: CircleAvatar(
                     backgroundColor: Colors.red,
                     radius: 10,
                     child: Text(
-                      '${familyDetails?.totalCount ?? 0}',
+                      ((familyDetails?.admin ?? false) ||
+                              familyDetails?.family?.leaderId == user?.id)
+                          ? '${familyDetails?.totalCount ?? 0}'
+                          : '${familyDetails?.invitationCount ?? 0}',
                       style: TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),

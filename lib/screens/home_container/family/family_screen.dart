@@ -295,11 +295,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
                 ),
                 Visibility(
                   visible: true ||
-                      widget.familyIdModel.userId == user?.id &&
-                          familyDetails?.family?.leaderId == user?.id,
+                      (familyDetails?.admin ?? false) ||
+                      familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
-                        if (familyDetails?.admin ?? false) {
+                        if ((familyDetails?.admin ?? false) ||
+                            familyDetails?.family?.leaderId == user?.id) {
                           Navigator.of(context, rootNavigator: true)
                               .pushNamed(InvitationRequestScreen.route,
                                   arguments: familyDetails)
@@ -320,10 +321,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         }
                       },
                       icon: Badge(
-                        isLabelVisible: (familyDetails?.admin ?? false)
+                        isLabelVisible: (familyDetails?.admin ?? false) ||
+                                familyDetails?.family?.leaderId == user?.id
                             ? (familyDetails?.totalCount ?? 0) > 0
                             : (familyDetails?.invitationCount ?? 0) > 0,
-                        label: (familyDetails?.admin ?? false)
+                        label: (familyDetails?.admin ?? false) ||
+                                familyDetails?.family?.leaderId == user?.id
                             ? Text('${familyDetails?.totalCount ?? 0}')
                             : Text('${familyDetails?.invitationCount ?? 0}'),
                         offset: const Offset(0, -10),
