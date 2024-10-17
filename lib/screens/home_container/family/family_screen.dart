@@ -321,12 +321,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         }
                       },
                       icon: Badge(
-                        isLabelVisible: (familyDetails?.admin ?? false) ||
-                                familyDetails?.family?.leaderId == user?.id
-                            ? (familyDetails?.totalCount ?? 0) > 0
-                            : (familyDetails?.invitationCount ?? 0) > 0,
-                        label: (familyDetails?.admin ?? false) ||
-                                familyDetails?.family?.leaderId == user?.id
+                        isLabelVisible: (familyGroupAccess?.isAdmin ?? false) || (familyGroupAccess?.isLeader ?? false),
+                        label: (familyGroupAccess?.isAdmin ?? false) || (familyGroupAccess?.isLeader ?? false)
                             ? Text('${familyDetails?.totalCount ?? 0}')
                             : Text('${familyDetails?.invitationCount ?? 0}'),
                         offset: const Offset(0, -10),
