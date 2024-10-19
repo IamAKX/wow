@@ -237,9 +237,9 @@ class _SendVipToFriendScreenState extends State<SendVipToFriendScreen> {
 
   void sendVip(String otherUserId) async {
     Map<String, dynamic> reqBody = {
-      'senderId': prefs.getString(PrefsKey.userId),
+      'userId': prefs.getString(PrefsKey.userId),
       'receiverId': otherUserId,
-      'vipType': widget.vipType
+      'vipId': widget.vipType
     };
     await apiCallProvider.postRequest(API.sendVip, reqBody).then((value) async {
       showToastMessage(value['message'] ?? '');

@@ -149,4 +149,6 @@ class API {
   static const String getSuperLuckyBagDetails =
       '$baseUrl/getSuperLuckyBagDetails';
   static const String hitLuckyBag = '$baseUrl/hitLuckyBag';
+  static const String getUserInvitationRequestCount =
+      '$baseUrl/getUserInvitationRequestCount';
 }

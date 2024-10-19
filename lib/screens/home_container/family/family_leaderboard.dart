@@ -7,13 +7,16 @@ import 'package:worldsocialintegrationapp/widgets/default_page_loader.dart';
 import 'package:worldsocialintegrationapp/widgets/framed_circular_image.dart';
 import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
+import '../../../main.dart';
 import '../../../models/family_details.dart';
+import '../../../models/family_group_access.dart';
 import '../../../models/family_id_model.dart';
 import '../../../models/family_leaderboard_member.dart';
 import '../../../models/user_profile_detail.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/generic_api_calls.dart';
+import '../../../utils/prefs_key.dart';
 import 'family_screen.dart';
 import 'invitation_request.dart';
 import 'only_invitation.dart';
@@ -34,6 +37,7 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
   List<FamilyLeaderboardMember> list = [];
   UserProfileDetail? user;
   FamilyDetails? familyDetails;
+  FamilyGroupAccess? familyGroupAccess;
 
   @override
   void initState() {
@@ -47,6 +51,19 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       loadFamilyLeaderboard(1);
+      loadFamilyGroupAccess();
+    });
+  }
+
+  loadFamilyGroupAccess() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    await apiCallProvider
+        .postRequest(API.getUserInvitationRequestCount, reqBody)
+        .then((value) async {
+      if (value['details'] != null) {
+        familyGroupAccess = FamilyGroupAccess.fromJson(value['details']);
+        setState(() {});
+      }
     });
   }
 
@@ -96,8 +113,8 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 familyDetails?.family?.leaderId == user?.id,
             child: IconButton(
                 onPressed: () {
-                  if ((familyDetails?.admin ?? false) ||
-                      familyDetails?.family?.leaderId == user?.id) {
+                  if ((familyGroupAccess?.isAdmin ?? false) ||
+                      (familyGroupAccess?.isLeader ?? false)) {
                     Navigator.of(context, rootNavigator: true)
                         .pushNamed(InvitationRequestScreen.route,
                             arguments: familyDetails)
@@ -122,13 +139,19 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                 icon: Badge(
                   // isLabelVisible: (familyDetails?.totalCount ?? 0) > 0,
                   // label: Text('${familyDetails?.totalCount ?? 0}'),
-                  isLabelVisible: (familyDetails?.admin ?? false) ||
-                          familyDetails?.family?.leaderId == user?.id
-                      ? (familyDetails?.totalCount ?? 0) > 0
-                      : (familyDetails?.invitationCount ?? 0) > 0,
-                  label: (familyDetails?.admin ?? false)
-                      ? Text('${familyDetails?.totalCount ?? 0}')
-                      : Text('${familyDetails?.invitationCount ?? 0}'),
+                  isLabelVisible: (((familyGroupAccess?.isAdmin ?? false) ||
+                              (familyGroupAccess?.isLeader ?? false)) &&
+                          ((familyGroupAccess?.requestCount ?? 0) +
+                                  (familyGroupAccess?.invitationCount ?? 0)) >
+                              0) ||
+                      ((!((familyGroupAccess?.isAdmin ?? false) ||
+                              (familyGroupAccess?.isLeader ?? false))) &&
+                          (((familyGroupAccess?.invitationCount ?? 0)) > 0)),
+                  label: ((familyGroupAccess?.isAdmin ?? false) ||
+                          (familyGroupAccess?.isLeader ?? false))
+                      ? Text(
+                          '${((familyGroupAccess?.requestCount ?? 0) + (familyGroupAccess?.invitationCount ?? 0))}')
+                      : Text('${familyGroupAccess?.invitationCount ?? 0}'),
                   offset: const Offset(0, -10),
                   backgroundColor: Colors.red,
                   child: Image.asset(
@@ -498,23 +521,30 @@ class _FamilyLeaderboardState extends State<FamilyLeaderboard>
                         fit: BoxFit.fill),
                   ),
                   alignment: Alignment.center,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      horizontalGap(2),
-                      Image.asset(
-                        'assets/image/fire.png',
-                        width: 14,
-                      )
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        horizontalGap(2),
+                        Image.asset(
+                          'assets/image/fire.png',
+                          width: 14,
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Container(

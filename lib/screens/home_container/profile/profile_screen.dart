@@ -28,6 +28,7 @@ import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
 import '../../../models/family_details.dart';
+import '../../../models/family_group_access.dart';
 import '../../../providers/api_call_provider.dart';
 import '../../../utils/api.dart';
 import '../../../utils/prefs_key.dart';
@@ -46,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String frame = '';
   FamilyDetails? familyDetails;
   late ApiCallProvider apiCallProvider;
+  FamilyGroupAccess? familyGroupAccess;
 
   @override
   void initState() {
@@ -412,21 +414,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 20,
                 ),
                 trailing: Visibility(
-                  visible: (((familyDetails?.admin ?? false) ||
-                              familyDetails?.family?.leaderId == user?.id) &&
-                          (familyDetails?.totalCount ?? 0) > 0) ||
-                      (!((user?.familyJoinStatus) ?? true) &&
-                          ((familyDetails?.invitationCount ?? 0) > 0)),
+                  visible: (((familyGroupAccess?.isAdmin ?? false) ||
+                              (familyGroupAccess?.isLeader ?? false)) &&
+                          ((familyGroupAccess?.requestCount ?? 0) +
+                                  (familyGroupAccess?.invitationCount ?? 0)) >
+                              0) ||
+                      ((!((familyGroupAccess?.isAdmin ?? false) ||
+                              (familyGroupAccess?.isLeader ?? false))) &&
+                          (((familyGroupAccess?.invitationCount ?? 0)) > 0)),
                   child: CircleAvatar(
                     backgroundColor: Colors.red,
                     radius: 10,
-                    child: Text(
-                      ((familyDetails?.admin ?? false) ||
-                              familyDetails?.family?.leaderId == user?.id)
-                          ? '${familyDetails?.totalCount ?? 0}'
-                          : '${familyDetails?.invitationCount ?? 0}',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
-                    ),
+                    child: ((familyGroupAccess?.isAdmin ?? false) ||
+                            (familyGroupAccess?.isLeader ?? false))
+                        ? Text(
+                            '${((familyGroupAccess?.requestCount ?? 0) + (familyGroupAccess?.invitationCount ?? 0))}',
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          )
+                        : Text(
+                            '${familyGroupAccess?.invitationCount ?? 0}',
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          ),
                   ),
                 ),
                 title: const Text(
@@ -632,10 +640,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
     loadFamilyDeatilsData();
+    loadFamilyGroupAccess();
+
     frame = await loadFrame();
     setState(() {});
 
     log('frame = ${frame}');
+  }
+
+  loadFamilyGroupAccess() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    await apiCallProvider
+        .postRequest(API.getUserInvitationRequestCount, reqBody)
+        .then((value) async {
+      if (value['details'] != null) {
+        familyGroupAccess = FamilyGroupAccess.fromJson(value['details']);
+        setState(() {});
+      }
+    });
   }
 
   static const platform = MethodChannel('com.example.webview/native');

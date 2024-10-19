@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:worldsocialintegrationapp/models/family_details.dart';
+import 'package:worldsocialintegrationapp/models/family_group_access.dart';
 import 'package:worldsocialintegrationapp/models/family_id_model.dart';
 import 'package:worldsocialintegrationapp/models/single_family_detail_model.dart';
 import 'package:worldsocialintegrationapp/screens/home_container/family/edit_family.dart';
@@ -53,6 +54,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
   SingleFamilyDetailModel? singleFamilyDetailModel;
   int familyLevel = 0;
   List<FamilyLiveMembers> list = [];
+  FamilyGroupAccess? familyGroupAccess;
 
   @override
   void initState() {
@@ -60,6 +62,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       loadLiveMemebers();
+      loadFamilyGroupAccess();
     });
   }
 
@@ -247,7 +250,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
               actions: [
                 Visibility(
                   visible: widget.familyIdModel.userId == user?.id &&
-                      familyDetails?.family?.leaderId != user?.id &&
+                      !((familyGroupAccess?.isAdmin ?? false) ||
+                          (familyGroupAccess?.isLeader ?? false)) &&
                       (familyDetails?.allMembers ?? []).any((item) {
                         return item.id == user?.id;
                       }),
@@ -263,8 +267,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: widget.familyIdModel.userId == user?.id &&
-                      familyDetails?.family?.leaderId == user?.id,
+                  visible: ((familyGroupAccess?.isAdmin ?? false) ||
+                      (familyGroupAccess?.isLeader ?? false)),
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context, rootNavigator: true)
@@ -299,8 +303,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
                       familyDetails?.family?.leaderId == user?.id,
                   child: IconButton(
                       onPressed: () {
-                        if ((familyDetails?.admin ?? false) ||
-                            familyDetails?.family?.leaderId == user?.id) {
+                        if ((familyGroupAccess?.isAdmin ?? false) ||
+                            (familyGroupAccess?.isLeader ?? false)) {
                           Navigator.of(context, rootNavigator: true)
                               .pushNamed(InvitationRequestScreen.route,
                                   arguments: familyDetails)
@@ -321,10 +325,23 @@ class _FamilyScreenState extends State<FamilyScreen> {
                         }
                       },
                       icon: Badge(
-                        isLabelVisible: (familyGroupAccess?.isAdmin ?? false) || (familyGroupAccess?.isLeader ?? false),
-                        label: (familyGroupAccess?.isAdmin ?? false) || (familyGroupAccess?.isLeader ?? false)
-                            ? Text('${familyDetails?.totalCount ?? 0}')
-                            : Text('${familyDetails?.invitationCount ?? 0}'),
+                        isLabelVisible: (((familyGroupAccess?.isAdmin ??
+                                        false) ||
+                                    (familyGroupAccess?.isLeader ?? false)) &&
+                                ((familyGroupAccess?.requestCount ?? 0) +
+                                        (familyGroupAccess?.invitationCount ??
+                                            0)) >
+                                    0) ||
+                            ((!((familyGroupAccess?.isAdmin ?? false) ||
+                                    (familyGroupAccess?.isLeader ?? false))) &&
+                                (((familyGroupAccess?.invitationCount ?? 0)) >
+                                    0)),
+                        label: ((familyGroupAccess?.isAdmin ?? false) ||
+                                (familyGroupAccess?.isLeader ?? false))
+                            ? Text(
+                                '${((familyGroupAccess?.requestCount ?? 0) + (familyGroupAccess?.invitationCount ?? 0))}')
+                            : Text(
+                                '${familyGroupAccess?.invitationCount ?? 0}'),
                         offset: const Offset(0, -10),
                         backgroundColor: Colors.red,
                         child: Image.asset(
@@ -611,8 +628,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
       if (members.isFamilyLeader == '1' || members.isAdmin == '1') {
         familyMember.add(
           InkWell(
-            onTap: () => showBottomSheet(context, members.userId ?? '',
-                members.isAdmin ?? '', familyDetails?.leaderId == user?.id),
+            onTap: () => showBottomSheet(
+                context,
+                members.userId ?? '',
+                members.isAdmin ?? '',
+                ((familyGroupAccess?.isAdmin ?? false) ||
+                    (familyGroupAccess?.isLeader ?? false))),
             child: CategorizedCircularImage(
                 imagePath: members.userProfileImage ?? '',
                 imageSize: 50,
@@ -624,8 +645,12 @@ class _FamilyScreenState extends State<FamilyScreen> {
       } else {
         familyMember.add(
           InkWell(
-            onTap: () => showBottomSheet(context, members.userId ?? '',
-                members.isAdmin ?? '', familyDetails?.leaderId == user?.id),
+            onTap: () => showBottomSheet(
+                context,
+                members.userId ?? '',
+                members.isAdmin ?? '',
+                ((familyGroupAccess?.isAdmin ?? false) ||
+                    (familyGroupAccess?.isLeader ?? false))),
             child: CircularImage(
               imagePath: members.userProfileImage ?? '',
               diameter: 50,
@@ -778,6 +803,18 @@ class _FamilyScreenState extends State<FamilyScreen> {
         .then((value) async {
       if (value['message'] != null) {
         showToastMessage(value['message']);
+      }
+    });
+  }
+
+  loadFamilyGroupAccess() async {
+    Map<String, dynamic> reqBody = {'userId': prefs.getString(PrefsKey.userId)};
+    await apiCallProvider
+        .postRequest(API.getUserInvitationRequestCount, reqBody)
+        .then((value) async {
+      if (value['details'] != null) {
+        familyGroupAccess = FamilyGroupAccess.fromJson(value['details']);
+        setState(() {});
       }
     });
   }
