@@ -267,8 +267,7 @@ class _FamilyScreenState extends State<FamilyScreen> {
                   ),
                 ),
                 Visibility(
-                  visible: ((familyGroupAccess?.isAdmin ?? false) ||
-                      (familyGroupAccess?.isLeader ?? false)),
+                  visible: ((familyGroupAccess?.isLeader ?? false)),
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context, rootNavigator: true)
