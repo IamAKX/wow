@@ -44,8 +44,10 @@ class _LiveRecordState extends State<LiveRecord> {
     await apiCallProvider
         .postRequest(API.get_user_live_details_by_dates, reqBody)
         .then((value) async {
-      if (value['status'] == '1') {
-        showToastMessage(value['message']);
+      if (value['success'] == '1') {
+        diamonds = '${value['details']['gifts_recieved_today'] ?? 0}';
+        validDays = '${value['details']['valid_days'] ?? 0}';
+        setState(() {});
       }
     });
   }
@@ -82,9 +84,10 @@ class _LiveRecordState extends State<LiveRecord> {
             DateTime? dateTime = await showDatePicker(
                 context: context,
                 firstDate: DateTime(1900),
-                lastDate: DateTime(2500));
+                lastDate: DateTime.now());
             setState(() {
               selectedDate = formatDate(dateTime ?? DateTime.now());
+              loadMonthlyRecord();
             });
           },
           iconAlignment: IconAlignment.end,
@@ -182,7 +185,7 @@ class _LiveRecordState extends State<LiveRecord> {
   }) async {
     initialDate ??= DateTime.now();
     firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
-    lastDate ??= firstDate.add(const Duration(days: 365 * 200));
+    lastDate ??= DateTime.now();
 
     final DateTime? selectedDate = await showDatePicker(
       context: context,
