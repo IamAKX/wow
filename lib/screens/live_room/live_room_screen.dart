@@ -91,6 +91,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
   int totalDiamond = 0;
   String selectedGift = '';
   int friendRequestCount = 0;
+  int unreadCount = 0;
+
+  late StreamSubscription<DatabaseEvent> unreadMsgListner;
   late StreamSubscription<DatabaseEvent> friendRequestListner;
 
   Duration _totalDuration = Duration.zero;
@@ -577,6 +580,35 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         if (mounted) setState(() {});
       }
     });
+
+    unreadMsgListner = database
+        .ref(
+            '${FirebaseDbNode.chatReadReceipt}/${prefs.getString(PrefsKey.userId)}')
+        .onValue
+        .listen((event) async {
+      final readReceiptDataSnapshot = event.snapshot;
+
+      Map<dynamic, dynamic> readReceiptMap = {};
+      unreadCount = 0;
+      if (readReceiptDataSnapshot.exists) {
+        readReceiptMap = readReceiptDataSnapshot.value as Map;
+        log('readReceiptMap : $readReceiptMap');
+        readReceiptMap.forEach((key, value) {
+          if (value is int) {
+            // Ensure the value is an integer or numeric
+            unreadCount += value;
+          }
+        });
+        log('unreadCount : $unreadCount');
+
+        if (mounted) setState(() {});
+      } else {
+        readReceiptMap.clear();
+        log('unreadCount : $unreadCount');
+        unreadCount = 0;
+        if (mounted) setState(() {});
+      }
+    });
   }
 
   void showAudioSignal(String userID, int volume) {
@@ -742,6 +774,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
         .onValue
         .drain();
     friendRequestListner.cancel();
+    unreadMsgListner.cancel();
   }
 
   void loadRoomOwnerData() async {
@@ -1416,8 +1449,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen>
                       );
                     },
                     child: Badge(
-                      isLabelVisible: friendRequestCount > 0,
-                      label: Text('${friendRequestCount}'),
+                      isLabelVisible: friendRequestCount + unreadCount > 0,
+                      label: Text('${friendRequestCount + unreadCount}'),
                       offset: const Offset(0, -5),
                       backgroundColor: Colors.red,
                       child: const CircleAvatar(

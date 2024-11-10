@@ -48,6 +48,7 @@ class _HomeContainerState extends State<HomeContainer> {
     FirebaseDbService.updateOnlineStatus(
         prefs.getString(PrefsKey.userId) ?? '', 'Online');
     firebaseListners();
+    readReciptListner();
     appLinks.uriLinkStream.listen((uri) {
       log('uri deeplink = $uri');
     });
@@ -58,6 +59,7 @@ class _HomeContainerState extends State<HomeContainer> {
     FirebaseDbService.updateOnlineStatus(
         prefs.getString(PrefsKey.userId) ?? '', 'Offline');
     friendRequestListner.cancel();
+    unreadMsgListner.cancel();
     super.dispose();
   }
 
@@ -105,8 +107,8 @@ class _HomeContainerState extends State<HomeContainer> {
               color: bottomNavBarSelectedColor,
             ),
             icon: Badge(
-              isLabelVisible: requestCount > 0,
-              label: Text('${requestCount}'),
+              isLabelVisible: (requestCount + unreadCount) > 0,
+              label: Text('${requestCount + unreadCount}'),
               offset: const Offset(0, -10),
               backgroundColor: Colors.red,
               child: SvgPicture.asset(
@@ -144,21 +146,54 @@ class _HomeContainerState extends State<HomeContainer> {
   }
 
   late StreamSubscription<DatabaseEvent> friendRequestListner;
+  late StreamSubscription<DatabaseEvent> unreadMsgListner;
   int requestCount = 0;
+  int unreadCount = 0;
   void firebaseListners() {
     friendRequestListner = database
         .ref(
             '${FirebaseDbNode.friendRequestList}/${prefs.getString(PrefsKey.userId)}')
         .onValue
         .listen((event) async {
-      final dataSnapshot = event.snapshot;
-
-      if (dataSnapshot.exists) {
-        log('dataSnapshot.children = ${dataSnapshot.children.length}');
-        requestCount = dataSnapshot.children.length;
+      final friendRequestDataSnapshot = event.snapshot;
+      requestCount = 0;
+      if (friendRequestDataSnapshot.exists) {
+        log('dataSnapshot.children = ${friendRequestDataSnapshot.children.length}');
+        requestCount = friendRequestDataSnapshot.children.length;
         if (mounted) setState(() {});
       } else {
         requestCount = 0;
+        if (mounted) setState(() {});
+      }
+    });
+  }
+
+  void readReciptListner() {
+    unreadMsgListner = database
+        .ref(
+            '${FirebaseDbNode.chatReadReceipt}/${prefs.getString(PrefsKey.userId)}')
+        .onValue
+        .listen((event) async {
+      final readReceiptDataSnapshot = event.snapshot;
+
+      Map<dynamic, dynamic> readReceiptMap = {};
+      unreadCount = 0;
+      if (readReceiptDataSnapshot.exists) {
+        readReceiptMap = readReceiptDataSnapshot.value as Map;
+        log('readReceiptMap : $readReceiptMap');
+        readReceiptMap.forEach((key, value) {
+          if (value is int) {
+            // Ensure the value is an integer or numeric
+            unreadCount += value;
+          }
+        });
+        log('unreadCount : $unreadCount');
+
+        if (mounted) setState(() {});
+      } else {
+        readReceiptMap.clear();
+        log('unreadCount : $unreadCount');
+        unreadCount = 0;
         if (mounted) setState(() {});
       }
     });

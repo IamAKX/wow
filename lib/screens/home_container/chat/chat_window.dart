@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -54,6 +55,8 @@ class _ChatWindowState extends State<ChatWindow> {
   late ApiCallProvider apiCallProvider;
   String isOnline = 'Offline';
   static FirebaseDatabase database = FirebaseDatabase.instance;
+  late StreamSubscription<DatabaseEvent> unreadMsgListner;
+  late StreamSubscription<DatabaseEvent> onlineStatusListner;
 
   @override
   void initState() {
@@ -64,7 +67,21 @@ class _ChatWindowState extends State<ChatWindow> {
     Future.delayed(Duration(seconds: 2), () {
       _scrollToBottom();
     });
-    database
+
+    unreadMsgListner = database
+        .ref(
+            '${FirebaseDbNode.chatReadReceipt}/${prefs.getString(PrefsKey.userId)}')
+        .onValue
+        .listen((event) {
+      final dataSnapshot = event.snapshot;
+      if (dataSnapshot.exists) {
+        FirebaseDbService.removeUnreadChatCount(
+            prefs.getString(PrefsKey.userId) ?? '0',
+            widget.chatWindowDetails.chatWindowId ?? '0');
+      }
+    });
+
+    onlineStatusListner = database
         .ref(
             '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
         .onValue
@@ -85,11 +102,13 @@ class _ChatWindowState extends State<ChatWindow> {
     recorderController.dispose();
     // FirebaseDbService.updateOnlineStatus(
     //     widget.chatWindowDetails.currentUser?.id ?? '', 'Offline');
-    database
-        .ref(
-            '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
-        .onValue
-        .drain();
+    unreadMsgListner.cancel();
+    // database
+    //     .ref(
+    //         '${FirebaseDbNode.onlineStatus}/${widget.chatWindowDetails.friendUser?.id}')
+    //     .onValue
+    //     .drain();
+    onlineStatusListner.cancel();
     super.dispose();
   }
 
@@ -288,6 +307,9 @@ class _ChatWindowState extends State<ChatWindow> {
                             widget.chatWindowDetails.chatWindowId ?? '', chat)
                         .then(
                       (value) {
+                        FirebaseDbService.addUnreadChatCount(
+                            widget.chatWindowDetails.friendUser?.id ?? '',
+                            widget.chatWindowDetails.chatWindowId ?? '');
                         textCtrl.text = '';
                         _scrollToBottom();
                       },

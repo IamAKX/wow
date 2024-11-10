@@ -151,4 +151,48 @@ class FirebaseDbService {
       return false;
     }
   }
+
+  static Future<void> addUnreadChatCount(
+      String userId, String chatWindow) async {
+    DatabaseReference chatReadReceipt =
+        database.ref('${FirebaseDbNode.chatReadReceipt}/$userId');
+    DataSnapshot snapshot = await chatReadReceipt.get();
+    Map<dynamic, dynamic> map = {};
+    if (snapshot.exists) {
+      map = snapshot.value as Map<dynamic, dynamic>;
+      log("map -> $map");
+    }
+    if (map.containsKey(chatWindow) && null != map[chatWindow]) {
+      map[chatWindow] = map[chatWindow] + 1;
+    } else {
+      map[chatWindow] = 1;
+    }
+    Map<String, Object?> typedMap = Map<String, Object?>.from(map);
+    chatReadReceipt.update(typedMap);
+  }
+
+  static Future<void> removeUnreadChatCount(
+      String userId, String chatWindow) async {
+    DatabaseReference chatReadReceipt =
+        database.ref('${FirebaseDbNode.chatReadReceipt}/$userId');
+    DataSnapshot snapshot = await chatReadReceipt.get();
+    Map<String, Object?> map = {};
+    if (snapshot.exists) {
+      // Convert the dynamic map to a typed map right after retrieving it.
+      map = Map<String, Object?>.from(snapshot.value as Map<dynamic, dynamic>);
+    }
+
+    // Remove the chat window key if it exists.
+    if (map.containsKey(chatWindow)) {
+      map.remove(chatWindow);
+    }
+
+    log("map -> $map");
+    // Update the database with the modified map.
+    if (map.isEmpty) {
+      await chatReadReceipt.remove();
+    } else {
+      await chatReadReceipt.update(map);
+    }
+  }
 }

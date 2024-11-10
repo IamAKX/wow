@@ -11,6 +11,7 @@ import 'package:worldsocialintegrationapp/screens/home_container/chat/friend_req
 import 'package:worldsocialintegrationapp/services/firebase_db_service.dart';
 import 'package:worldsocialintegrationapp/utils/helpers.dart';
 import 'package:worldsocialintegrationapp/widgets/circular_image.dart';
+import 'package:worldsocialintegrationapp/widgets/gaps.dart';
 
 import '../../../main.dart';
 import '../../../models/user_profile_detail.dart';
@@ -36,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late ApiCallProvider apiCallProvider;
   UserProfileDetail? user;
   Map<String, bool> onlineMap = {};
+  Map<dynamic, dynamic> readReceiptMap = {};
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserData();
       loadSelfUserData();
+      readReciptListner();
     });
   }
 
@@ -123,6 +126,22 @@ class _ChatScreenState extends State<ChatScreen> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (readReceiptMap.containsKey(getChatRoomId(
+                            list.elementAt(index).id ?? '0',
+                            prefs.getString(PrefsKey.userId)!)) &&
+                        readReceiptMap[(getChatRoomId(
+                                list.elementAt(index).id ?? '0',
+                                prefs.getString(PrefsKey.userId)!))] !=
+                            0) ...{
+                      CircleAvatar(
+                          backgroundColor: Colors.red,
+                          radius: 10,
+                          child: Text(
+                            '${readReceiptMap[(getChatRoomId(list.elementAt(index).id ?? '0', prefs.getString(PrefsKey.userId)!))]}',
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          )),
+                      horizontalGap(10),
+                    },
                     if (onlineMap[list.elementAt(index).id] ?? false)
                       const Icon(
                         Icons.circle,
@@ -140,7 +159,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       currentUser: user,
                       friendUser: list.elementAt(index));
                   Navigator.of(context, rootNavigator: true)
-                      .pushNamed(ChatWindow.route, arguments: chatWindowModel);
+                      .pushNamed(ChatWindow.route, arguments: chatWindowModel)
+                      .then(
+                    (value) {
+                      triggerReadReciptListnerManually();
+                    },
+                  );
                 }),
             separatorBuilder: (context, index) => const Divider(
                   color: hintColor,
@@ -151,6 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   late StreamSubscription<DatabaseEvent> friendRequestListner;
+  late StreamSubscription<DatabaseEvent> unreadMsgListner;
   int requestCount = 0;
   static FirebaseDatabase database = FirebaseDatabase.instance;
 
@@ -170,6 +195,40 @@ class _ChatScreenState extends State<ChatScreen> {
         if (mounted) setState(() {});
       }
     });
+  }
+
+  void readReciptListner() {
+    unreadMsgListner = database
+        .ref(
+            '${FirebaseDbNode.chatReadReceipt}/${prefs.getString(PrefsKey.userId)}')
+        .onValue
+        .listen((event) async {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.exists) {
+        readReceiptMap = dataSnapshot.value as Map;
+        log('readReceiptMap : $readReceiptMap');
+        if (mounted) setState(() {});
+      } else {
+        readReceiptMap.clear();
+        if (mounted) setState(() {});
+      }
+    });
+  }
+
+  Future<void> triggerReadReciptListnerManually() async {
+    log('clearing read recipt manually');
+    DatabaseReference chatReadReceiptRef = database.ref(
+        '${FirebaseDbNode.chatReadReceipt}/${prefs.getString(PrefsKey.userId)}');
+    DataSnapshot dataSnapshot = await chatReadReceiptRef.get();
+    if (dataSnapshot.exists) {
+      readReceiptMap = dataSnapshot.value as Map<dynamic, dynamic>;
+      log('readReceiptMap : $readReceiptMap');
+      if (mounted) setState(() {});
+    } else {
+      readReceiptMap.clear();
+      if (mounted) setState(() {});
+    }
   }
 
   Future<void> getOnlineStatus() async {
