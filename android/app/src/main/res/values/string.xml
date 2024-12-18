@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">1066196318458159</string>
+    <string name="facebook_client_token">3529a46a6cfafb7a7841e58e1504ef2f</string>
+    <string name="snapchat_client_id">cdf9620f-3b98-4c87-8153-7c9965ea75d3</string>
+    <string name="snapchat_redirect_url">wows://oauth/snapchat</string>
+</resources>

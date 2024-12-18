@@ -1,0 +1,7 @@
+<resources>
+    <color name="colorPrimary">#FFFFFF</color> <!-- Purple -->
+    <color name="colorPrimaryDark">#FFFFFF</color> <!-- Dark Purple -->
+    <color name="colorAccent">#FFFFFF</color> <!-- Teal -->
+    <color name="backgroundColor">#FFFFFF</color> <!-- White -->
+    <color name="textColor">#000000</color> <!-- Black -->
+</resources>

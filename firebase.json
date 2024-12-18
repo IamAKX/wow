@@ -1,0 +1,33 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "wowcross-d1bf1",
+          "appId": "1:102730474815:android:19859ecace9a3f49d6df8a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "wowcross-d1bf1",
+          "appId": "1:102730474815:ios:46c84deb9ba72507d6df8a",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "wowcross-d1bf1",
+          "configurations": {
+            "android": "1:102730474815:android:19859ecace9a3f49d6df8a",
+            "ios": "1:102730474815:ios:46c84deb9ba72507d6df8a"
+          }
+        }
+      }
+    }
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}
